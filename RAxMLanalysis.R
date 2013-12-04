@@ -1,0 +1,307 @@
+###################################################
+########## Load functions, trees, & data ##########
+###################################################
+
+library(ape)
+library(phangorn)
+source("~/Dropbox/UWstuff/phrynomics/Analyses/Rcode/PhrynoNucCodes.R")
+
+
+# Load RAxML Trees
+analysis <- "RAxML"
+setwd("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/RAxMLResults")
+trees <- system("ls RAxML_bipartitions.*", intern=T)  #trees with bootstrap support
+TreeList <- CreateTreeList(trees, "RAxML")
+treeMatrix <- CreateTreeMatrix(trees)
+
+
+# Load MrBayes Trees
+analysis <- "MrBayes"
+setwd("~/Dropbox/UWstuff/phrynomics/Analyses/MrBayesRuns/MrBayesResults")
+trees <- system("ls *.con.tre", intern=T)  
+TreeList <- CreateTreeList(trees, "MrBayes")
+treeMatrix <- CreateTreeMatrix(trees)
+
+
+setwd("~/Dropbox/UWstuff/phrynomics/Analyses/Figs")
+
+
+###################################################
+######## Get whole-tree distance metrics ##########
+###################################################
+
+# Add whole-tree metrics (phangorn) data to the tree matrix
+treeMatrix2 <- AddTreeDist(treeMatrix, TreeList)
+# Add whole-tree metrics (Kuhner & Felsenstein; Kscore) data to tree matrix 
+treeMatrix3 <- AddBLD(treeMatrix2, TreeList)
+
+
+# Plot some whole tree measures
+missingData <- as.numeric(sapply(rownames(treeMatrix3), function (x) strsplit(x, "\\D")[[1]][2]))
+layout(matrix(1:3, nrow=1, byrow=TRUE), respect=TRUE)
+plot(missingData, treeMatrix3$symmetric.difference, pch=21, bg="gray", main="Symmetric Difference")
+plot(missingData, treeMatrix3$quadratic.path.difference, pch=21, bg="gray", main="Quadratic Path Difference")
+plot(missingData, treeMatrix3$Kscore, pch=21, bg="gray", main="Kscore")
+
+
+
+###################################################
+## Compare Homologous branch lengths and support ##
+###################################################
+
+# Homologous Branch Comparisons between ASC & GTR trees
+BL.AllTrees <- list()
+for(i in sequence(dim(treeMatrix)[1])) {
+  tree1 <- assTrees(treeMatrix3[i,1], TreeList)[[1]]
+  tree2 <- assTrees(treeMatrix3[i,2], TreeList)[[1]]
+  BL.AllTrees[[i]] <- MakeBranchLengthMatrix(tree1, tree2, analysis=analysis, dataset=rownames(treeMatrix)[i])
+  names(BL.AllTrees)[[i]] <- rownames(treeMatrix)[i]
+}
+
+
+
+# Plotting ASC trees with colored branches
+if(analysis == "RAxML")
+  orderToGo <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+if(analysis == "MrBayes")
+  orderToGo <- c("c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3")
+
+RAxMLresults <- GetRAxMLStatsPostAnalysis("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/RAxMLResults")
+#MrBayesresults <- GetMrBayesStatsPostAnalysis("")
+for(i in sequence(length(orderToGo))){
+  letters <- c("a","b","c","d","e","f","g","h","i","j","k","l","m","n")
+  dataToUse <- which(rownames(treeMatrix) == orderToGo[i])
+  pdf(file=paste(analysis, ".", rownames(treeMatrix)[dataToUse], "trees.pdf", sep=""), width=8.5, height=11)
+  tree1 <- assTrees(treeMatrix3[dataToUse,1], TreeList)[[1]]
+  tree2 <- assTrees(treeMatrix3[dataToUse,2], TreeList)[[1]]
+  plot(tree1, edge.lty=BL.AllTrees[[dataToUse]]$edgelty, edge.color=BL.AllTrees[[dataToUse]]$edgeColor, cex=0.5, edge.width=2)
+  legtxt <- c("Discordant", "< -10%", "-10% to 10%", "> 10%", "> 20%", "> 30%", "> 40%", "> 50%")
+  legcolors <- c("gray", rgb(51,51,255, max=255), "gray", rgb(255,255,102, max=255), rgb(255,178,102, max=255), rgb(225,128,0, max=255), rgb(225,0,0, max=255), rgb(153,0,0, max=255))
+  legend("bottomleft", legend=legtxt, col=legcolors, lty=c(2,rep(1,7)), lwd=2, merge = TRUE, bty="n", xjust=1, inset=0.02, cex=0.75, title=expression(underline("Branchlength Difference"))) 
+  nodelabels(c(NA, BL.AllTrees[[dataToUse]]$support[which(BL.AllTrees[[dataToUse]]$class == "internal")]), cex=0.5, col="black", bg="white", frame="none", adj=c(1.1, -0.1))
+  nodelabels(c(NA, BL.AllTrees[[dataToUse]]$corr.support[which(BL.AllTrees[[dataToUse]]$class == "internal")]), cex=0.5, col="black", bg="white", frame="none", adj=c(1.1, 1.1))
+  if(analysis == "RAxML"){
+    bquote1 <- bquote(bold("Supplemental Figure S1" * .(letters[i]) * ".") * " Maximum likelihood phylogeny for the ascertainment-corrected dataset s" * .(strsplit(orderToGo[i], "\\D")[[1]][2]) ~ "(" * .(makeNumberwithcommas(RAxMLresults[which(RAxMLresults$Level == orderToGo[i]), 4][1])) ~ "variable sites," ~ "\n" )
+    bquote2 <- bquote(.(unique(RAxMLresults[which(RAxMLresults$Level == orderToGo[i]), 6])) * "% missing data). Bootstrap values are shown on nodes (ascertainment-corrected above, no correction below). Branch")
+    bquote3 <- bquote("color coding reflects the degree of relative length difference between ascertainment and non-ascertainment estimates.")
+  }
+  if(analysis == "MrBayes"){
+    bquote1 <- bquote(bold("Supplemental Figure S2" * .(letters[i]) * ".") * " Bayesian consensus phylogeny for the ascertainment-corrected dataset s" * .(strsplit(orderToGo[i], "\\D")[[1]][2]) ~ "(" * .(makeNumberwithcommas(RAxMLresults[which(RAxMLresults$Level == orderToGo[i]), 4][1])) ~ "variable sites," ~ "\n" )
+    bquote2 <- bquote(.(unique(RAxMLresults[which(RAxMLresults$Level == orderToGo[i]), 6])) * "% missing data). Posterior probability values are shown on nodes (ascertainment-corrected above, no correction below). Branch")
+    bquote3 <- bquote("color coding reflects the degree of relative length difference between ascertainment and non-ascertainment estimates.")
+  }
+  mtext(bquote1, side=3, cex=.75, adj=c(0), line=2)
+  mtext(bquote2, side=3, cex=.75, adj=c(0), line=1)
+  mtext(bquote3, side=3, cex=.75, adj=c(0), line=0)
+  dev.off()
+}
+
+
+
+# Branch length density plots for paper
+pdf(file="densityPlots.pdf", width=8.5, height=5)
+op <- par(mar=par("mar")/1.7)
+layout(matrix(c(1:4), nrow=1, byrow=TRUE), respect=TRUE)
+#whichDatasets <- c("c5p3", "c25p3", "c45p3", "c65p3")
+whichDatasets <- c("c10p3", "c25p3", "c35p3", "c45p3")  #works for MrBayes trials too
+
+for(i in sequence(length(whichDatasets))){
+  dataToUse <- which(whichDatasets[i] == names(BL.AllTrees))
+  BLs <- BL.AllTrees[[dataToUse]]$branchlength[which(BL.AllTrees[[dataToUse]]$present)]
+  corr.BLs <- BL.AllTrees[[dataToUse]]$corr.BL[which(BL.AllTrees[[dataToUse]]$present)]
+  maxy <- max(density(BLs)$y, density(corr.BLs)$y)
+  maxx <- max(density(BLs)$x, density(corr.BLs)$x)
+  plot(density(BLs), type="n", main="", frame=F, xlim=c(0, 0.35), ylim=c(0,160))
+  lines(density(BLs), lwd=1, col="blue")
+  lines(density(corr.BLs), lty=1, lwd=1)
+  title(main=paste("s", strsplit(whichDatasets[[i]], "\\D")[[1]][2], sep=""))
+}
+dev.off()
+
+# Branch length density plots for supplement
+pdf(file="all.densityPlots.pdf", width=8.5, height=11)
+op <- par(mar=par("mar")/1.7)
+layout(matrix(c(1:16), nrow=4, byrow=TRUE), respect=TRUE)
+whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+for(i in sequence(length(whichDatasets))){
+  dataToUse <- which(whichDatasets[i] == names(BL.AllTrees))
+  BLs <- BL.AllTrees[[dataToUse]]$branchlength[which(BL.AllTrees[[dataToUse]]$present)]
+  corr.BLs <- BL.AllTrees[[dataToUse]]$corr.BL[which(BL.AllTrees[[dataToUse]]$present)]
+  maxy <- max(density(BLs)$y, density(corr.BLs)$y)
+  maxx <- max(density(BLs)$x, density(corr.BLs)$x)
+  plot(density(BLs), type="n", main="", frame=F, xlim=c(0, 0.35), ylim=c(0,160))
+  #leg.txt <- c("ASC", "GTR")
+  #legend("topright", legend=leg.txt, text.col=c(rgb(1,0,0,0.3), rgb(0,0,1,0.3)), merge = TRUE, bty="n", xjust=1, inset=0.02) 
+  #legend("topright", legend=leg.txt, lwd=1, lty=1:2, merge = TRUE, bty="n", xjust=1, inset=0.02) 
+  lines(density(BLs), lwd=1, col="blue")
+  lines(density(corr.BLs), lty=1, lwd=1)
+  #polygon(density(BLs), col=rgb(0,0,0,.3), border=NA)
+  #polygon(density(corr.BLs), col=rgb(0,0,1,.3), border=NA)
+  title(main=paste("s", strsplit(whichDatasets[[i]], "\\D")[[1]][2], sep=""))
+}
+dev.off()
+
+# Branch length scatter plots for paper
+usr2dev <- function(x) 180/pi*atan(x*diff(par("usr")[1:2])/diff(par("usr")[3:4]))
+getX <- function(y, linmod) (y-linmod$coefficients[1])/linmod$coefficients[2]  #(y -b)/m = x
+pdf(file="ScatterPlots.pdf", width=8.5, height=5)
+op <- par(mar=par("mar")/1.7)
+layout(matrix(1:4, nrow=1, byrow=TRUE), respect=TRUE)  
+#whichDatasets <- c("c5p3", "c25p3", "c45p3", "c65p3")
+whichDatasets <- c("c10p3", "c25p3", "c35p3", "c45p3")  #works for MrBayes trials too
+
+for(i in sequence(length(whichDatasets))){
+  dataToUse <- which(whichDatasets[i] == names(BL.AllTrees))
+  BLs <- BL.AllTrees[[dataToUse]]$branchlength[which(BL.AllTrees[[dataToUse]]$present)]
+  corr.BLs <- BL.AllTrees[[dataToUse]]$corr.BL[which(BL.AllTrees[[dataToUse]]$present)]
+  plot(BLs, corr.BLs, pch=21, bg="gray", ylim=c(0, 0.22), xlim=c(0, 0.22), xlab="ASC", ylab="non-ASC", type="n")
+  linmod <- lm(corr.BLs ~ BLs)
+  abline(linmod, lty=2)
+  y <- 0.18
+  points(getX(y, linmod), y, col="white", pch=21, bg="white", cex=12, crt=usr2dev(linmod$coefficients[2]))
+  points(BLs, corr.BLs, pch=21, bg="gray")
+  text(x=getX(y, linmod), y=y, paste("m =", round(linmod$coefficients[2], digits=2)), srt=usr2dev(linmod$coefficients[2]))
+  lines(c(-1,1), c(-1,1))
+  title(main=paste("s", strsplit(whichDatasets[[i]], "\\D")[[1]][2], sep=""))
+}
+dev.off()
+
+# Branch length scatter plots for supplement
+usr2dev <- function(x) 180/pi*atan(x*diff(par("usr")[1:2])/diff(par("usr")[3:4]))
+getX <- function(y, linmod) (y-linmod$coefficients[1])/linmod$coefficients[2]  #(y -b)/m = x
+pdf(file="all.ScatterPlots.pdf", height=11, width=8.5)
+op <- par(mar=par("mar")/1.7)
+layout(matrix(1:16, nrow=4, byrow=TRUE), respect=TRUE)  
+whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+for(i in sequence(length(whichDatasets))){
+  dataToUse <- which(whichDatasets[i] == names(BL.AllTrees))
+  BLs <- BL.AllTrees[[dataToUse]]$branchlength[which(BL.AllTrees[[dataToUse]]$present)]
+  corr.BLs <- BL.AllTrees[[dataToUse]]$corr.BL[which(BL.AllTrees[[dataToUse]]$present)]
+  plot(BLs, corr.BLs, pch=21, bg="gray", ylim=c(0, 0.22), xlim=c(0, 0.22), xlab="ASC", ylab="non-ASC", type="n")
+  linmod <- lm(corr.BLs ~ BLs)
+  abline(linmod, lty=2)
+  y <- 0.18
+  points(getX(y, linmod), y, col="white", pch=21, bg="white", cex=12, crt=usr2dev(linmod$coefficients[2]))
+  points(BLs, corr.BLs, pch=21, bg="gray")
+  text(x=getX(y, linmod), y=y, paste("m =", round(linmod$coefficients[2], digits=2)), srt=usr2dev(linmod$coefficients[2]))
+  lines(c(-1,1), c(-1,1))
+  title(main=paste("s", strsplit(whichDatasets[[i]], "\\D")[[1]][2], sep=""))
+}
+dev.off()
+
+# Make Scatter plots for RAxML support
+pdf(file="all.ScatterPlots.support.pdf", width=8.5, height=11)
+op <- par(mar=par("mar")/1.7)
+layout(matrix(1:16, nrow=4, byrow=TRUE), respect=TRUE)
+#whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+whichDatasets <- c("c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3")
+for(i in sequence(dim(treeMatrix)[1])){
+  dataToUse <- which(whichDatasets[i] == names(BL.AllTrees))
+  datarows <- which(BL.AllTrees[[dataToUse]]$present)[which(BL.AllTrees[[dataToUse]]$present) %in% which(BL.AllTrees[[dataToUse]]$support != 0)]  #don't want all the tip support 0s or non homologous clades
+  support <- BL.AllTrees[[dataToUse]]$support[datarows]
+  corr.support <- BL.AllTrees[[dataToUse]]$corr.support[datarows]
+  if(analysis == "RAxML")
+    xlims <- ylims <- c(1,100)
+  if(analysis == "MrBayes")
+    xlims <- ylims <- c(0,1)
+  plot(support, corr.support, ylab="GTR Tree", xlab="ASC Tree", pch=21, bg="gray", xlim=xlims, ylim=ylims)
+  title(main=paste("s", strsplit(whichDatasets[[i]], "\\D")[[1]][2], sep=""))
+}
+dev.off()
+
+
+#Make scatter plots for MrBayes support
+pdf(file="MrBayes.scatter.support", width=8.5, height=11)
+op <- par(mar=par("mar")/1.7)
+layout(matrix(1:8, nrow=2, byrow=TRUE), respect=TRUE)
+#whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+whichDatasets <- c("c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3")
+for(i in sequence(length(whichDatasets))){
+  dataToUse <- which(whichDatasets[i] == rownames(treeMatrix))
+  supportMatrix <- CompareMrBayesPosteriors(treeMatrix[dataToUse,1], treeMatrix[dataToUse,2])
+  xlims <- ylims <- c(0,1)
+  plot(supportMatrix$ASC.support, supportMatrix$GTR.support, ylab="GTR Tree", xlab="ASC Tree", pch=21, bg="gray", xlim=xlims, ylim=ylims)
+  title(main=paste("s", strsplit(whichDatasets[[i]], "\\D")[[1]][2], sep=""))
+}
+dev.off()
+
+
+
+
+
+
+
+###################################################
+######## Scrape Data from post-analysis ###########
+###################################################
+
+ML.results <- GetRAxMLStatsPostAnalysis("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/RAxMLResults")
+
+
+# Plot number alignment patterns vs missing data
+plot(ML.results$AlignmentPatterns[which(ML.results$Model == "ASC")], ML.results$MissingData[which(ML.results$Model == "ASC")], type="n", ylab="Percent Missing Data", xlab="Distinct Alignment Patterns")
+text(ML.results$AlignmentPatterns[which(ML.results$Model == "ASC")], ML.results$MissingData[which(ML.results$Model == "ASC")], labels=ML.results$Level[which(ML.results$Model == "ASC")])
+
+# Plot likelihood scores by model
+plot(ML.results$Likelihood[which(ML.results$Model == "ASC")], ML.results$Likelihood[which(ML.results$Model == "GTR")], xlab="ASC Likelihood", ylab="GTR Likelihood")
+linMod <- lm(ML.results$Likelihood[which(ML.results$Model == "ASC")] ~ ML.results$Likelihood[which(ML.results$Model == "GTR")], ML.results)
+abline(linMod)
+cor(ML.results$Likelihood[which(ML.results$Model == "ASC")], ML.results$Likelihood[which(ML.results$Model == "GTR")])
+text(-100000, 100, paste("r =", cor(ML.results$Likelihood[which(ML.results$Model == "ASC")], ML.results$Likelihood[which(ML.results$Model == "GTR")])), pos=2) 
+
+# Plot bootstrap times by model and missing data
+levels <- seq(from=5, to=70, by=5)
+whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+plot(levels, ML.results$BootstrapTime[which(ML.results$Model == "ASC")], type="n")
+for(i in sequence(length(whichDatasets))){
+  dataToUse <- which(whichDatasets[i] == ML.results$Level)
+  points(levels[i], ML.results$BootstrapTime[dataToUse[1]], pch=21, bg="red")
+  points(levels[i], ML.results$BootstrapTime[dataToUse[2]], pch=21, bg="Blue")
+}
+
+# Plot alpha by levels
+levels <- seq(from=5, to=70, by=5)
+whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+plot(levels, ML.results$Alpha[which(ML.results$Model == "ASC")], type="n", xlab="Missing Data", ylab="Alpha (Gamma Shape Parameter)")
+for(i in sequence(length(whichDatasets))){
+  dataToUse <- which(whichDatasets[i] == ML.results$Level)
+  points(levels[i], ML.results$Alpha[dataToUse[1]], pch=21, bg="red")
+  points(levels[i], ML.results$Alpha[dataToUse[2]], pch=21, bg="Blue")
+}
+  legtxt <- c("GTR+ASC", "GTR")
+  legend("bottomleft", legend=legtxt, col=c("red", "blue"), lwd=1, merge = TRUE, bty="n", xjust=1, inset=0.05, cex=1) 
+
+for(i in sequence(length(whichDatasets)-1)){
+  dataToUse <- which(whichDatasets[i] == ML.results$Level)
+  nextDataToUse <- which(whichDatasets[i+1] == ML.results$Level)
+  segments(levels[i], ML.results$Alpha[dataToUse[1]], levels[i+1], ML.results$Alpha[nextDataToUse[1]], col="red")
+  segments(levels[i], ML.results$Alpha[dataToUse[2]], levels[i+1], ML.results$Alpha[nextDataToUse[2]], col="blue")
+}
+
+#Plot tree length by amount of missing data
+levels <- seq(from=5, to=70, by=5)
+whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+plot(levels, ML.results$TreeLength[which(ML.results$Model == "ASC")], type="n")
+for(i in sequence(length(whichDatasets))){
+  dataToUse <- which(whichDatasets[i] == ML.results$Level)
+  points(levels[i], ML.results$TreeLength[dataToUse[1]], pch=21, bg="red")
+  points(levels[i], ML.results$TreeLength[dataToUse[2]], pch=21, bg="Blue")
+}
+
+# Compare tree lengths by model
+whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+plot(ML.results$TreeLength[which(ML.results$Model == "ASC")], ML.results$TreeLength[which(ML.results$Model == "GTR")], type="n", xlab="ASC Tree Length", ylab="GTR Tree Length")
+for(i in sequence(length(whichDatasets))){
+  dataToUse <- which(whichDatasets[i] == ML.results$Level)
+  text(ML.results$TreeLength[dataToUse[1]], ML.results$TreeLength[dataToUse[2]], labels=paste("s", strsplit(whichDatasets[[i]], "\\D")[[1]][2], sep=""))
+}
+
+
+
+
+
+
+
+
+
+
