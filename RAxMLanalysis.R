@@ -169,25 +169,41 @@ dev.off()
 # Branch length scatter plots for supplement
 usr2dev <- function(x) 180/pi*atan(x*diff(par("usr")[1:2])/diff(par("usr")[3:4]))
 getX <- function(y, linmod) (y-linmod$coefficients[1])/linmod$coefficients[2]  #(y -b)/m = x
-pdf(file="all.ScatterPlots.pdf", height=11, width=8.5)
+getColor <- function(BLtable){
+  if(is.null(BLtable$min.ASC.BL.CI))
+    return(rep("gray", dim(BLtable)[1]))
+  colorVector <- rep("NA", dim(BLtable)[1])
+  for(i in sequence(dim(BLtable)[1])){
+    if(BLtable$corr.BL[i] != 0){
+      if(BLtable$min.ASC.BL.CI[i] < BLtable$corr.BL[i] && BLtable$corr.BL[i] < BLtable$max.ASC.BL.CI[i]){
+        colorVector[i] <- "gray"
+      }
+      else colorVector[i] <- "red"
+    }
+  }
+return(colorVector)
+}
+#pdf(file="all.ScatterPlots.pdf", height=11, width=8.5)
 op <- par(mar=par("mar")/1.7)
-layout(matrix(1:16, nrow=4, byrow=TRUE), respect=TRUE)  
-whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+layout(matrix(1:8, nrow=2, byrow=TRUE), respect=TRUE)  
+#whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+whichDatasets <- c("c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3")
 for(i in sequence(length(whichDatasets))){
   dataToUse <- which(whichDatasets[i] == names(BL.AllTrees))
   BLs <- BL.AllTrees[[dataToUse]]$branchlength[which(BL.AllTrees[[dataToUse]]$present)]
   corr.BLs <- BL.AllTrees[[dataToUse]]$corr.BL[which(BL.AllTrees[[dataToUse]]$present)]
+  colors <- getColor(BL.AllTrees[[dataToUse]])[which(BL.AllTrees[[dataToUse]]$present)]
   plot(BLs, corr.BLs, pch=21, bg="gray", ylim=c(0, 0.22), xlim=c(0, 0.22), xlab="ASC", ylab="non-ASC", type="n")
   linmod <- lm(corr.BLs ~ BLs)
   abline(linmod, lty=2)
   y <- 0.18
   points(getX(y, linmod), y, col="white", pch=21, bg="white", cex=12, crt=usr2dev(linmod$coefficients[2]))
-  points(BLs, corr.BLs, pch=21, bg="gray")
+  points(BLs, corr.BLs, pch=21, bg=colors)
   text(x=getX(y, linmod), y=y, paste("m =", round(linmod$coefficients[2], digits=2)), srt=usr2dev(linmod$coefficients[2]))
   lines(c(-1,1), c(-1,1))
   title(main=paste("s", strsplit(whichDatasets[[i]], "\\D")[[1]][2], sep=""))
 }
-dev.off()
+#dev.off()
 
 # Make Scatter plots for RAxML support
 pdf(file="all.ScatterPlots.support.pdf", width=8.5, height=11)
