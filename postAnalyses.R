@@ -263,6 +263,7 @@ for(i in sequence(length(whichDatasets))){
   points(levels[i], ML.results$BootstrapTime[dataToUse[2]], pch=21, bg="Blue")
 }
 
+
 # Plot alpha by levels
 levels <- seq(from=5, to=70, by=5)
 MrB.levels <- seq(from=10, to=45, by=5)
@@ -302,9 +303,6 @@ for(i in sequence(length(MrBdatasets))){
   points(MrB.levels[i], MrB.results$Alpha[dataToUse[2]], pch=21, bg="blue")
 }
 
-
-
-#plot ML and MrB as layout plot
 
 
 #Plot tree length by amount of missing data
@@ -351,10 +349,27 @@ for(i in sequence(length(MrBdatasets))){
 
 # Compare tree lengths by model
 whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
-plot(results$TreeLength[which(results$Model == "ASC")], results$TreeLength[which(results$Model == "GTR")], type="n", xlab="ASC Tree Length", ylab="GTR Tree Length")
+plot(results$TreeLength[which(ML.results$Model == "ASC")], ML.results$TreeLength[which(ML.results$Model == "GTR")], type="n", xlab="ASC Tree Length", ylab="GTR Tree Length", xlim=c(0,7))
+for(i in sequence(length(whichDatasets)-1)){
+  dataToUse <- which(whichDatasets[i] == ML.results$Level)
+  nextDataToUse <- which(whichDatasets[i+1] == ML.results$Level)
+  segments(ML.results$TreeLength[dataToUse[1]], ML.results$TreeLength[dataToUse[2]], ML.results$TreeLength[nextDataToUse[1]], ML.results$TreeLength[nextDataToUse[2]], col="blue")
+}
 for(i in sequence(length(whichDatasets))){
-  dataToUse <- which(whichDatasets[i] == results$Level)
-  text(results$TreeLength[dataToUse[1]], results$TreeLength[dataToUse[2]], labels=paste("s", strsplit(whichDatasets[[i]], "\\D")[[1]][2], sep=""))
+  dataToUse <- which(whichDatasets[i] == ML.results$Level)
+  points(ML.results$TreeLength[dataToUse[1]], ML.results$TreeLength[dataToUse[2]], col="blue", cex=3, bg="white", pch=21)  
+  text(ML.results$TreeLength[dataToUse[1]], ML.results$TreeLength[dataToUse[2]], labels=paste("s", strsplit(whichDatasets[[i]], "\\D")[[1]][2], sep=""), col="blue", cex=0.75)
+}
+MrBdatasets <-  c("c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3")
+for(i in sequence(length(MrBdatasets)-1)){
+  dataToUse <- which(MrBdatasets[i] == MrB.results$Level)
+  nextDataToUse <- which(MrBdatasets[i+1] == MrB.results$Level)
+  segments(MrB.results$TreeLength[dataToUse[1]], MrB.results$TreeLength[dataToUse[2]], MrB.results$TreeLength[nextDataToUse[1]], MrB.results$TreeLength[nextDataToUse[2]], col="green")
+}
+for(i in sequence(length(MrBdatasets))){
+  dataToUse <- which(MrBdatasets[i] == MrB.results$Level)
+  points(MrB.results$TreeLength[dataToUse[1]], MrB.results$TreeLength[dataToUse[2]], col="green", cex=3, bg="white", pch=21)  
+  text(MrB.results$TreeLength[dataToUse[1]], MrB.results$TreeLength[dataToUse[2]], labels=paste("s", strsplit(MrBdatasets[[i]], "\\D")[[1]][2], sep=""), col="green", cex=0.75)
 }
 
 
