@@ -565,7 +565,28 @@ results$GTR.support <- as.numeric(results$GTR.support)
 return(results)
 }
 
-
+getColor <- function(BLtable, nonSigColor="gray", sigColor="red", method=c("varOverlap", "meanWithin")){
+#for method, choose whether you want to distinguish significant deviants either by non-overlapping CI distributions or by the mean of the GTR BL not falling within the ASC distribution 
+  method <- match.arg(method, choices=c("varOverlap", "meanWithin"))  
+  if(is.null(BLtable$min.ASC.BL.CI))
+    return(rep(nonSigColor, dim(BLtable)[1]))
+  colorVector <- rep("NA", dim(BLtable)[1])
+  for(i in sequence(dim(BLtable)[1])){
+    if(BLtable$corr.BL[i] != 0){
+      if(method == "meanWithin"){
+        if(BLtable$min.ASC.BL.CI[i] < BLtable$corr.BL[i] && BLtable$corr.BL[i] < BLtable$max.ASC.BL.CI[i])
+          colorVector[i] <- nonSigColor
+        else colorVector[i] <- sigColor
+      }
+      if(method == "varOverlap"){
+        if(BLtable$min.GTR.BL.CI[i] < BLtable$max.ASC.BL.CI[i] || BLtable$min.ASC.BL.CI[i] < BLtable$max.GTR.BL.CI[i])
+          colorVector[i] <- nonSigColor
+        else  colorVector[i] <- sigColor
+      }
+    }
+  }
+return(colorVector)
+}
 
 
 

@@ -169,20 +169,6 @@ dev.off()
 # Branch length scatter plots for supplement
 usr2dev <- function(x) 180/pi*atan(x*diff(par("usr")[1:2])/diff(par("usr")[3:4]))
 getX <- function(y, linmod) (y-linmod$coefficients[1])/linmod$coefficients[2]  #(y -b)/m = x
-getColor <- function(BLtable){
-  if(is.null(BLtable$min.ASC.BL.CI))
-    return(rep("gray", dim(BLtable)[1]))
-  colorVector <- rep("NA", dim(BLtable)[1])
-  for(i in sequence(dim(BLtable)[1])){
-    if(BLtable$corr.BL[i] != 0){
-      if(BLtable$min.ASC.BL.CI[i] < BLtable$corr.BL[i] && BLtable$corr.BL[i] < BLtable$max.ASC.BL.CI[i]){
-        colorVector[i] <- "gray"
-      }
-      else colorVector[i] <- "red"
-    }
-  }
-return(colorVector)
-}
 #pdf(file="all.ScatterPlots.pdf", height=11, width=8.5)
 op <- par(mar=par("mar")/1.7)
 layout(matrix(1:8, nrow=2, byrow=TRUE), respect=TRUE)  
@@ -192,15 +178,15 @@ for(i in sequence(length(whichDatasets))){
   dataToUse <- which(whichDatasets[i] == names(BL.AllTrees))
   BLs <- BL.AllTrees[[dataToUse]]$branchlength[which(BL.AllTrees[[dataToUse]]$present)]
   corr.BLs <- BL.AllTrees[[dataToUse]]$corr.BL[which(BL.AllTrees[[dataToUse]]$present)]
-  colors <- getColor(BL.AllTrees[[dataToUse]])[which(BL.AllTrees[[dataToUse]]$present)]
+  colors <- getColor(BL.AllTrees[[dataToUse]], method="meanWithin")[which(BL.AllTrees[[dataToUse]]$present)]
   plot(BLs, corr.BLs, pch=21, bg="gray", ylim=c(0, 0.22), xlim=c(0, 0.22), xlab="ASC", ylab="non-ASC", type="n")
   linmod <- lm(corr.BLs ~ BLs)
+  lines(c(-1,1), c(-1,1))
   abline(linmod, lty=2)
   y <- 0.18
   points(getX(y, linmod), y, col="white", pch=21, bg="white", cex=12, crt=usr2dev(linmod$coefficients[2]))
   points(BLs, corr.BLs, pch=21, bg=colors)
   text(x=getX(y, linmod), y=y, paste("m =", round(linmod$coefficients[2], digits=2)), srt=usr2dev(linmod$coefficients[2]))
-  lines(c(-1,1), c(-1,1))
   title(main=paste("s", strsplit(whichDatasets[[i]], "\\D")[[1]][2], sep=""))
 }
 #dev.off()
@@ -278,39 +264,89 @@ for(i in sequence(length(whichDatasets))){
 }
 
 # Plot alpha by levels
-#levels <- seq(from=5, to=70, by=5)
-#whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
-levels <- seq(from=10, to=45, by=5)
-whichDatasets <- c("c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3")
-plot(c(levels, levels), results$Alpha, type="n", xlab="Missing Data", ylab="Alpha (Gamma Shape Parameter)")
-  legtxt <- c("GTR+ASC", "GTR")
-  legend("bottomleft", legend=legtxt, col=c("lightblue", "blue"), lwd=1, merge = TRUE, bty="n", xjust=1, inset=0.05, cex=1) 
+levels <- seq(from=5, to=70, by=5)
+MrB.levels <- seq(from=10, to=45, by=5)
+whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+MrBdatasets <-  c("c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3")
+layout(matrix(1:2, nrow=1, byrow=TRUE), respect=TRUE)
+plot(c(levels, levels), ML.results$Alpha, type="n", xlab="Missing Data", ylab="Alpha (Gamma Shape Parameter)")
+title(main="RAxML")
+legend("bottomleft", legend=c("GTR", "GTR+ASC"), col=c("blue", "lightblue"), lwd=1, merge = TRUE, bty="n", xjust=1, inset=0.05, cex=1) 
 for(i in sequence(length(whichDatasets)-1)){
-  dataToUse <- which(whichDatasets[i] == results$Level)
-  nextDataToUse <- which(whichDatasets[i+1] == results$Level)
-  segments(levels[i], results$Alpha[dataToUse[1]], levels[i+1], results$Alpha[nextDataToUse[1]], col="lightblue")
-  segments(levels[i], results$Alpha[dataToUse[2]], levels[i+1], results$Alpha[nextDataToUse[2]], col="blue")  
+  dataToUse <- which(whichDatasets[i] == ML.results$Level)
+  nextDataToUse <- which(whichDatasets[i+1] == ML.results$Level)
+  segments(levels[i], ML.results$Alpha[dataToUse[1]], levels[i+1], ML.results$Alpha[nextDataToUse[1]], col="lightblue")
+  segments(levels[i], ML.results$Alpha[dataToUse[2]], levels[i+1], ML.results$Alpha[nextDataToUse[2]], col="blue")  
 }
 for(i in sequence(length(whichDatasets))){
-  dataToUse <- which(whichDatasets[i] == results$Level)
-  if(!is.null(results$Alpha.lowCI)){
-    arrows(levels[i], results$Alpha.lowCI[dataToUse[1]], levels[i], results$Alpha.uppCI[dataToUse[1]], code=3, length=0.05, col="lightblue", angle=90)
-    arrows(levels[i], results$Alpha.lowCI[dataToUse[2]], levels[i], results$Alpha.uppCI[dataToUse[2]], code=3, length=0.05, col="blue", angle=90)
-  }
-  points(levels[i], results$Alpha[dataToUse[1]], pch=21, bg="lightblue")
-  points(levels[i], results$Alpha[dataToUse[2]], pch=21, bg="blue")
+  dataToUse <- which(whichDatasets[i] == ML.results$Level)
+  points(levels[i], ML.results$Alpha[dataToUse[1]], pch=21, bg="lightblue")
+  points(levels[i], ML.results$Alpha[dataToUse[2]], pch=21, bg="blue")
 }
+plot(c(MrB.levels, MrB.levels), MrB.results$Alpha, type="n", xlab="Missing Data", ylab="Alpha (Gamma Shape Parameter)")
+title(main="MrBayes")
+legend("bottomleft", legend=c("GTR", "GTR+ASC"), col=c("blue", "lightblue"), lwd=1, merge = TRUE, bty="n", xjust=1, inset=0.05, cex=1) 
+for(i in sequence(length(MrBdatasets)-1)){
+  dataToUse <- which(MrBdatasets[i] == MrB.results$Level)
+  nextDataToUse <- which(MrBdatasets[i+1] == MrB.results$Level)
+  segments(MrB.levels[i], MrB.results$Alpha[dataToUse[1]], MrB.levels[i+1], MrB.results$Alpha[nextDataToUse[1]], col="lightblue")
+  segments(MrB.levels[i], MrB.results$Alpha[dataToUse[2]], MrB.levels[i+1], MrB.results$Alpha[nextDataToUse[2]], col="blue")  
+}
+for(i in sequence(length(MrBdatasets))){
+  dataToUse <- which(MrBdatasets[i] == MrB.results$Level)
+  if(!is.null(MrB.results$Alpha.lowCI)){
+    arrows(MrB.levels[i], MrB.results$Alpha.lowCI[dataToUse[1]], MrB.levels[i], MrB.results$Alpha.uppCI[dataToUse[1]], code=3, length=0.05, col="lightblue", angle=90)
+    arrows(MrB.levels[i], MrB.results$Alpha.lowCI[dataToUse[2]], MrB.levels[i], MrB.results$Alpha.uppCI[dataToUse[2]], code=3, length=0.05, col="blue", angle=90)
+  }
+  points(MrB.levels[i], MrB.results$Alpha[dataToUse[1]], pch=21, bg="lightblue")
+  points(MrB.levels[i], MrB.results$Alpha[dataToUse[2]], pch=21, bg="blue")
+}
+
+
+
+#plot ML and MrB as layout plot
 
 
 #Plot tree length by amount of missing data
 levels <- seq(from=5, to=70, by=5)
+MrB.levels <- seq(from=10, to=45, by=5)
 whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
-plot(levels, results$TreeLength[which(results$Model == "ASC")], type="n")
-for(i in sequence(length(whichDatasets))){
-  dataToUse <- which(whichDatasets[i] == results$Level)
-  points(levels[i], results$TreeLength[dataToUse[1]], pch=21, bg="red")
-  points(levels[i], results$TreeLength[dataToUse[2]], pch=21, bg="Blue")
+MrBdatasets <-  c("c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3")
+layout(matrix(1:2, nrow=1, byrow=TRUE), respect=TRUE)
+plot(c(levels, levels), ML.results$TreeLength, type="n", ylab="Tree Length", xlab="Missing Data")
+title(main="RAxML")
+legend("topright", legend=c("GTR", "GTR + ASC"), col=c("blue", "lightblue"), lwd=1, merge=TRUE, bty="n", xjust=1, inset=0.02, cex=1) 
+
+for(i in sequence(length(whichDatasets)-1)){
+  dataToUse <- which(whichDatasets[i] == ML.results$Level)
+  nextDataToUse <- which(whichDatasets[i+1] == ML.results$Level)
+  segments(levels[i], ML.results$TreeLength[dataToUse[1]], levels[i+1], ML.results$TreeLength[nextDataToUse[1]], col="lightblue")
+  segments(levels[i], ML.results$TreeLength[dataToUse[2]], levels[i+1], ML.results$TreeLength[nextDataToUse[2]], col="blue")  
 }
+for(i in sequence(length(whichDatasets))){
+  dataToUse <- which(whichDatasets[i] == ML.results$Level)
+  points(levels[i], ML.results$TreeLength[dataToUse[1]], pch=21, bg="lightblue")
+  points(levels[i], ML.results$TreeLength[dataToUse[2]], pch=21, bg="blue")
+}
+plot(c(levels, levels), ML.results$TreeLength, type="n", ylab="Tree Length", xlab="Missing Data")
+title(main="MrBayes")
+legend("topright", legend=c("GTR", "GTR + ASC"), col=c("blue", "lightblue"), lwd=1, merge=TRUE, bty="n", xjust=1, inset=0.02, cex=1) 
+for(i in sequence(length(MrBdatasets)-1)){
+  dataToUse <- which(MrBdatasets[i] == MrB.results$Level)
+  nextDataToUse <- which(MrBdatasets[i+1] == MrB.results$Level)
+  segments(MrB.levels[i], MrB.results$TreeLength[dataToUse[1]], MrB.levels[i+1], MrB.results$TreeLength[nextDataToUse[1]], col="lightblue")
+  segments(MrB.levels[i], MrB.results$TreeLength[dataToUse[2]], MrB.levels[i+1], MrB.results$TreeLength[nextDataToUse[2]], col="blue")  
+}
+for(i in sequence(length(MrBdatasets))){
+  dataToUse <- which(MrBdatasets[i] == MrB.results$Level)
+  arrows(MrB.levels[i], MrB.results$TreeLength.lowCI[dataToUse[1]], MrB.levels[i], MrB.results$TreeLength.uppCI[dataToUse[1]], code=3, length=0.05, col="lightblue", angle=90)
+  arrows(MrB.levels[i], MrB.results$TreeLength.lowCI[dataToUse[2]], MrB.levels[i], MrB.results$TreeLength.uppCI[dataToUse[2]], code=3, length=0.05, col="blue", angle=90)
+  points(MrB.levels[i], MrB.results$TreeLength[dataToUse[1]], pch=21, bg="lightblue")
+  points(MrB.levels[i], MrB.results$TreeLength[dataToUse[2]], pch=21, bg="blue")
+}
+
+
+
 
 
 # Compare tree lengths by model
