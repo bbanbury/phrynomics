@@ -621,18 +621,44 @@ GetRAxMLStatsPostAnalysis <- function(workingDirectoryOfResults) {
 GetMrBayesStatsPostAnalysis <- function(workingDirectoryOfResults){
   startingDir <- getwd()
   setwd(workingDirectoryOfResults)
-
-#get level of missing data
-#get Model ASC or GTR
-#get Number of Loci
-#get number of Variable sites
-#get Alignment Patterns (?)
-#get amount of missing data
-#get total time
-#get alpha (gamma shape param)  (pstat)
-#get total tree length
-#also get CI branch length values...might go elsewhere (vstat)
-
+  nexFiles <- system("ls *.nex", intern=TRUE)  #num loci
+  pstatFiles <- system("ls *.pstat", intern=TRUE)  #tree length and alpha
+  logFiles <- system("ls log*", intern=TRUE)  
+  results <- matrix(nrow=length(nexFiles), ncol=12)
+  for(i in sequence(length(nexFiles))){
+    MissingDataLevel <- paste("c", strsplit(nexFiles[i], "\\D+")[[1]][2], "p3", sep="")
+    whichModel <- strsplit(nexFiles[i], "_")[[1]][1]
+    numLociLine <- system(paste("grep DIMENSIONS", nexFiles[i]), intern=TRUE)
+    numberLoci <- strsplit(numLociLine, "\\D+")[[1]][3]
+    dataName <- paste(whichModel, "_c", strsplit(nexFiles[i], "\\D+")[[1]][2], "p3", sep="")
+    pstats <- read.csv(pstatFiles[grep(dataName, pstatFiles)], sep="")
+    treelength <- pstats[1,2]
+    treelength.lowCI <- pstats[1,4]
+    treelength.uppCI <- pstats[1,5]
+    treelengthESS <- pstats[1,8]
+    alpha <- pstats[2,2]
+    alpha.lowCI <- pstats[2,4]
+    alpha.uppCI <- pstats[2,5]
+    alphaESS <- pstats[2,8]
+    stdSplitLine <- system(paste("tail -n 2 ", logFiles[grep(dataName, pstatFiles)], sep=""), intern=T)[1]
+    stdSplits <- gsub("      Average standard deviation of split frequencies: ", "", stdSplitLine)
+    #other ESS params?
+    results[i,] <- c(MissingDataLevel, whichModel, numberLoci, treelength, treelength.lowCI, treelength.uppCI, treelengthESS, alpha, alpha.lowCI, alpha.uppCI, alphaESS, stdSplits)
+  }  
+  results <- data.frame(results, stringsAsFactors=FALSE)
+  colnames(results) <- c("Level", "Model", "NumberLoci", "TreeLength", "TreeLength.lowCI", "TreeLength.uppCI", "TreeLengthESS", "Alpha", "Alpha.lowCI", "Alpha.uppCI", "AlphaESS", "stdSplits")
+  results$NumberLoci <- as.numeric(results$NumberLoci)
+  results$TreeLength <- as.numeric(results$TreeLength)
+  results$TreeLength.lowCI <- as.numeric(results$TreeLength.lowCI)
+  results$TreeLength.uppCI <- as.numeric(results$TreeLength.uppCI)
+  results$TreeLengthESS <- as.numeric(results$TreeLengthESS)
+  results$Alpha <- as.numeric(results$Alpha)
+  results$Alpha.lowCI <- as.numeric(results$Alpha.lowCI)
+  results$Alpha.uppCI <- as.numeric(results$Alpha.uppCI)
+  results$AlphaESS <- as.numeric(results$AlphaESS)
+  results$stdSplits <- as.numeric(results$stdSplits)
+  setwd(startingDir)
+  return(results)
 }
 
 

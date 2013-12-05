@@ -4,7 +4,7 @@
 
 library(ape)
 library(phangorn)
-source("~/Dropbox/UWstuff/phrynomics/Analyses/Rcode/PhrynoNucCodes.R")
+source("~/phrynomics/trunk/phrynomicsFunctions.R")
 
 
 # Load RAxML Trees
@@ -252,7 +252,9 @@ dev.off()
 ###################################################
 
 ML.results <- GetRAxMLStatsPostAnalysis("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/RAxMLResults")
+MrB.results <- GetMrBayesStatsPostAnalysis("~/Dropbox/UWstuff/phrynomics/Analyses/MrBayesRuns/MrBayesResults")
 
+results <- MrB.results
 
 # Plot number alignment patterns vs missing data
 plot(ML.results$AlignmentPatterns[which(ML.results$Model == "ASC")], ML.results$MissingData[which(ML.results$Model == "ASC")], type="n", ylab="Percent Missing Data", xlab="Distinct Alignment Patterns")
@@ -276,40 +278,47 @@ for(i in sequence(length(whichDatasets))){
 }
 
 # Plot alpha by levels
-levels <- seq(from=5, to=70, by=5)
-whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
-plot(levels, ML.results$Alpha[which(ML.results$Model == "ASC")], type="n", xlab="Missing Data", ylab="Alpha (Gamma Shape Parameter)")
-for(i in sequence(length(whichDatasets))){
-  dataToUse <- which(whichDatasets[i] == ML.results$Level)
-  points(levels[i], ML.results$Alpha[dataToUse[1]], pch=21, bg="red")
-  points(levels[i], ML.results$Alpha[dataToUse[2]], pch=21, bg="Blue")
-}
+#levels <- seq(from=5, to=70, by=5)
+#whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+levels <- seq(from=10, to=45, by=5)
+whichDatasets <- c("c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3")
+plot(c(levels, levels), results$Alpha, type="n", xlab="Missing Data", ylab="Alpha (Gamma Shape Parameter)")
   legtxt <- c("GTR+ASC", "GTR")
-  legend("bottomleft", legend=legtxt, col=c("red", "blue"), lwd=1, merge = TRUE, bty="n", xjust=1, inset=0.05, cex=1) 
-
+  legend("bottomleft", legend=legtxt, col=c("lightblue", "blue"), lwd=1, merge = TRUE, bty="n", xjust=1, inset=0.05, cex=1) 
 for(i in sequence(length(whichDatasets)-1)){
-  dataToUse <- which(whichDatasets[i] == ML.results$Level)
-  nextDataToUse <- which(whichDatasets[i+1] == ML.results$Level)
-  segments(levels[i], ML.results$Alpha[dataToUse[1]], levels[i+1], ML.results$Alpha[nextDataToUse[1]], col="red")
-  segments(levels[i], ML.results$Alpha[dataToUse[2]], levels[i+1], ML.results$Alpha[nextDataToUse[2]], col="blue")
+  dataToUse <- which(whichDatasets[i] == results$Level)
+  nextDataToUse <- which(whichDatasets[i+1] == results$Level)
+  segments(levels[i], results$Alpha[dataToUse[1]], levels[i+1], results$Alpha[nextDataToUse[1]], col="lightblue")
+  segments(levels[i], results$Alpha[dataToUse[2]], levels[i+1], results$Alpha[nextDataToUse[2]], col="blue")  
 }
+for(i in sequence(length(whichDatasets))){
+  dataToUse <- which(whichDatasets[i] == results$Level)
+  if(!is.null(results$Alpha.lowCI)){
+    arrows(levels[i], results$Alpha.lowCI[dataToUse[1]], levels[i], results$Alpha.uppCI[dataToUse[1]], code=3, length=0.05, col="lightblue", angle=90)
+    arrows(levels[i], results$Alpha.lowCI[dataToUse[2]], levels[i], results$Alpha.uppCI[dataToUse[2]], code=3, length=0.05, col="blue", angle=90)
+  }
+  points(levels[i], results$Alpha[dataToUse[1]], pch=21, bg="lightblue")
+  points(levels[i], results$Alpha[dataToUse[2]], pch=21, bg="blue")
+}
+
 
 #Plot tree length by amount of missing data
 levels <- seq(from=5, to=70, by=5)
 whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
-plot(levels, ML.results$TreeLength[which(ML.results$Model == "ASC")], type="n")
+plot(levels, results$TreeLength[which(results$Model == "ASC")], type="n")
 for(i in sequence(length(whichDatasets))){
-  dataToUse <- which(whichDatasets[i] == ML.results$Level)
-  points(levels[i], ML.results$TreeLength[dataToUse[1]], pch=21, bg="red")
-  points(levels[i], ML.results$TreeLength[dataToUse[2]], pch=21, bg="Blue")
+  dataToUse <- which(whichDatasets[i] == results$Level)
+  points(levels[i], results$TreeLength[dataToUse[1]], pch=21, bg="red")
+  points(levels[i], results$TreeLength[dataToUse[2]], pch=21, bg="Blue")
 }
+
 
 # Compare tree lengths by model
 whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
-plot(ML.results$TreeLength[which(ML.results$Model == "ASC")], ML.results$TreeLength[which(ML.results$Model == "GTR")], type="n", xlab="ASC Tree Length", ylab="GTR Tree Length")
+plot(results$TreeLength[which(results$Model == "ASC")], results$TreeLength[which(results$Model == "GTR")], type="n", xlab="ASC Tree Length", ylab="GTR Tree Length")
 for(i in sequence(length(whichDatasets))){
-  dataToUse <- which(whichDatasets[i] == ML.results$Level)
-  text(ML.results$TreeLength[dataToUse[1]], ML.results$TreeLength[dataToUse[2]], labels=paste("s", strsplit(whichDatasets[[i]], "\\D")[[1]][2], sep=""))
+  dataToUse <- which(whichDatasets[i] == results$Level)
+  text(results$TreeLength[dataToUse[1]], results$TreeLength[dataToUse[2]], labels=paste("s", strsplit(whichDatasets[[i]], "\\D")[[1]][2], sep=""))
 }
 
 
