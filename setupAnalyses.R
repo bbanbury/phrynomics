@@ -8,6 +8,7 @@
 ################################################
 
 #Remove invariant sites and write data to file
+source("~/phrynomics/trunk/phrynomicsFunctions.R")
 setwd("~/Dropbox/phrynomics/Analyses/RAxMLruns")
 snpFiles <- system("ls ~/Dropbox/phrynomics/c*", intern=T)
 minSamples <- NULL
@@ -74,6 +75,46 @@ for(model in sequence(length(models))) {
   write(jobArgs, file=paste(writeFileName, "_RAXML_JobArgs", sep=""))
 }
 
+
+#write shell script for each input file (run on imac)
+setwd("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns")
+files <- system("ls c*", intern=T)
+models <- c("ASC_GTRCAT", "GTRCAT")
+systemSeeds <- NULL
+treeSeeds <- NULL
+filenames <- NULL
+setwd("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns2")
+write(paste(""), file="raxmlSystemCalls.txt")
+orderToGo <- c("c65p3", "c45p3", "c25p3", "c5p3", "c10p3", "c15p3", "c20p3", "c30p3", "c35p3", "c40p3", "c50p3", "c55p3", "c60p3", "c70p3")
+for(model in sequence(length(models))){
+  jobArg <- NULL
+  for(i in sequence(length(snpFiles))){
+    snpFile <- files[grep(orderToGo[i], files)]
+    NumCores <- 8
+    inputFile <- snpFile
+    outgroup <- "GAWI1"
+    systemSeed <- floor(runif(1, min=1, max=10^6))
+    bootstrapReps <- 1000
+    treeSeed <- floor(runif(1, min=1, max=10^6))
+    outputName <- paste(gsub("\\D+$", "", snpFile), "_", models[model], sep="")
+    filename <- NULL
+    filename <- paste(models[model], "_", strsplit(strsplit(snpFile, "/")[[1]][9], "noAmbigs",  fixed=T)[[1]][1], sep="")
+    jobArg <- paste("raxmlHPC-PTHREADS -T ", NumCores, " -s ../", inputFile, " -f a -m ", models[model], " -V -o ", outgroup, " -x ", systemSeed, " -# ", bootstrapReps, " -p ", treeSeed, " -n ", outputName, sep="")
+    write(jobArg, file="raxmlSystemCalls.txt", append=TRUE)
+    systemSeeds <- c(systemSeeds, systemSeed) 
+    treeSeeds <- c(treeSeeds, treeSeed) 
+    filenames <- c(filenames, outputName) 
+  }
+  save(systemSeeds, treeSeeds, filenames, file="seeds.rdata")
+}
+
+#to execute this new script, open in R
+toRun <- scan(file="~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns2/raxmlSystemCalls.txt", what="character", sep="\n")
+for(i in sequence(length(toRun))){
+  system(toRun[i])
+}
+
+
 ################################################
 ###################### END #####################
 ################################################
@@ -87,7 +128,7 @@ for(model in sequence(length(models))) {
 ################################################
 
 setwd("~/Dropbox/UWstuff/phrynomics/Analyses/MrBayesRuns")
-source('~/Dropbox/UWstuff/phrynomics/Analyses/Rcode/PhrynoNucCodes.R', chdir = TRUE)
+source("~/phrynomics/trunk/phrynomicsFunctions.R")
 snpFiles <- system("ls ~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/c*", intern=T)
 seedNumbers <- NULL
 AllFilenames <- NULL
@@ -153,10 +194,6 @@ for(model in sequence(length(models))){
   }
 }
 
-
-
-
-
 ################################################
 ###################### END #####################
 ################################################
@@ -165,19 +202,40 @@ for(model in sequence(length(models))){
 
 
 
+################################################
+########### Writing SNAPP Data Files ###########
+################################################
+
+#file <- ("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/c65p3noAmbigs.snps")
+file <- ("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/c5p3noAmbigs.snps")
+
+source("~/phrynomics/trunk/phrynomicsFunctions.R")
+
+Data1 <- read.table(file, row.names=1, colClasses="character", skip=1)
+Data2 <- removeOutgroups(Data1)
+#Data3 <- RemoveMissingSpeciesLoci(Data2)
+Data3 <- Data2
+Data4 <- RemoveNonBinary(Data3)
+Data5 <- TakeSingleSNPfromEachLocus(Data4)[[1]]
+Data6 <- TranslateBases(Data5, translateMissing=FALSE, ordered=TRUE)
+
+setwd("~/Dropbox/UWstuff/phrynomics/Analyses/SNAPP")
+SNAPPfile <- paste(dim(Data6)[1], nchar(Data6[1,]))
+write(SNAPPfile, file="allPhrynosomaSNAPP.noStep3.snps")
+write.table(Data6, file="allPhrynosomaSNAPP.noStep3.snps", append=TRUE, quote=FALSE, col.names=FALSE)  
+
+#remove individuals with missing data (not just species, ut now individuals)
+indToRemove <- NULL
+for(i in sequence(dim(Data6)[1])){
+  if(Data6[i,])
+}
 
 
 
 
-
-
-
-
-
-
-
-
-
+################################################
+###################### END #####################
+################################################
 
 
 

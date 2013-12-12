@@ -7,13 +7,19 @@ library(phangorn)
 source("~/phrynomics/trunk/phrynomicsFunctions.R")
 
 
-# Load RAxML Trees
+# Load RAxML Trees (GTRGAMMA model)
 analysis <- "RAxML"
 setwd("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/RAxMLResults")
 trees <- system("ls RAxML_bipartitions.*", intern=T)  #trees with bootstrap support
 TreeList <- CreateTreeList(trees, "RAxML")
 treeMatrix <- CreateTreeMatrix(trees)
 
+# Load RAxMLrun2 Trees (GTRCAT model)
+analysis <- "RAxML"
+setwd("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns2")
+trees <- system("ls RAxML_bipartitions.*", intern=T)  #trees with bootstrap support
+TreeList <- CreateTreeList(trees, "RAxML")
+treeMatrix <- CreateTreeMatrix(trees)
 
 # Load MrBayes Trees
 analysis <- "MrBayes"
@@ -102,8 +108,8 @@ for(i in sequence(length(orderToGo))){
 pdf(file="densityPlots.pdf", width=8.5, height=5)
 op <- par(mar=par("mar")/1.7)
 layout(matrix(c(1:4), nrow=1, byrow=TRUE), respect=TRUE)
-#whichDatasets <- c("c5p3", "c25p3", "c45p3", "c65p3")
-whichDatasets <- c("c10p3", "c25p3", "c35p3", "c45p3")  #works for MrBayes trials too
+whichDatasets <- c("c5p3", "c25p3", "c45p3", "c65p3")
+#whichDatasets <- c("c10p3", "c25p3", "c35p3", "c45p3")  #works for MrBayes trials too
 
 for(i in sequence(length(whichDatasets))){
   dataToUse <- which(whichDatasets[i] == names(BL.AllTrees))
@@ -147,8 +153,8 @@ getX <- function(y, linmod) (y-linmod$coefficients[1])/linmod$coefficients[2]  #
 pdf(file="ScatterPlots.pdf", width=8.5, height=5)
 op <- par(mar=par("mar")/1.7)
 layout(matrix(1:4, nrow=1, byrow=TRUE), respect=TRUE)  
-#whichDatasets <- c("c5p3", "c25p3", "c45p3", "c65p3")
-whichDatasets <- c("c10p3", "c25p3", "c35p3", "c45p3")  #works for MrBayes trials too
+whichDatasets <- c("c5p3", "c25p3", "c45p3", "c65p3")
+#whichDatasets <- c("c10p3", "c25p3", "c35p3", "c45p3")  #works for MrBayes trials too
 
 for(i in sequence(length(whichDatasets))){
   dataToUse <- which(whichDatasets[i] == names(BL.AllTrees))
@@ -195,8 +201,8 @@ for(i in sequence(length(whichDatasets))){
 pdf(file="all.ScatterPlots.support.pdf", width=8.5, height=11)
 op <- par(mar=par("mar")/1.7)
 layout(matrix(1:16, nrow=4, byrow=TRUE), respect=TRUE)
-#whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
-whichDatasets <- c("c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3")
+whichDatasets <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+#whichDatasets <- c("c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3")
 for(i in sequence(dim(treeMatrix)[1])){
   dataToUse <- which(whichDatasets[i] == names(BL.AllTrees))
   datarows <- which(BL.AllTrees[[dataToUse]]$present)[which(BL.AllTrees[[dataToUse]]$present) %in% which(BL.AllTrees[[dataToUse]]$support != 0)]  #don't want all the tip support 0s or non homologous clades
