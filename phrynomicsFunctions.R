@@ -275,8 +275,14 @@ TranslateBases <- function(data, translateMissing=TRUE, translateMissingChar="-"
     bases <- apply(splitdata, 2, ReturnUniqueBases)
     baseFrequencies <- apply(splitdata, 2, GetBaseFrequencies)
     for(i in sequence(dim(splitdata)[2])){
-      MostFrequentBase <- bases[which(baseFrequencies[,i] == max(baseFrequencies[,i])), i]
-      LeastFrequentBase <- bases[which(baseFrequencies[,i] == min(baseFrequencies[,i])), i]
+      if(baseFrequencies[1,i] == baseFrequencies[2,i]){
+        MostFrequentBase <- bases[1,i]
+        LeastFrequentBase <- bases[2,i]       
+      }
+      if(baseFrequencies[1,i] != baseFrequencies[2,i]){
+        MostFrequentBase <- bases[which(baseFrequencies[,i] == max(baseFrequencies[,i])), i]
+        LeastFrequentBase <- bases[which(baseFrequencies[,i] == min(baseFrequencies[,i])), i]
+      }  
       zeros <- which(splitdata[,i] == MostFrequentBase)
       splitdata[zeros,i] <- 0
       if(any(splitdata[,i] == ReturnAmbyCode(bases[,i]))){
@@ -342,7 +348,7 @@ CreateTreeMatrix <- function(trees) {
   colnames(treeMatrix) <- c("ASC", "GTR")
   for(i in sequence(dim(treeMatrix)[1])) {
     twoFiles <- trees[grep(rownames(treeMatrix)[i], trees, fixed=TRUE)]
-    treeMatrix[i,] <- c(twoFiles[grep("ASC", twoFiles)], twoFiles[grep("GTR", twoFiles)])
+    treeMatrix[i,] <- c(twoFiles[grep("ASC", twoFiles)], twoFiles[-grep("ASC", twoFiles)])
   }
   return(as.data.frame(treeMatrix, stringsAsFactors=FALSE))
 }
@@ -608,8 +614,8 @@ GetRAxMLStatsPostAnalysis <- function(workingDirectoryOfResults) {
   outFiles <- system("ls RAxML_info*", intern=T)
   results <- matrix(nrow=length(outFiles), ncol=10)
   for(i in sequence(length(outFiles))){
-    MissingDataLevel <- strsplit(strsplit(outFiles[i], "out")[[1]][2], "noAmbigs")[[1]][1]
-    whichModel <- strsplit(strsplit(outFiles[i], "info.")[[1]][2], "_")[[1]][1]
+    MissingDataLevel <- strsplit(strsplit(outFiles[i], "_")[[1]][2], "info.")[[1]][2]
+    whichModel <- strsplit(outFiles[i], "_")[[1]][3]
     SNPdataset <- read.table(cFiles[grep(MissingDataLevel, cFiles)], row.names=1, colClasses="character", skip=1)
     VariableSites <- nchar(paste(SNPdataset[1,], collapse=""))
     numberLoci <- dim(SNPdataset)[2]
@@ -617,8 +623,9 @@ GetRAxMLStatsPostAnalysis <- function(workingDirectoryOfResults) {
     Missing <-gsub("[A-Za-z:]+|[%]$", "", system(paste("grep 'Proportion of gaps and completely undetermined characters in this alignment:'", outFiles[i]), intern=T), perl=T)
     BootstrapTime <- strsplit(system(paste("grep 'Overall Time for 1000 Rapid Bootstraps'", outFiles[i]), intern=T), split="[A-Za-z:]+|[%]$", perl=T)[[1]][6]
     Likelihood <- strsplit(system(paste("grep 'Final ML Optimization Likelihood:'", outFiles[i]), intern=T), split="[A-Za-z:]+|[%]$", perl=T)[[1]][5]
-    Alpha <- gsub("[alpha: ]", "", system(paste("grep alpha: ", outFiles[i]), intern=T), perl=T)
-    TreeLength <- gsub("Tree-Length: ", "", system(paste("grep Tree-Length: ", outFiles[i]), intern=T), fixed=T)
+    #Alpha <- gsub("[alpha: ]", "", system(paste("grep alpha: ", outFiles[i]), intern=T), perl=T)
+    Alpha <- "0"
+	TreeLength <- gsub("Tree-Length: ", "", system(paste("grep Tree-Length: ", outFiles[i]), intern=T), fixed=T)
     results[i,] <- c(MissingDataLevel, whichModel, numberLoci, VariableSites, alignmentPatterns, Missing, BootstrapTime, Likelihood, Alpha, TreeLength)
   }
   results <- data.frame(results, stringsAsFactors=FALSE)
@@ -661,9 +668,9 @@ GetMrBayesStatsPostAnalysis <- function(workingDirectoryOfResults){
     alpha.lowCI <- pstats[2,4]
     alpha.uppCI <- pstats[2,5]
     alphaESS <- pstats[2,8]
-    stdSplitLine <- system(paste("tail -n 2 ", logFiles[grep(dataName, pstatFiles)], sep=""), intern=T)[1]
-    stdSplits <- gsub("      Average standard deviation of split frequencies: ", "", stdSplitLine)
-    #other ESS params?
+    stdSplitLine <- system(paste("grep -A 1 'Summary statistics for partitions with frequency' ", logFiles[grep(dataName, pstatFiles)], sep=""), intern=T)[2]
+
+    stdSplits <- gsub("          Average standard deviation of split frequencies = ", "", stdSplitLine)
     results[i,] <- c(MissingDataLevel, whichModel, numberLoci, treelength, treelength.lowCI, treelength.uppCI, treelengthESS, alpha, alpha.lowCI, alpha.uppCI, alphaESS, stdSplits)
   }  
   results <- data.frame(results, stringsAsFactors=FALSE)

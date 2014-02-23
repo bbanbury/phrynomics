@@ -38,6 +38,7 @@ for(i in sequence(length(snpFiles))) {
 }
 
 
+
 #exploratory plots of data
 plot(minSamples, log(NuSNPs), type="n")
 text(minSamples, log(NuSNPs), labels=NuSNPs)
@@ -207,22 +208,27 @@ for(model in sequence(length(models))){
 ################################################
 
 #file <- ("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/c65p3noAmbigs.snps")
-file <- ("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/c5p3noAmbigs.snps")
+# file <- ("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/c5p3noAmbigs.snps")  #old file that makes 36 final SNPs
+file <- ("~/Dropbox/UWstuff/phrynomics/Analyses/SNAPP/c20p25.unlinked_snps")
 
 source("~/phrynomics/trunk/phrynomicsFunctions.R")
 
 Data1 <- read.table(file, row.names=1, colClasses="character", skip=1)
-Data2 <- removeOutgroups(Data1)
-#Data3 <- RemoveMissingSpeciesLoci(Data2)
+#Data2 <- removeOutgroups(Data1) #all removed for new unlinked file
+Data2 <- Data1
+#Data3 <- RemoveMissingSpeciesLoci(SplitSNP(Data2))
 Data3 <- Data2
 Data4 <- RemoveNonBinary(Data3)
-Data5 <- TakeSingleSNPfromEachLocus(Data4)[[1]]
+#Data5 <- TakeSingleSNPfromEachLocus(Data4)[[1]]
+Data5 <- Data4
 Data6 <- TranslateBases(Data5, translateMissing=FALSE, ordered=TRUE)
 
 setwd("~/Dropbox/UWstuff/phrynomics/Analyses/SNAPP")
 SNAPPfile <- paste(dim(Data6)[1], nchar(Data6[1,]))
-write(SNAPPfile, file="allPhrynosomaSNAPP.noStep3.snps")
-write.table(Data6, file="allPhrynosomaSNAPP.noStep3.snps", append=TRUE, quote=FALSE, col.names=FALSE)  
+# write(SNAPPfile, file="allPhrynosomaSNAPP.noStep3.snps")
+# write.table(Data6, file="allPhrynosomaSNAPP.noStep3.snps", append=TRUE, quote=FALSE, col.names=FALSE)  
+write(SNAPPfile, file="translated.c20p25.unlinked_snps")
+write.table(Data6, file="translated.c20p25.unlinked_snps", append=TRUE, quote=FALSE, col.names=FALSE)  
 
 #remove individuals with missing data (not just species, ut now individuals)
 indToRemove <- NULL
@@ -236,6 +242,94 @@ for(i in sequence(dim(Data6)[1])){
 ################################################
 ###################### END #####################
 ################################################
+
+
+
+
+################################################
+######  Comparison using invariant Sites  ######
+################################################
+
+#checking allSites using sims
+snpList <- read.table("sim.phy", row.names=1, colClasses="character", skip=1)
+  loci <- dim(snpList)[2]
+  initialLociLengths <- nchar(snpList[1,])
+  splitdata <- SplitSNP(snpList)
+  KeepVector <- apply(splitdata, 2, IsVariable)  #If True, then keep as variable
+  breaks <- which(splitdata[1,] == " ")
+  newSNP <- cSNP(splitdata, KeepVector=KeepVector)
+  newLoci <- length(which(newSNP[1,] != ""))  #number of new loci 
+  SNPFile <- paste(dim(newSNP)[1], length(which(KeepVector == "TRUE")) - length(breaks))
+  write(SNPFile, file="red.sim.phy")
+  write.table(newSNP, file="red.sim.phy", append=TRUE, quote=FALSE, col.names=FALSE)  
+
+#checking allSites using c55 dataset and made up invariant sites
+snpList <- read.table("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns2/c55p3noAmbigs.snps", row.names=1, colClasses="character", skip=1)
+extra1 <- as.character(paste(rep("A", 500), collapse=""))
+extra2 <- as.character(paste(rep("G", 500), collapse=""))
+extra3 <- as.character(paste(rep("T", 500), collapse=""))
+extra4 <- as.character(paste(rep("C", 500), collapse=""))
+snpList <- cbind(snpList, extra1, extra2, extra3, extra4, stringsAsFactors=FALSE)
+loci <- dim(snpList)[2]
+initialLociLengths <- nchar(snpList[1,])
+SNPFile <- paste(dim(snpList)[1], sum(initialLociLengths))
+write(SNPFile, file="c55.extraData2")
+write.table(snpList, file="c55.extraData2", append=TRUE, quote=FALSE, col.names=FALSE)  
+
+
+#after simulating data along a random 73 taxon tree
+#get ratio to the same variant/total sites as c45 dataset
+c45data <- read.table("~/Dropbox/UWstuff/phrynomics/c45p3.phy", colClasses="character", row.names=1, skip=1)
+c45pruned <- read.table("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns2/c45p3noAmbigs.snps", colClasses="character", row.names=1, skip=1)
+ratio <- sum(nchar(c45pruned[1,])) / nchar(c45data[1,])   #16.6%
+
+library(phangorn)
+tree <- rtree(73)
+tree <- root(tree, "t10")
+tree$edge.length <- tree$edge.length/400
+data <- simSeq(tree, l=10000, type="DNA", bf=c(.25,.25,.25,.25), Q=rep(1,6))
+data <- toupper(as.character(data))
+initialLociLengths <- length(data[1,])
+data2 <- cSNP(data)
+SNPFile <- paste(dim(data2)[1], initialLociLengths)
+write(SNPFile, file="c45.sim")
+write.table(data2, file="c45.sim", append=TRUE, quote=FALSE, col.names=FALSE)  
+
+KeepVector <- apply(data, 2, IsVariable)  #If True, then keep as variable
+newSNP <- cSNP(data, KeepVector=KeepVector)
+newLociLength <- nchar(newSNP[1,])
+newLociLength/initialLociLengths  #16.3%
+SNPFile <- paste(dim(newSNP)[1], newLociLength)
+write(SNPFile, file="c45.red.sim")
+write.table(newSNP, file="c45.red.sim", append=TRUE, quote=FALSE, col.names=FALSE)  
+
+## setup three RAxML runs on two sim files (full, nonASC, ASC)
+setwd("~/Dropbox/UWstuff/phrynomics/Analyses/RAxML.allSites")
+fullRun <- paste("raxmlHPC-PTHREADS -T 8 -s c45.sim -f a -m GTRCAT -o t10 -x 320234 -# 4 -p 30947 -n c45.full")
+igfullRun <- paste("raxmlHPC-PTHREADS -T 8 -s c45.sim -f a -m GTRGAMMAI -o t10 -x 2439085 -# 4 -p 981437 -n c45.igfull")
+gfullRun <- paste("raxmlHPC-PTHREADS -T 8 -s c45.sim -f a -m GTRGAMMA -o t10 -x 249085 -# 4 -p 98437 -n c45.gfull")
+nonASCrun <- paste("raxmlHPC-PTHREADS -T 8 -s c45.red.sim -f a -m GTRCAT -o t10 -x 64831 -# 4 -p 186324 -n c45.nonASC")
+ASCrun <- paste("raxmlHPC-PTHREADS -T 8 -s c45.red.sim -f a -m ASC_GTRCAT -V -o t10 -x 192873 -# 4 -p 75984 -n c45.ASC")
+
+allRuns <- c(fullRun, igfullRun, gfullRun, nonASCrun, ASCrun)
+for(i in sequence(length(allRuns))){
+  system(allRuns[i], intern=FALSE)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
