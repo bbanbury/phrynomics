@@ -391,7 +391,25 @@ AddBLD <- function(TreeMatrixName, ListOfTrees){
   cbind(TreeMatrixName, Kscores)
 }
 
-GetEdgeList <- function (tree) {
+
+
+
+GetEdgeList <- function(tree) {
+  tipList <- cbind(tree$edge, tree$edge[, 2] %in% tree$edge[, 1], tree$edge.length)
+  tipList <- as.data.frame(tipList, stringsAsFactors=F)
+  colnames(tipList) <- c("anc", "desc", "class", "branchlength")
+  tipList[which(tipList[,3] == 0), 3] <- "tip"
+  tipList[which(tipList[, 3] == 1), 3] <- "internal"
+  tipList$support <- rep(0, dim(tipList)[1])
+  tipList  <- tipList[order(tipList[,2]), ]  ##NOT comfy with this...  :s
+  tipList$support[which(tipList$class == "internal")] <- as.numeric(tree$node.label)[-1] #node support comes in with an extra space in the beginning, so it has to be cleaved then readded for plotting.
+  options(digits=15)
+  tipList$branchlength <- as.numeric(tipList$branchlength)
+  return(data.frame(tipList, stringsAsFactors = F))
+}
+
+
+ORIGINALGetEdgeList <- function (tree) {
   tipList <- cbind(tree$edge, tree$edge[, 2] %in% tree$edge[, 1], tree$edge.length)
   tipList <- as.data.frame(tipList, stringsAsFactors=F)
   colnames(tipList) <- c("anc", "desc", "class", "branchlength")

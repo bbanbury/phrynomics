@@ -116,6 +116,19 @@ for(i in sequence(length(toRun))){
 }
 
 
+#to make partition file
+setwd("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns")
+file <- "~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/RAxMLruns.noGamma/c65p3noAmbigs.snps"
+data <- read.table(file, row.names=1, colClasses="character", skip=1)
+write(paste(""), file="c65.partitions.txt")
+sites <- nchar(data[1,])
+for(i in 1:dim(data)[2]){
+  start <- 1 + sum(sites[1:i-1])
+  stop <- start + sites[i] - 1
+  line <- paste("DNA, locus", i, " = ", start, "-", stop, sep="")
+  write(line, file="c65.partitions.txt", append=TRUE)
+}
+
 ################################################
 ###################### END #####################
 ################################################
