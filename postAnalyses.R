@@ -64,7 +64,7 @@ for(i in sequence(dim(treeMatrix)[1])) {
   BL.AllTrees[[i]] <- MakeBranchLengthMatrix(tree1, tree2, analysis=analysis, dataset=rownames(treeMatrix)[i])
   names(BL.AllTrees)[[i]] <- rownames(treeMatrix)[i]
 }
-setwd("~/Dropbox/UWstuff/phrynomics/Analyses/newFigs")
+setwd("~/Dropbox/UWstuff/phrynomics/Analyses/newFigs2")
 
 
 
@@ -79,13 +79,17 @@ for(i in sequence(length(orderToGo))){
   dataToUse <- which(rownames(treeMatrix) == orderToGo[i])
   pdf(file=paste(analysis, ".", rownames(treeMatrix)[dataToUse], "trees.pdf", sep=""), width=8.5, height=11)
   tree1 <- assTrees(treeMatrix3[dataToUse,1], TreeList)[[1]]
+  tree1$tip.label[which(tree1$tip.label == "UMNO1")] <- "CADR2"  #change taxon
   tree2 <- assTrees(treeMatrix3[dataToUse,2], TreeList)[[1]]
+  tree2$tip.label[which(tree2$tip.label == "UMNO1")] <- "CADR2" #change taxon in tree2
   plot(tree1, edge.lty=BL.AllTrees[[dataToUse]]$edgelty, edge.color=BL.AllTrees[[dataToUse]]$edgeColor, cex=0.5, edge.width=2)
   legtxt <- c("Discordant", "< -10%", "-10% to 10%", "> 10%", "> 20%", "> 30%", "> 40%", "> 50%")
   legcolors <- c("gray", rgb(51,51,255, max=255), "gray", rgb(255,255,102, max=255), rgb(255,178,102, max=255), rgb(225,128,0, max=255), rgb(225,0,0, max=255), rgb(153,0,0, max=255))
   legend("bottomleft", legend=legtxt, col=legcolors, lty=c(2,rep(1,7)), lwd=2, merge = TRUE, bty="n", xjust=1, inset=0.02, cex=0.75, title=expression(underline("Branchlength Difference"))) 
-  nodelabels(c(NA, BL.AllTrees[[dataToUse]]$support[which(BL.AllTrees[[dataToUse]]$class == "internal")]), cex=0.5, col="black", bg="white", frame="none", adj=c(1.1, -0.1))
-  nodelabels(c(NA, BL.AllTrees[[dataToUse]]$corr.support[which(BL.AllTrees[[dataToUse]]$class == "internal")]), cex=0.5, col="black", bg="white", frame="none", adj=c(1.1, 1.1))
+  nodelabels(text=BL.AllTrees[[dataToUse]]$support[which(BL.AllTrees[[dataToUse]]$class == "internal")], node=BL.AllTrees[[dataToUse]]$desc[which(BL.AllTrees[[dataToUse]]$class == "internal")], cex=0.5, col="black", bg="white", frame="none", adj=c(1.1, -0.1))
+  nodelabels(text=BL.AllTrees[[dataToUse]]$corr.support[which(BL.AllTrees[[dataToUse]]$class == "internal")], node=BL.AllTrees[[dataToUse]]$desc[which(BL.AllTrees[[dataToUse]]$class == "internal")], cex=0.5, col="black", bg="white", frame="none", adj=c(1.1, 1.1))
+  # nodelabels(c(NA, BL.AllTrees[[dataToUse]]$support[which(BL.AllTrees[[dataToUse]]$class == "internal")]), cex=0.5, col="black", bg="white", frame="none", adj=c(1.1, -0.1))
+  # nodelabels(c(NA, BL.AllTrees[[dataToUse]]$corr.support[which(BL.AllTrees[[dataToUse]]$class == "internal")]), cex=0.5, col="black", bg="white", frame="none", adj=c(1.1, 1.1))
   if(analysis == "RAxML"){
     bquote1 <- bquote(bold("Supplemental Figure S" * .(letters[i]) * ".") * " Maximum likelihood phylogeny for the ascertainment-corrected dataset s" * .(strsplit(orderToGo[i], "\\D")[[1]][2]) ~ "(" * .(makeNumberwithcommas(RAxMLresults[which(RAxMLresults$Level == orderToGo[i]), 4][1])) ~ "variable sites," ~ "\n" )
     bquote2 <- bquote(.(unique(RAxMLresults[which(RAxMLresults$Level == orderToGo[i]), 6])) * "% missing data). Bootstrap values are shown on nodes (ascertainment-corrected above, no correction below). Branch")
@@ -228,6 +232,19 @@ if(analysis == "MrBayes"){
   }
   dev.off()
 }
+
+
+# Get Taxa SNP overlap 
+datasets <- system("ls ~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/RAxMLruns.noGamma/c*.snps", intern=T)
+dataOverlap <- list()
+for(i in sequence(length(datasets))){
+  dataset <- read.table(datasets[[i]], row.names=1, colClasses="character", skip=1)
+  dataOverlap[[i]] <- DataOverlap(dataset)[[2]]
+  names(dataOverlap)[[i]] <- strsplit(strsplit(datasets[i], "/")[[1]][10], "p")[[1]][1]
+}
+
+
+
 
 
 

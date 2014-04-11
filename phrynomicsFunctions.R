@@ -304,6 +304,31 @@ TranslateBases <- function(data, translateMissing=TRUE, translateMissingChar="-"
 }
 
 
+MakePresentAbsent <- function(dataset){
+#function removes loci breaks, and changes all data to 1, all missing data to 0
+  split <- SplitSNP(dataset)
+  split <- split[,-which(split[1,] == " ")]
+  split[c(which(split=="-"), which(split=="N"))] <- 0
+  split[-c(which(split=="-"), which(split=="N"), which(split=="0"))] <- 1
+  return(matrix(as.numeric(unlist(split)),nrow=nrow(split)))
+}
+
+
+DataOverlap <- function (dataset){
+#This function will calculate the amount of shared SNPs
+  presAbsentDataset <- MakePresentAbsent(dataset)
+  rownames(presAbsentDataset) <- rownames(dataset)
+  totals <- apply(presAbsentDataset, 2, sum)
+  probs <- totals/73
+  for(i in sequence(dim(presAbsentDataset)[2])){  #probably could clean this up by using replace()
+    presAbsentDataset[which(presAbsentDataset[,i] == 1),i] <- probs[i]
+  }  
+  speciesTotals <- apply(presAbsentDataset, 1, mean)
+  return(list(presAbsentDataset, speciesTotals))
+}
+
+
+
 
 ################################################
 #################   END   ######################
@@ -392,35 +417,22 @@ AddBLD <- function(TreeMatrixName, ListOfTrees){
 }
 
 
-
-
 GetEdgeList <- function(tree) {
+  desc.order <- tree$edge[,2]  #store this order so that you can go back to it after
   tipList <- cbind(tree$edge, tree$edge[, 2] %in% tree$edge[, 1], tree$edge.length)
   tipList <- as.data.frame(tipList, stringsAsFactors=F)
   colnames(tipList) <- c("anc", "desc", "class", "branchlength")
   tipList[which(tipList[,3] == 0), 3] <- "tip"
   tipList[which(tipList[, 3] == 1), 3] <- "internal"
   tipList$support <- rep(0, dim(tipList)[1])
-  tipList  <- tipList[order(tipList[,2]), ]  ##NOT comfy with this...  :s
+  tipList  <- tipList[order(tipList[,2]), ]  # reorder edge list so that you can assign the correct support vals
   tipList$support[which(tipList$class == "internal")] <- as.numeric(tree$node.label)[-1] #node support comes in with an extra space in the beginning, so it has to be cleaved then readded for plotting.
+  tipList <- tipList[match(desc.order , tipList[,2]),]
   options(digits=15)
   tipList$branchlength <- as.numeric(tipList$branchlength)
   return(data.frame(tipList, stringsAsFactors = F))
 }
 
-
-ORIGINALGetEdgeList <- function (tree) {
-  tipList <- cbind(tree$edge, tree$edge[, 2] %in% tree$edge[, 1], tree$edge.length)
-  tipList <- as.data.frame(tipList, stringsAsFactors=F)
-  colnames(tipList) <- c("anc", "desc", "class", "branchlength")
-  tipList[which(tipList[,3] == 0), 3] <- "tip"
-  tipList[which(tipList[, 3] == 1), 3] <- "internal"
-  tipList$support <- rep(0, dim(tipList)[1])
-  tipList$support[which(tipList$class == "internal")] <- as.numeric(tree$node.label)[-1] #node support comes in with an extra space in the beginning, so it has to be cleaved then readded for plotting.
-  options(digits=15)
-  tipList$branchlength <- as.numeric(tipList$branchlength)
-  return(data.frame(tipList, stringsAsFactors = F))
-}
 
 nodeOffspring <- function(tree, anc.node) {
   rows <- which(tree$edge[, 1] == anc.node)
@@ -492,9 +504,10 @@ ReturnMaxCI <- function(x, vstat){
   else return(0)
 }
 
+
 MakeBranchLengthMatrix <- function(tree1, tree2, analysis="RAxML", dataset=NULL){  
-  t1 <- GetEdgeList(tree1)
-  t2 <- GetEdgeList(tree2)
+  t1 <- GetEdgeList(tree1) 
+  t2 <- GetEdgeList(tree2) 
   desc.nodes <- t1[,2]
   t1$present <- sapply(desc.nodes, CheckSharedMonophy, tree1=tree1, tree2=tree2) 
   t1$corr.anc <- sapply(t1[,1], GetCorrespondingEdge, tree1=tree1, tree2=tree2)
@@ -610,6 +623,38 @@ getColor <- function(BLtable, nonSigColor="gray", sigColor="red", method=c("varO
     }
   }
 return(colorVector)
+}
+
+GetAncestors <- function(treeEdgeMatrix, tip) {
+#function to tree traverse back to the root to get node numbers
+  Root <- min(treeEdgeMatrix[,1])
+  is.done <- FALSE
+  desc <- tip
+  desc.vector <- tip
+  while(!is.done){
+    a <- which(treeEdgeMatrix[, 2] == desc)
+    b <- treeEdgeMatrix[a, 1]
+    desc.vector <- c(desc.vector, b)
+    if(b == Root)
+      is.done <- TRUE
+    else
+      desc <- b
+  }
+  return(desc.vector)
+}
+
+CalculateTotalTipBLError <- function(BL.AllTrees) {
+#this function should take BL.AllTrees matrix and return root to tip totals BL.DIFF
+  tips <- BL.AllTrees[which(BL.AllTrees$class == "tip"), 2]
+  tipPathDifferences <- NULL
+  for(i in tips){
+    ancs <- GetAncestors(BL.AllTrees[,1:2], tips[i])
+    pathDifferences <- BL.AllTrees[which(BL.AllTrees[,2] %in% ancs), 12]  #column 12 is relativeBLdiff (which can be pos or neg)
+    totalPathDifference <- sum(abs(pathDifferences))  # sum absolute value path differences # relative number
+    tipPathDifferences <- c(tipPathDifferences, totalPathDifference)
+  }
+  names(tipPathDifferences) <- paste("tip", tips, sep="")
+  return(tipPathDifferences)
 }
 
 
