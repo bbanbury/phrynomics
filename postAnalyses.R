@@ -234,14 +234,76 @@ if(analysis == "MrBayes"){
 }
 
 
+
 # Get Taxa SNP overlap 
 datasets <- system("ls ~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/RAxMLruns.noGamma/c*.snps", intern=T)
 dataOverlap <- list()
 for(i in sequence(length(datasets))){
   dataset <- read.table(datasets[[i]], row.names=1, colClasses="character", skip=1)
   dataOverlap[[i]] <- DataOverlap(dataset)[[2]]
-  names(dataOverlap)[[i]] <- strsplit(strsplit(datasets[i], "/")[[1]][10], "p")[[1]][1]
+  names(dataOverlap)[[i]] <- strsplit(strsplit(datasets[i], "/")[[1]][10], "no")[[1]][1]
 }
+
+# Get Taxa total branchlengh differences from root to tip
+sum.BLdiff <- list()
+for(i in sequence(length(BL.AllTrees))){
+  sum.BLdiff[[i]] <- CalculateTotalTipBLError(BL.AllTrees[[i]])
+  names(sum.BLdiff)[[i]] <- names(BL.AllTrees)[[i]]
+}
+
+#Get Taxon specific branchlength error
+taxon.BLdiff <- list()
+for(i in sequence(length(BL.AllTrees))){
+  taxon.BLdiff[[i]] <- GetJustTipBLError(BL.AllTrees[[i]])
+  names(taxon.BLdiff)[[i]] <- names(BL.AllTrees)[[i]]
+}
+
+#plot just data overlap
+layout(matrix(c(1:16), nrow=4, byrow=TRUE), respect=TRUE)
+for(i in sequence(length(dataOverlap))){
+  whichData <- names(dataOverlap[i])
+  plot(dataOverlap[[which(names(dataOverlap) == whichData)]], ylab="data Overlap")
+  title(sub=whichData)
+}
+
+# sum of BL differences
+layout(matrix(c(1:16), nrow=4, byrow=TRUE), respect=TRUE)
+for(i in sequence(length(dataOverlap))){
+  orderToGo <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+  whichData <- orderToGo[i]
+  plot(dataOverlap[[which(names(dataOverlap) == whichData)]], sum.BLdiff[[which(names(sum.BLdiff) == whichData)]], xlab="data Overlap", ylab="sum BL differences")
+  title(sub=whichData)
+}
+
+# data overlap with tip BL differences
+layout(matrix(c(1:16), nrow=4, byrow=TRUE), respect=TRUE)
+for(i in sequence(length(dataOverlap))){
+ # orderToGo <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+  orderToGo <- c("c5p3", "c25p3", "c45p3", "c65p3")
+
+  whichData <- orderToGo[i]
+  plot(dataOverlap[[which(names(dataOverlap) == whichData)]], taxon.BLdiff[[which(names(taxon.BLdiff) == whichData)]], xlab="data Overlap", ylab="taxon BL Diff", type="n")
+  whichPhrynosoma <- grep(pattern="PH", names(dataOverlap[[which(names(dataOverlap) == whichData)]]))
+  points(dataOverlap[[which(names(dataOverlap) == whichData)]][whichPhrynosoma], taxon.BLdiff[[which(names(taxon.BLdiff) == whichData)]][whichPhrynosoma], col="red")
+  points(dataOverlap[[which(names(dataOverlap) == whichData)]][-whichPhrynosoma], taxon.BLdiff[[which(names(taxon.BLdiff) == whichData)]][-whichPhrynosoma], col="blue")
+  title(sub=whichData)
+}
+
+#boxplot the data
+#make a new table with all data
+all.data <- NULL
+orderToGo <- c("c5p3", "c25p3", "c45p3", "c65p3")
+for(i in sequence(length(orderToGo))){
+  whichData <- orderToGo[i]
+  data1 <- taxon.BLdiff[[which(names(taxon.BLdiff) == whichData)]]
+  data2 <- rep("OG", length(data1))
+  data2[grep(pattern="PH", names(dataOverlap[[which(names(dataOverlap) == whichData)]]))] <- "PH"
+  data2 <- paste(whichData, data2, sep=".")
+  data3 <- data.frame(data1, data2)
+  colnames(data3) <- c("BL", "whichData") 
+  all.data <- rbind(all.data, data3)
+}
+boxplot(all.data[,1] ~ all.data[,2], range=0)
 
 
 
