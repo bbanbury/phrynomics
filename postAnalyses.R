@@ -276,13 +276,13 @@ for(i in sequence(length(dataOverlap))){
 }
 
 # data overlap with tip BL differences
-layout(matrix(c(1:16), nrow=4, byrow=TRUE), respect=TRUE)
+layout(matrix(c(1:4), nrow=1, byrow=TRUE), respect=TRUE)
 for(i in sequence(length(dataOverlap))){
  # orderToGo <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
   orderToGo <- c("c5p3", "c25p3", "c45p3", "c65p3")
 
   whichData <- orderToGo[i]
-  plot(dataOverlap[[which(names(dataOverlap) == whichData)]], taxon.BLdiff[[which(names(taxon.BLdiff) == whichData)]], xlab="data Overlap", ylab="taxon BL Diff", type="n")
+  plot(dataOverlap[[which(names(dataOverlap) == whichData)]], taxon.BLdiff[[which(names(taxon.BLdiff) == whichData)]], xlab="data Overlap", ylab="taxon BL Diff", type="n", ylim=c(min(all.data[,1]), max(all.data[,1])), xlim=c(0,1))
   whichPhrynosoma <- grep(pattern="PH", names(dataOverlap[[which(names(dataOverlap) == whichData)]]))
   points(dataOverlap[[which(names(dataOverlap) == whichData)]][whichPhrynosoma], taxon.BLdiff[[which(names(taxon.BLdiff) == whichData)]][whichPhrynosoma], col="red")
   points(dataOverlap[[which(names(dataOverlap) == whichData)]][-whichPhrynosoma], taxon.BLdiff[[which(names(taxon.BLdiff) == whichData)]][-whichPhrynosoma], col="blue")
@@ -303,11 +303,121 @@ for(i in sequence(length(orderToGo))){
   colnames(data3) <- c("BL", "whichData") 
   all.data <- rbind(all.data, data3)
 }
-boxplot(all.data[,1] ~ all.data[,2], range=0)
+boxplot(all.data[,1] ~ all.data[,2], range=0, outline=FALSE)
+boxplot(log(abs(all.data[,1])) ~ all.data[,2], range=0)
 
 
+#new thought on plotting dataset size (x) with two y vars (mean and variance) of combined datasets
+mean.var.data <- NULL
+orderToGo <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+#orderToGo <- c("c5p3", "c25p3", "c45p3", "c65p3")
+for(i in sequence(length(orderToGo))){
+  whichData <- orderToGo[i]
+  data1 <- taxon.BLdiff[[which(names(taxon.BLdiff) == whichData)]]
+  data2 <- rep("OG", length(data1))
+  data2[grep(pattern="PH", names(dataOverlap[[which(names(dataOverlap) == whichData)]]))] <- "PH"
+  data3 <- data.frame(data1, data2)
+  OGmean <- mean(data3[which(data3[,2] == "OG"),1])
+  OGvar <- var(data3[which(data3[,2] == "OG"),1])
+  PHmean <- mean(data3[which(data3[,2] == "PH"),1])
+  PHvar <- var(data3[which(data3[,2] == "PH"),1])
+  data4 <- c(whichData, OGmean, OGvar, PHmean, PHvar)
+  mean.var.data <- rbind(mean.var.data, data4)
+}
+colnames(mean.var.data) <- c("whichData", "OGmean", "OGvar", "PHmean", "PHvar")
+mean.var.data <- as.data.frame(mean.var.data, row.names= mean.var.data[,1], stringsAsFactors=FALSE)
+for(i in 2:5){
+  mean.var.data[,i] <- as.numeric(mean.var.data[,i])
+}
+q <- 1:13  #make this something else later that orders correctly
+mean.var.data <- mean.var.data[-14,]
+par(mar=c(5,5,2,5))
+plot(q, mean.var.data[,2], type="n", ylim=c(min(c(mean.var.data[,4], mean.var.data[,2])), max(c(mean.var.data[,4], mean.var.data[,2]))), ylab="mean", xlab="", axes=FALSE)
+axis(side=2)
+axis(side=1, at=1:13, labels=orderToGo[-14])
+points(q, mean.var.data[,2], col="gray")
+points(q, mean.var.data[,4], col="black")
+for(i in sequence(dim(mean.var.data)[1]-1)){
+  segments(i, mean.var.data[i,2], i+1, mean.var.data[i+1,2], col="gray")
+  segments(i, mean.var.data[i,4], i+1, mean.var.data[i+1,4], col="black")
+}
+#par(new=TRUE)
+#plot(q, mean.var.data[,3], type="n", bty="n", axes=FALSE, xlab="", ylab="")
+#points(q, mean.var.data[,3], col="blue")
+#points(q, mean.var.data[,5], col="red")
+#for(i in sequence(dim(mean.var.data)[1]-1)){
+#  segments(i, mean.var.data[i,3], i+1, mean.var.data[i+1,3], col="blue", lty=2)
+#  segments(i, mean.var.data[i,5], i+1, mean.var.data[i+1,5], col="red", lty=2)
+#}
+#axis(side=4)
+#mtext(side=4, line=3, "variance")
 
 
+#PICs?
+#use pic(sum.BLdiff) and pic(dataOverlap) 
+orderToGo <- c("c5p3", "c25p3", "c45p3", "c65p3")
+layout(matrix(c(1:length(orderToGo)), nrow=1, byrow=TRUE), respect=TRUE)
+for(i in sequence(length(orderToGo))){
+  tree <- assTrees(treeMatrix3[which(rownames(treeMatrix3) == orderToGo[i]),1], TreeList)[[1]]
+  BLdiffs <- sum.BLdiff[which(names(sum.BLdiff) == orderToGo[i])][[1]]
+  pic.BLdiffs <- pic(BLdiffs, tree)
+  dataO <- dataOverlap[which(names(dataOverlap) == orderToGo[i])][[1]]
+  picDataOverlap <- pic(dataO, tree) 
+  plot(picDataOverlap, pic.BLdiffs)
+}
+
+
+#new thoughts on plotting dataset BLdiff means and using error bars to represent var
+mean.var.data <- NULL
+orderToGo <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+#orderToGo <- c("c5p3", "c25p3", "c45p3", "c65p3")
+for(i in sequence(length(orderToGo))){
+  whichData <- orderToGo[i]
+  data1 <- taxon.BLdiff[[which(names(taxon.BLdiff) == whichData)]]
+  data2 <- rep("OG", length(data1))
+  data2[grep(pattern="PH", names(dataOverlap[[which(names(dataOverlap) == whichData)]]))] <- "PH"
+  data3 <- data.frame(data1, data2)
+  ALLmean <- mean(data3[,1])
+  ALLsd <- sd(data3[,1])
+  PHmean <- mean(data3[which(data3[,2] == "PH"),1])
+  PHsd <- sd(data3[which(data3[,2] == "PH"),1])
+  data4 <- c(whichData, ALLmean, ALLsd, PHmean, PHsd)
+  mean.var.data <- rbind(mean.var.data, data4)
+}
+colnames(mean.var.data) <- c("whichData", "ALLmean", "ALLsd", "PHmean", "PHsd")
+mean.var.data <- as.data.frame(mean.var.data, row.names= mean.var.data[,1], stringsAsFactors=FALSE)
+for(i in 2:5){
+  mean.var.data[,i] <- as.numeric(mean.var.data[,i])
+}
+q <- 1:13  #make this something else later that orders correctly
+mean.var.data <- mean.var.data[-14,]
+par(mar=c(5,5,2,5))
+ymax <- max(mean.var.data$ALLmean + mean.var.data$ALLsd)
+ymin <- min(mean.var.data$ALLmean - mean.var.data$ALLsd)
+plot(q, mean.var.data[,2], type="n", ylim=c(ymin, ymax), ylab="mean")
+points(q, mean.var.data[,2], col="blue")
+points(q, mean.var.data[,4], col="red")
+for(i in sequence(dim(mean.var.data)[1])){
+  arrows(i, mean.var.data[i,2], i, mean.var.data[i,2]+mean.var.data[i,3], angle=90, code=2, length=0.1, col="blue")
+  arrows(i, mean.var.data[i,2], i, mean.var.data[i,2]-mean.var.data[i,3], angle=90, code=2, length=0.1, col="blue")
+  arrows(i, mean.var.data[i,4], i, mean.var.data[i,4]+mean.var.data[i,5], angle=90, code=2, length=0.1, col="red")
+  arrows(i, mean.var.data[i,4], i, mean.var.data[i,4]-mean.var.data[i,5], angle=90, code=2, length=0.1, col="red")
+}
+for(i in sequence(dim(mean.var.data)[1]-1)){
+  segments(i, mean.var.data[i,2], i+1, mean.var.data[i+1,2], col="blue")
+  segments(i, mean.var.data[i,4], i+1, mean.var.data[i+1,4], col="red")
+}
+
+
+# amount of mean dataOverlap for OG and PH per dataset
+newDataOverlap <- matrix(nrow=14, ncol=2)
+rownames(newDataOverlap) <- names(dataOverlap)
+colnames(newDataOverlap) <- c("outgroup", "Phrynosoma")
+for(i in sequence(length(dataOverlap))){
+  newDataOverlap[i,1] <- mean(dataOverlap[[i]][-grep(pattern="PH", names(dataOverlap[[i]]))])
+  newDataOverlap[i,2] <- mean(dataOverlap[[i]][grep(pattern="PH", names(dataOverlap[[i]]))])
+}
+write.table(newDataOverlap, file="amountOfDataOverlap.txt")
 
 
 
