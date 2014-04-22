@@ -1,8 +1,16 @@
+##  --------------------------------  ##
+##  ---      shinyPhrynomics     ---  ##
+##  ---    written by B.Banbury  ---  ##
+##  ---     v 1.0  22April2014   ---  ##
+##  --------------------------------  ##
+
+
+##  ---         Load Code        ---  ##
 library(shiny)
 library(devtools)
 source("~/phrynomics/trunk/phrynomicsFunctions.R")
 
-##Functions for Server
+##  ---     Server Functions     ---  ##
 fileFormat <- function(file){
   # returns "phy" or "nex" depending on the file type
   format <- NULL
@@ -37,11 +45,10 @@ GetNumberSNPs <- function(taxon){
   return(nchar(paste(taxon, collapse="")))
 }
 
-#writeNexus
 WriteNexus <- function(phyData, file, missing) {
   nchars <- min(apply(phyData, 1, GetNumberSNPs))
   write(paste("#NEXUS"), file)
-  write(paste("[Written ", Sys.Date(), " via phrynomics Rscript]", sep=""), file, append=TRUE)
+  write(paste("[Written ", Sys.Date(), " via shinyPhrynomics]", sep=""), file, append=TRUE)
   write(paste("BEGIN Data;"), file, append=TRUE)
   write(paste("   DIMENSIONS NTAX=", dim(phyData)[1], " NCHAR=", nchars, ";", sep=""), file, append=TRUE)
   write(paste("   FORMAT DATATYPE=Standard INTERLEAVE=no missing=", missing, ";", sep=""), file, append=TRUE)
@@ -54,7 +61,7 @@ WriteNexus <- function(phyData, file, missing) {
 }
 
 
-##Communicates with UI
+##  ---   Server Communication   ---  ##
 shinyServer(function(input, output) {
   initializeTable <- reactive({
     inFile <- input$SNPdataset

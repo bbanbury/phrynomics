@@ -1,12 +1,28 @@
-library(shiny)
-shinyUI(pageWithSidebar(
-  
-  headerPanel(
-    h1("Phrynomics")),
+##  --------------------------------  ##
+##  ---      shinyPhrynomics     ---  ##
+##  ---    written by B.Banbury  ---  ##
+##  ---     v 1.0  22April2014   ---  ##
+##  --------------------------------  ##
 
+
+##  Load packages and source code
+library(shiny)
+
+##  shiny user interface
+shinyUI(pageWithSidebar(  
+
+##  ---          header          ---  ##
+  headerPanel(
+    HTML(paste("shiny", tags$span(style="color:Burlywood", "Phrynomics"), sep = ""))),
+
+
+
+##  ---         side bar         ---  ##
   sidebarPanel(
     a("See phrynomics GitHub for full code base", href="https://github.com/bbanbury/phrynomics"),
     br(),
+    a("exampleData.phy", href="https://github.com/bbanbury/phrynomics"),
+    a("exampleData.nex", href="https://github.com/bbanbury/phrynomics"),
     br(),
     h4("Original Dastset"),    
     textInput("datasetName", "Enter SNP Dataset Name:", value="SNPdata"), 
@@ -25,19 +41,18 @@ shinyUI(pageWithSidebar(
     br(),
     h5("Transform to MrBayes Mk/Mkv Model"),
     h6(em("Will convert A,T,G,C to 1,2,3,4 (respectively), ambiguity codes are supported.")),
-    #h6(em("A will always return a 1, T=2, G=3, C=4, and ambiguity codes get parentheses with possible bases")),
     checkboxInput("transMrBayes", "Translate", value=FALSE),
     br(),
     img(src="phryno.png", width=350)),
-    #img(src="https://flic.kr/p/cuLLcW", width=350)),
-    #img(src="http://upload.wikimedia.org/wikipedia/commons/4/46/Horned_lizard_032507_kdh.jpg", width=350)),
 
+##  ---         main bar         ---  ##
   mainPanel(
     h4("Preview Original Dataset"),
     tableOutput("inputPreview"),
     h4("Preview Results"),
     tableOutput("resultsPreview"),
     verbatimTextOutput("communicationWindow"),
+    hr(),
     downloadButton("downloadPhy", label="Download Full Results to Phy"),
     downloadButton("downloadNex", label="Download Full Results to Nexus"))
 ))
