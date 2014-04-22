@@ -21,10 +21,11 @@ shinyUI(pageWithSidebar(
   sidebarPanel(
     a("See phrynomics GitHub for full code base", href="https://github.com/bbanbury/phrynomics"),
     br(),
-    a("exampleData.phy", href="https://github.com/bbanbury/phrynomics"),
-    a("exampleData.nex", href="https://github.com/bbanbury/phrynomics"),
+    a("exampleData.phy", href="example.txt"),
     br(),
-    h4("Original Dastset"),    
+    a("exampleData.nex", href="example.nex"),
+    br(),
+    h4("Original Dastset"),
     textInput("datasetName", "Enter SNP Dataset Name:", value="SNPdata"), 
     fileInput("SNPdataset", "Choose File To Upload (.phy or .nex):", accept=c("text/csv", "text/comma-separated-values", "text/plain", ".txt", ".nex")),
 #    a("See example input", href="https://raw.githubusercontent.com/bbanbury/phrynomics/master/shinyPhrynomics/example.txt"),
@@ -43,7 +44,8 @@ shinyUI(pageWithSidebar(
     h6(em("Will convert A,T,G,C to 1,2,3,4 (respectively), ambiguity codes are supported.")),
     checkboxInput("transMrBayes", "Translate", value=FALSE),
     br(),
-    img(src="phryno.png", width=350)),
+    img(src="phryno.png", width=350),
+    verbatimTextOutput("phrynoversion")),
 
 ##  ---         main bar         ---  ##
   mainPanel(

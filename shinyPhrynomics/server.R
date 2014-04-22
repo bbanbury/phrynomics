@@ -1,7 +1,7 @@
 ##  --------------------------------  ##
 ##  ---      shinyPhrynomics     ---  ##
 ##  ---    written by B.Banbury  ---  ##
-##  ---     v 1.0  22April2014   ---  ##
+##  ---     v1.0  22April2014   ---  ##
 ##  --------------------------------  ##
 
 
@@ -9,6 +9,7 @@
 library(shiny)
 library(devtools)
 source("~/phrynomics/trunk/phrynomicsFunctions.R")
+vers <- "v1.0"
 
 ##  ---     Server Functions     ---  ##
 fileFormat <- function(file){
@@ -63,6 +64,10 @@ WriteNexus <- function(phyData, file, missing) {
 
 ##  ---   Server Communication   ---  ##
 shinyServer(function(input, output) {
+  output$phrynoversion <- renderText({
+    paste("Made with Phrynoversion", vers)
+  })
+
   initializeTable <- reactive({
     inFile <- input$SNPdataset
     inputFileType <- fileFormat(inFile$datapath)
