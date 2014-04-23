@@ -8,7 +8,7 @@
 ##  ---         Load Code        ---  ##
 library(shiny)
 #library(devtools)
-source("~/phrynomics/trunk/phrynomicsFunctions.R")
+source("~./phrynomicsFunctions.R")
 vers <- "v1.0"
 
 ##  ---     Server Functions     ---  ##
