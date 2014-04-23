@@ -7,7 +7,7 @@
 
 ##  ---         Load Code        ---  ##
 library(shiny)
-library(devtools)
+#library(devtools)
 source("~/phrynomics/trunk/phrynomicsFunctions.R")
 vers <- "v1.0"
 
