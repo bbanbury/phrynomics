@@ -8,8 +8,16 @@
 ##  ---         Load Code        ---  ##
 library(shiny)
 #library(devtools)
-source("./phrynomicsFunctions.R")
 vers <- "v1.0"
+#system("ls ..")
+source("../phrynomicsFunctions.R")
+#downloadPhrynoFunctions <- function(url) {
+#  name <- tempfile()
+#  download.file(url, name)
+#  source(name)
+#  unlink(name)
+#}
+#downloadPhrynoFunctions("http://raw.githubusercontent.com/bbanbury/phrynomics/master/phrynomicsFunctions.R")
 
 ##  ---     Server Functions     ---  ##
 fileFormat <- function(file){
