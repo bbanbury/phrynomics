@@ -7,10 +7,12 @@
 
 ##  ---         Load Code        ---  ##
 library(shiny)
-#library(devtools)
 vers <- "v1.0"
-#system("ls ..")
-source("../phrynomicsFunctions.R")
+loadSourceFiles <- function(path){
+  filesToLoad <- list.files(path)
+  sapply(paste(path, filesToLoad, sep=""), source)
+}
+loadSourceFiles("../../R/")
 
 ##  ---     Server Functions     ---  ##
 fileFormat <- function(file){
