@@ -27,7 +27,7 @@ shinyUI(pageWithSidebar(
     br(),
     h4("Original Dastset"),
     textInput("datasetName", "Enter SNP Dataset Name:", value="SNPdata"), 
-    fileInput("SNPdataset", "Choose File To Upload (.phy or .nex):", accept=c("text/csv", "text/comma-separated-values", "text/plain", ".txt", ".nex", ".snps")),
+    fileInput("SNPdataset", "Choose File To Upload (.phy, .nex, .txt, .snps):", accept=c("text/csv", "text/comma-separated-values", "text/plain", ".txt", ".nex", ".snps")),
 #    a("See example input", href="https://raw.githubusercontent.com/bbanbury/phrynomics/master/shinyPhrynomics/example.txt"),
     numericInput("obs", "Number Of Taxa to Preview:", 5),
     checkboxInput("rmInvSites", "Remove Invariant Sites", value=TRUE),
@@ -45,6 +45,7 @@ shinyUI(pageWithSidebar(
     checkboxInput("transMrBayes", "Translate", value=FALSE),
     br(),
     img(src="phryno.png", width=350),
+    helpText("Photo by Jared Grummer"),
     verbatimTextOutput("phrynoversion")),
 
 ##  ---         main bar         ---  ##
