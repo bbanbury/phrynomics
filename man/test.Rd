@@ -1,4 +1,4 @@
-\name{g}
+\name{go}
 \alias{g}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
