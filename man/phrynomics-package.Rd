@@ -16,6 +16,7 @@
 	License: \tab GPL (>= 2)\cr}
 }
 \author{
-Barb Banbury, Adam Leaché
-Maintainer: Barb Banbury <darwinthesun@gmail.com>
+	\tabular{ll}{
+     Authors: \tab Barb Banbury, Adam Leaché \cr
+     Maintainer: \tab Barb Banbury <darwinthesun@gmail.com> \cr}
 }
