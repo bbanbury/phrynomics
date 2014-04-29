@@ -4,8 +4,9 @@
 
 library(ape)
 library(phangorn)
-source("~/phrynomics/trunk/phrynomicsFunctions.R")
-
+path <- "~/phrynomics/trunk/R/"
+files <- list.files(path)
+sapply(paste(path, files, sep=""), source)
 
 # Load RAxML Trees (GTRGAMMA model) -- OLD
 # analysis <- "RAxML"
@@ -35,7 +36,6 @@ setwd("~/Dropbox/UWstuff/phrynomics/Analyses/newFigs")
 ###################################################
 ######## Get whole-tree distance metrics ##########
 ###################################################
-
 # Add whole-tree metrics (phangorn) data to the tree matrix
 treeMatrix2 <- AddTreeDist(treeMatrix, TreeList)
 # Add whole-tree metrics (Kuhner & Felsenstein; Kscore) data to tree matrix 
@@ -158,7 +158,6 @@ pdf(file=paste(analysis, "ScatterPlots.pdf", sep=""), width=8.5, height=5)
 op <- par(mar=par("mar")/1.7)
 layout(matrix(1:4, nrow=1, byrow=TRUE), respect=TRUE)  
 whichDatasets <- c("c5p3", "c25p3", "c45p3", "c65p3")
-#whichDatasets <- c("c10p3", "c25p3", "c35p3", "c45p3")  #works for MrBayes trials too
 
 for(i in sequence(length(whichDatasets))){
   dataToUse <- which(whichDatasets[i] == names(BL.AllTrees))
@@ -275,20 +274,6 @@ for(i in sequence(length(dataOverlap))){
   title(sub=whichData)
 }
 
-# data overlap with tip BL differences
-layout(matrix(c(1:4), nrow=1, byrow=TRUE), respect=TRUE)
-for(i in sequence(length(dataOverlap))){
- # orderToGo <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
-  orderToGo <- c("c5p3", "c25p3", "c45p3", "c65p3")
-
-  whichData <- orderToGo[i]
-  plot(dataOverlap[[which(names(dataOverlap) == whichData)]], taxon.BLdiff[[which(names(taxon.BLdiff) == whichData)]], xlab="data Overlap", ylab="taxon BL Diff", type="n", ylim=c(min(all.data[,1]), max(all.data[,1])), xlim=c(0,1))
-  whichPhrynosoma <- grep(pattern="PH", names(dataOverlap[[which(names(dataOverlap) == whichData)]]))
-  points(dataOverlap[[which(names(dataOverlap) == whichData)]][whichPhrynosoma], taxon.BLdiff[[which(names(taxon.BLdiff) == whichData)]][whichPhrynosoma], col="red")
-  points(dataOverlap[[which(names(dataOverlap) == whichData)]][-whichPhrynosoma], taxon.BLdiff[[which(names(taxon.BLdiff) == whichData)]][-whichPhrynosoma], col="blue")
-  title(sub=whichData)
-}
-
 #boxplot the data
 #make a new table with all data
 all.data <- NULL
@@ -305,6 +290,20 @@ for(i in sequence(length(orderToGo))){
 }
 boxplot(all.data[,1] ~ all.data[,2], range=0, outline=FALSE)
 boxplot(log(abs(all.data[,1])) ~ all.data[,2], range=0)
+
+
+# data overlap with tip BL differences
+layout(matrix(c(1:4), nrow=1, byrow=TRUE), respect=TRUE)
+for(i in sequence(length(dataOverlap))){
+ # orderToGo <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
+  orderToGo <- c("c5p3", "c25p3", "c45p3", "c65p3")
+  whichData <- orderToGo[i]
+  plot(dataOverlap[[which(names(dataOverlap) == whichData)]], taxon.BLdiff[[which(names(taxon.BLdiff) == whichData)]], xlab="data Overlap", ylab="taxon BL Diff", type="n", ylim=c(min(all.data[,1]), max(all.data[,1])), xlim=c(0,1))
+  whichPhrynosoma <- grep(pattern="PH", names(dataOverlap[[which(names(dataOverlap) == whichData)]]))
+  points(dataOverlap[[which(names(dataOverlap) == whichData)]][whichPhrynosoma], taxon.BLdiff[[which(names(taxon.BLdiff) == whichData)]][whichPhrynosoma], col="red")
+  points(dataOverlap[[which(names(dataOverlap) == whichData)]][-whichPhrynosoma], taxon.BLdiff[[which(names(taxon.BLdiff) == whichData)]][-whichPhrynosoma], col="blue")
+  title(sub=whichData)
+}
 
 
 #new thought on plotting dataset size (x) with two y vars (mean and variance) of combined datasets
