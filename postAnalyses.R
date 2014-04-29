@@ -307,6 +307,7 @@ for(i in sequence(length(dataOverlap))){
 
 
 #new thought on plotting dataset size (x) with two y vars (mean and variance) of combined datasets
+## Figure 5 ##
 mean.var.data <- NULL
 orderToGo <- c("c5p3", "c10p3", "c15p3", "c20p3", "c25p3", "c30p3", "c35p3", "c40p3", "c45p3", "c50p3", "c55p3", "c60p3", "c65p3", "c70p3")
 #orderToGo <- c("c5p3", "c25p3", "c45p3", "c65p3")
