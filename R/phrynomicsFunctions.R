@@ -3,7 +3,7 @@
 ##RAxMLsetup and RAxMLanalysis for the SNP setup and tree analysis
 
 library(ape)
-
+library(phangorn)
 
 
 ################################################
@@ -109,7 +109,8 @@ GetEdgeList <- function(tree) {
   tipList[which(tipList[, 3] == 1), 3] <- "internal"
   tipList$support <- rep(0, dim(tipList)[1])
   tipList  <- tipList[order(tipList[,2]), ]  # reorder edge list so that you can assign the correct support vals
-  tipList$support[which(tipList$class == "internal")] <- as.numeric(tree$node.label)[-1] #node support comes in with an extra space in the beginning, so it has to be cleaved then readded for plotting.
+  if(!is.null(tree$node.label))
+    tipList$support[which(tipList$class == "internal")] <- as.numeric(tree$node.label)[-1] #node support comes in with an extra space in the beginning, so it has to be cleaved then readded for plotting.
   tipList <- tipList[match(desc.order , tipList[,2]),]
   options(digits=15)
   tipList$branchlength <- as.numeric(tipList$branchlength)
@@ -167,11 +168,11 @@ GetCorresonding <- function(corr.desc, t2){
 GetSingleEdgeColor <- function(relativeBLdiff) {
   if (relativeBLdiff < -10) return(rgb(51,51,255, max=255)) #underestimate over 10%
   else if (relativeBLdiff <= 10) return("gray")  #plus/minus 10%
-  else if (relativeBLdiff < 20) return(rgb(255,255,102, max=255))
-  else if (relativeBLdiff < 30) return(rgb(255,178,102, max=255))
-  else if (relativeBLdiff < 40) return(rgb(225,128,0, max=255))
-  else if (relativeBLdiff < 50) return(rgb(225,0,0, max=255))
-  else return(rgb(153,0,0, max=255))	  
+  else if (relativeBLdiff < 20) return(rgb(255,255,102, maxColorValue=255))
+  else if (relativeBLdiff < 30) return(rgb(255,178,102, maxColorValue=255))
+  else if (relativeBLdiff < 40) return(rgb(225,128,0, maxColorValue=255))
+  else if (relativeBLdiff < 50) return(rgb(225,0,0, maxColorValue=255))
+  else return(rgb(153,0,0, maxColorValue=255))	  
 }
 #GetSingleEdgeColor(30)
 
@@ -338,6 +339,17 @@ CalculateTotalTipBLError <- function(BL.AllTrees) {
   }
   names(tipPathDifferences) <- paste("tip", tips, sep="")
   return(tipPathDifferences)
+}
+
+GetJustTipBLError <- function(BL.AllTrees){
+#this function will return a vector of BL differences for just tips
+  tips <- BL.AllTrees[which(BL.AllTrees$class == "tip"), 2]
+  tipDifferences <- rep(0, length(tips))
+  for(i in tips){
+    tipDifferences[i] <- BL.AllTrees[which(BL.AllTrees[,2] == tips[i]), 12]  #column 12 is relativeBLdiff (which can be pos or neg)
+    names(tipDifferences)[i] <- paste("tip", tips[i], sep="")
+  }
+  return(tipDifferences)
 }
 
 
