@@ -8,7 +8,7 @@ ReturnUniqueBases(SNP)
 \arguments{
   \item{SNP}{A single SNP}
 }
-\details{See \link{http://www.bioinformatics.org/sms/iupac.html}}
+\details{See http://www.bioinformatics.org/sms/iupac.html}
 \value{Returns vector of bases
 }
 \author{B.Banbury}

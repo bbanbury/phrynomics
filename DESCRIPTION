@@ -6,7 +6,7 @@ Author: Barb Banbury <darwinthesun@gmail.com>
 Maintainer: Barb Banbury <darwinthesun@gmail.com>
 BugReports: https://github.com/bbanbury/phrynomics/issues
 Depends: R (>= 2.13.0)
-Imports: ape
+Imports: ape, phangorn
 LazyData: yes
 Description: The package phrynomics is a toolkit for manipulating SNP data. It will read in sequences, check for variable and binary sites, allow removal of taxa or sites, and transform characters in various ways. There are options for exporting data to fit several popular phylogenetics programs (ex: RAxML, MrBayes, and SNAPP). 
 License: GPL (>= 2)

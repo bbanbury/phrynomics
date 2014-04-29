@@ -71,7 +71,7 @@ AddTreeDist <- function(TreeMatrixName, ListOfTrees){
   treeDists <- NULL
   for(row in sequence(dim(TreeMatrixName)[1])){
     twoTrees <- c(assTrees(TreeMatrixName[row,1], ListOfTrees), assTrees(TreeMatrixName[row,2], ListOfTrees))
-    dists <- treedist(twoTrees[[1]], twoTrees[[2]])
+    dists <- phangorn::treedist(twoTrees[[1]], twoTrees[[2]])
     treeDists <- rbind(treeDists, dists)
   }
   cbind(TreeMatrixName, treeDists)
@@ -166,7 +166,7 @@ GetCorresonding <- function(corr.desc, t2){
 }
 
 GetSingleEdgeColor <- function(relativeBLdiff) {
-  if (relativeBLdiff < -10) return(rgb(51,51,255, max=255)) #underestimate over 10%
+  if (relativeBLdiff < -10) return(rgb(51,51,255, maxColorValue =255)) #underestimate over 10%
   else if (relativeBLdiff <= 10) return("gray")  #plus/minus 10%
   else if (relativeBLdiff < 20) return(rgb(255,255,102, maxColorValue=255))
   else if (relativeBLdiff < 30) return(rgb(255,178,102, maxColorValue=255))

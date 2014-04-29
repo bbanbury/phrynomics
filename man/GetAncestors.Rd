@@ -9,7 +9,6 @@ GetAncestors(treeEdgeMatrix, tip)
   \item{treeEdgeMatrix}{An edge matrix from a tree, such as tree$edge}
   \item{tip}{An single tip node number (not taxon name)}
 }
-\details{}
 \value{Returns a vector of nodes in a tree.
 }
 \author{B.Banbury}

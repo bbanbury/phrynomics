@@ -13,6 +13,3 @@ removeOutgroups(SNPdataset, taxon="PH")
 \value{Returns a subset data frame.
 }
 \author{B.Banbury}
-\seealso{}
-\examples{
-}

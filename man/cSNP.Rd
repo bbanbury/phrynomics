@@ -4,8 +4,8 @@
 \title{Concatenate or Split SNP Datasets}
 \description{This function will concatenate or split datasets, and reduce them if necessary by the keepVector and/or remove spaces that indicate loci}
 \usage{
-cSNP(splitSNP, KeepVector=NULL, maintainLoci=TRUE))
-SplitSNP(SNPdataset)
+  cSNP(splitSNP, KeepVector=NULL, maintainLoci=TRUE)
+  SplitSNP(SNPdataset)
 }
 \arguments{
   \item{splitSNP}{A split SNP data matrix (using SplitSNP function)}

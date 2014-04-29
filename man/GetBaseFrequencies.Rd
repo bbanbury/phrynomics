@@ -8,7 +8,6 @@ GetBaseFrequencies(SNP)
 \arguments{
   \item{SNP}{A single SNP site}
 }
-\details{}
 \value{Returns a named vector with bases and frequencies
 }
 \author{B.Banbury}

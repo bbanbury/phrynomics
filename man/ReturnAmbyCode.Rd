@@ -8,7 +8,7 @@ ReturnAmbyCode(bases)
 \arguments{
   \item{bases}{A vector of bases}
 }
-\details{See \link{http://www.bioinformatics.org/sms/iupac.html}}
+\details{See http://www.bioinformatics.org/sms/iupac.html}
 \value{Returns a single character with IUPAC code.
 }
 \author{B.Banbury}

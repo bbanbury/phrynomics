@@ -82,15 +82,15 @@ ReturnMinCI(x, vstat)
   \item{method}{choices = c("varOverlap", "meanWithin")}
   \item{corr.desc}{descendent from tree1}
   \item{t2}{GetEdgeList matrix from tree2 info, this is the corresponding descendent}
-  \item{t1.node}{GetEdgeList matrix from tree 1, node of interst}
   \item{tree}{A single phylogenetic tree}
   \item{filename}{For phrynomics named datasets (ex: "c70p3" will return 70)}
   \item{workingDirectoryOfResults}{path to working directory of MrBayes/RAxML runs}
   \item{data}{SNP dataset}
+  \item{dataset}{SNP dataset}
   \item{locus}{Which locus in the SNP dataset to calculate sites}
   \item{relativeBLdiff}{Relative BL difference}
   \item{taxa}{vector of taxa to extract species from (Ex: c("PH1", "PH2", "PH3") will return just "PH")}
-  \item{linenumber}{some line number}
+  \item{lineNumber}{some line number}
   \item{tstat.table}{some tstat table I don't remember}
   \item{number}{Any number}
   \item{SpeciesNames}{A vector of tip taxa}

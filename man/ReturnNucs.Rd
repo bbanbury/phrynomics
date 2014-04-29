@@ -9,7 +9,7 @@ ReturnNucs(NucCode, forSNAPP=FALSE)
   \item{NucCode}{A single SNP Base or ambiguity code}
   \item{forSNAPP}{Whether to trat missing characters as possible bases (FALSE), or as missing data (TRUE), see example below}
 }
-\details{See \link{http://www.bioinformatics.org/sms/iupac.html}}
+\details{See http://www.bioinformatics.org/sms/iupac.html}
 \value{Returns possible nucleotides given an ambiguity code. 
 }
 \author{B.Banbury}

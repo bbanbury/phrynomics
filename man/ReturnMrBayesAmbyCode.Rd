@@ -4,6 +4,7 @@
 \title{Return MrBayes Ambiguity Code}
 \description{This function will return MrBayes Mk/Mkv model ambiguity codes}
 \usage{
+ReturnMrBayesCode(base)
 ReturnMrBayesAmbyCode(NucCode)
 }
 \arguments{
