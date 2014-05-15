@@ -12,5 +12,9 @@ WriteToPhy(data, fileName="file.phy")
 }
 \details{This will write the phylip file to the working directory.}
 \value{Saves a phylip formatted file to the working directory.}
+\examples{
+  data(fakeData)
+  WriteToPhy(data=fakeData, fileName="myNewFile.phy")
+}
 \author{B.Banbury}
 

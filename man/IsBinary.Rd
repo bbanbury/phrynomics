@@ -13,4 +13,11 @@ IsBinary(SNP)
 Ambiguity codes are taken into account to mean either heterozygotes or uncertainty. Such that c("A", "A", "R") will return TRUE; c("A", "A", "Y") will return FALSE}
 \value{Boolean return for whether SNP is binary
 }
+\examples{
+  data(fakeData)
+  splitData <- SplitSNP(fakeData)  #the IsVariable function will only work on single SNPs
+  IsBinary(splitData[,1])
+  IsBinary(splitData[,2])
+  apply(splitData, 2, IsBinary)
+}
 \author{B.Banbury}

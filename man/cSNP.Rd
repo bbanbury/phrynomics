@@ -15,5 +15,12 @@
 }
 \details{This function will return a data frame of concatenated or split SNPs}
 \value{Returns a data frame}
+\examples{
+  data(fakeData)
+  splitData <- SplitSNP(fakeData)
+  cSNP(splitData, maintainLoci=TRUE)
+
+  cSNP(splitData, maintainLoci=FALSE)
+}
 \author{B.Banbury}
 

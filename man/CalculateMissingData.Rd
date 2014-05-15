@@ -10,4 +10,8 @@
   \item{data}{SNP dataset}
   \item{missingChar}{Character that represents missing data ("N", "?", "-")}
 }
+\examples{
+  data(fakeData)
+  CalculateMissingData(fakeData, missingChar="N")
+}
 \author{B.Banbury}

@@ -9,6 +9,10 @@ GetAncestors(treeEdgeMatrix, tip)
   \item{treeEdgeMatrix}{An edge matrix from a tree, such as tree$edge}
   \item{tip}{An single tip node number (not taxon name)}
 }
-\value{Returns a vector of nodes in a tree.
+\value{Returns a vector of nodes in a tree}
+\examples{
+  library(ape)
+  phy <- rtree(10)
+  GetAncestors(phy$edge, 2)
 }
 \author{B.Banbury}

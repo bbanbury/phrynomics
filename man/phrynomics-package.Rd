@@ -17,6 +17,6 @@
 }
 \author{
 	\tabular{ll}{
-     Authors: \tab Barb Banbury, Adam Leaché \cr
+     Authors: \tab Barb Banbury, Adam Leache \cr
      Maintainer: \tab Barb Banbury <darwinthesun@gmail.com> \cr}
 }

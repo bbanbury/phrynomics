@@ -17,6 +17,6 @@ ReturnAmbyCode(bases)
   \code{\link{ReturnMrBayesAmbyCode}}
 }
 \examples{
-ReturnAmbyCode(c("A", "T"))
-ReturnAmbyCode(c("G","C","T"))
+  ReturnAmbyCode(c("A", "T"))
+  ReturnAmbyCode(c("G","C","T"))
 }

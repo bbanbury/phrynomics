@@ -16,6 +16,6 @@ ReturnMrBayesAmbyCode(NucCode)
 }
 \author{B.Banbury}
 \examples{
-ReturnMrBayesAmbyCode("A")
-ReturnMrBayesAmbyCode("D")
+  ReturnMrBayesAmbyCode("A")
+  ReturnMrBayesAmbyCode("D")
 }

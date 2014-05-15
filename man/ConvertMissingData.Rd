@@ -12,4 +12,8 @@ ConvertMissingData(SNPdataset, oldmissing="N", newmissing="?")
 }
 \details{This function will return the same data frame as input, but with replacement characters}
 \value{Returns a data frame}
+\examples{
+  data(fakeData)
+  ConvertMissingData(fakeData, "-", "N")
+}
 \author{B.Banbury}

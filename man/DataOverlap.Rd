@@ -10,4 +10,8 @@ DataOverlap(dataset)
 }
 \value{This will return a list of two items. The first is the present-absent data matrix with individual likelihood of overlap. The second is a vector of each taxon with average overlap among other taxa. 
 }
+\examples{
+  data(fakeData)
+  DataOverlap(fakeData)
+}
 \author{B.Banbury}

@@ -8,6 +8,9 @@ RemoveNonBinary(data)
 \arguments{
   \item{data}{A SNP dataset}
 }
-\value{Returns a subset data frame.
+\value{Returns a subset data frame.}
+\examples{
+  data(fakeData)
+  RemoveNonBinary(fakeData)
 }
 \author{B.Banbury}

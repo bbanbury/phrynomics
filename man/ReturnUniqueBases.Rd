@@ -17,6 +17,6 @@ ReturnUniqueBases(SNP)
   \code{\link{ReturnMrBayesAmbyCode}}
 }
 \examples{
-ReturnUniqueBases(c("R", "Y", "W", "D", "S", "M", "K"))
-ReturnUniqueBases(c("A"))
+  ReturnUniqueBases(c("R", "Y", "W", "D", "S", "M", "K"))
+  ReturnUniqueBases(c("A"))
 }

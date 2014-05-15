@@ -12,4 +12,11 @@ IsVariable(SNP)
 }
 \value{Boolean return for whether SNP is variable
 }
+\examples{
+  data(fakeData)
+  splitData <- SplitSNP(fakeData)  #the IsVariable function will only work on single SNPs
+  IsVariable(splitData[,1])
+  IsVariable(splitData[,2])
+  apply(splitData, 2, IsVariable)
+}
 \author{B.Banbury}

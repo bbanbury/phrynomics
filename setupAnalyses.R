@@ -52,7 +52,7 @@ files <- system("ls c*", intern=T)
 systemSeeds <- NULL
 treeSeeds <- NULL
 filenames <- NULL
-models <- c("ASC_GTRGAMMA", "GTRGAMMA")
+models <- c("ASC_GTRCAT", "GTRCAT")
 for(model in sequence(length(models))) {
   jobArgs <- NULL
   for(i in sequence(length(files))) {
@@ -75,6 +75,37 @@ for(model in sequence(length(models))) {
   save(systemSeeds, treeSeeds, filenames, file="seeds.rdata")
   write(jobArgs, file=paste(writeFileName, "_RAXML_JobArgs", sep=""))
 }
+
+#ReRun RAxML jobs using standard bootstraps
+#raxmlHPC-PTHREADS -T 8 -s c40p3noAmbigs.snps -m GTRCAT -V -o GAWI1 -b 628324 -# autoMRE -p 193689 -n c40p3_GTRCAT
+#Re-Run RAxML on cluster
+#use strict;
+#my $seed1=shift;
+#my $seed2=shift;
+#my $whichFile=shift;
+#open(OUT, ">job.sh") or die;
+#
+#       print OUT "#!/bin/sh\n\n";
+#
+#        print OUT "#PBS -N \"raxml".$whichFile."\"\n";
+#        print OUT "#PBS -l nodes=1:ppn=12,feature=12core,mem=22gb,walltime=100:00:00\n";
+#        print OUT "#PBS -o /gscratch/leache/Barb/jobLogs/\n";
+#        print OUT "#PBS -d /gscratch/leache/Barb/asc_RAXMLjobs/asc_Fives/\n";
+#
+#        print OUT "/gscratch/leache/Barb/standard-RAxML-master/ascRAxML_ver7.8.6 -s ".$whichFile." -f a -m ASC_GTRGAMMA -o GAWI1 -x ".$seed1." -# 1000 -p ".$seed2." -n ASC_out".$whichFile."\n";
+#close(OUT);
+
+#FILES="*.snps"
+#RANDOM=1345
+#for whichFile in $FILES
+#do
+#  seed1=$RANDOM
+#  seed2=$RANDOM
+#  echo $whichFile
+#  perl -w BarbJobScript.pl $seed1 $seed2 $whichFile
+#  qsub job.sh
+#done
+
 
 
 #write shell script for each input file (run on imac)
@@ -114,6 +145,10 @@ toRun <- scan(file="~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns2/raxmlSystem
 for(i in sequence(length(toRun))){
   system(toRun[i])
 }
+
+
+
+
 
 
 #to make partition file

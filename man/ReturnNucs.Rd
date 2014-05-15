@@ -18,7 +18,7 @@ ReturnNucs(NucCode, forSNAPP=FALSE)
   \code{\link{ReturnMrBayesAmbyCode}}
 }
 \examples{
-ReturnNucs("R")
-ReturnNucs("N", forSNAPP=FALSE)
-ReturnNucs("N", forSNAPP=TRUE)
+  ReturnNucs("R")
+  ReturnNucs("N", forSNAPP=FALSE)
+  ReturnNucs("N", forSNAPP=TRUE)
 }
