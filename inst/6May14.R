@@ -7,6 +7,7 @@
 
 install.packages("~/phrynomics/phrynomics_1.0.tar.gz", type="source")
 library(phrynomics)
+library(ape)
 setwd("~/Dropbox/UWstuff/phrynomics/")  #original pyRAD files located here
 
 
@@ -42,14 +43,15 @@ for(i in sequence(length(snpFiles))) {
 }
 
 
-# Writing RAxML invocation calls
+# Writing RAxML invocation calls   
+####change this to be exactly what the final script will write
 
 files <- system("ls c*noAmbigs.snps", intern=T)
 systemSeeds <- NULL
 treeSeeds <- NULL
 filenames <- NULL
 pathToRAxML <- "raxmlHPC-PTHREADS-SSE3"
-NumCores <- 16
+NumCores <- 6
 models <- c("ASC_GTRCAT", "GTRCAT")
 jobArgs <- NULL
 for(model in sequence(length(models))) {
@@ -57,10 +59,10 @@ for(model in sequence(length(models))) {
     inputFile <- files[i]
     outgroup <- "GAWI1"
     systemSeed <- floor(runif(1, min=1, max=10^6))
-    bootstrapReps <- "autoMRE"
+    bootstrapReps <- "50"
     treeSeed <- floor(runif(1, min=1, max=10^6))
     outputName <- paste(gsub("\\D+$", "", files[i]), "_", models[model], sep="")
-    systemCall <- paste(pathToRAxML, " -T ", NumCores, " -s ", inputFile, " -m ", models[model], " -V -o ", outgroup, " -b ", systemSeed, " -# ", bootstrapReps, " -p ", treeSeed, " -n ", outputName, sep="")
+    systemCall <- paste(pathToRAxML, " -T ", NumCores, " -s ", inputFile, " -f a -m ", models[model], " -V -o ", outgroup, " -# ", bootstrapReps, " -x ", systemSeed, " -p ", treeSeed, " -n ", outputName, sep="")
     jobArgs <- append(jobArgs, systemCall)
     systemSeeds <- c(systemSeeds, systemSeed) 
     treeSeeds <- c(treeSeeds, treeSeed) 
@@ -160,10 +162,7 @@ for(i in sequence(length(toRun))){
 ################################################
 
 
-#RAxMLfiles <- "~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/RAxMLruns.noGamma/"
-#MrBayesfiles <- "~/Dropbox/UWstuff/phrynomics/Analyses/MrBayesRuns/MrBayes.noGamma/"
-
-# Load RAxML Trees
+# Load RAxML Trees and post-analyses scraping
 
 analysis <- "RAxML"
 #setwd(RAxMLfiles)
@@ -179,14 +178,16 @@ for(i in sequence(dim(treeMatrix)[1])) {
   BL.AllTrees.RAxML[[i]] <- MakeBranchLengthMatrix(tree1, tree2, analysis=analysis, dataset=rownames(treeMatrix)[i])
   names(BL.AllTrees.RAxML)[[i]] <- rownames(treeMatrix)[i]
 }
+ML.results <- GetRAxMLStatsPostAnalysis(".")
 
 
-# Load MrBayes Trees
+# Load MrBayes Trees and post-analyses scraping
 
 analysis <- "MrBayes"
 #setwd(MrBayesfiles)
-trees <- system(paste("ls ", MrBayesfiles, "*.con.tre", sep=""), intern=T)  
+trees <- system(paste("ls *.con.tre", sep=""), intern=T)  
 TreeList <- CreateTreeList(trees, "MrBayes")
+TreeList <- lapply(TreeList, multi2di)  #remove later
 treeMatrix <- CreateTreeMatrix(trees)
 treeMatrix2 <- AddTreeDist(treeMatrix, TreeList)
 treeMatrix3 <- AddBLD(treeMatrix2, TreeList)
@@ -197,45 +198,49 @@ for(i in sequence(dim(treeMatrix)[1])) {
   BL.AllTrees.MrBayes[[i]] <- MakeBranchLengthMatrix(tree1, tree2, analysis=analysis, dataset=rownames(treeMatrix)[i])
   names(BL.AllTrees.MrBayes)[[i]] <- rownames(treeMatrix)[i]
 }
+MB.results <- GetMrBayesStatsPostAnalysis(".")
+
+
+# Make Table 2. Summary ddRadSeq data. 
+
+dataset <- seq(from=70, to=5, by=-5)
+ASC.ML.results <- ML.results[which(ML.results[,2] == "ASC"),]
+table2 <- matrix(nrow=14, ncol=6)
+rownames(table2) <- paste("c", dataset, "p3", sep="")
+colnames(table2) <- c("Matrix", "Loci", "VariableSites", "Missing(%)", "PhrynoOverlap", "non-PhrynoOverlap")
+table2[,1] <- paste("s", dataset, sep="")
+rows <- match(rownames(table2), ASC.ML.results[,1])
+table2 <- table2[!is.na(rows),]  
+table2[,c(2,3,4)] <- as.matrix(ASC.ML.results[order(rows[which(!is.na(rows))]), c(3,4,6)])
+dataOverlap <- list()
+for(i in sequence(length(files))){
+  dataset <- read.table(files[[i]], row.names=1, colClasses="character", skip=1)
+  dataOverlap[[i]] <- DataOverlap(dataset)[[2]]
+  names(dataOverlap)[[i]] <- strsplit(strsplit(files[i], "/")[[1]][length(strsplit(files[i], "/")[[1]])], "no")[[1]][1]
+}
+for(m in sequence(dim(table2)[1])){
+  whichDataset <- which(names(dataOverlap) == rownames(table2)[m])
+  table2[m,6] <- mean(dataOverlap[[whichDataset]][-grep(pattern="PH", names(dataOverlap[[whichDataset]]))])
+  table2[m,5] <- mean(dataOverlap[[whichDataset]][grep(pattern="PH", names(dataOverlap[[whichDataset]]))])
+}
+
+
+#Make Figure 2. Acquisition bias and tree length
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ################################################
 ##     End Post-Analyses Tables and Figs      ##
 ################################################
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

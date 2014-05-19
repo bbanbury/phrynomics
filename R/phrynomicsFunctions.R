@@ -166,7 +166,8 @@ GetCorresonding <- function(corr.desc, t2){
 }
 
 GetSingleEdgeColor <- function(relativeBLdiff) {
-  if (relativeBLdiff < -10) return(rgb(51,51,255, maxColorValue =255)) #underestimate over 10%
+  if(is.na(relativeBLdiff))  return(NA)
+  else if (relativeBLdiff < -10) return(rgb(51,51,255, maxColorValue =255)) #underestimate over 10%
   else if (relativeBLdiff <= 10) return("gray")  #plus/minus 10%
   else if (relativeBLdiff < 20) return(rgb(255,255,102, maxColorValue=255))
   else if (relativeBLdiff < 30) return(rgb(255,178,102, maxColorValue=255))
@@ -368,7 +369,7 @@ GetJustTipBLError <- function(BL.AllTrees){
 GetRAxMLStatsPostAnalysis <- function(workingDirectoryOfResults) {
   startingDir <- getwd()
   setwd(workingDirectoryOfResults)
-  cFiles <- system("ls c*.snps", intern=T)
+  cFiles <- system("ls c*noAmbigs.snps", intern=T)
   outFiles <- system("ls RAxML_info*", intern=T)
   results <- matrix(nrow=length(outFiles), ncol=10)
   for(i in sequence(length(outFiles))){
@@ -379,7 +380,7 @@ GetRAxMLStatsPostAnalysis <- function(workingDirectoryOfResults) {
     numberLoci <- dim(SNPdataset)[2]
     alignmentPatterns <- gsub("\\D", "", system(paste("grep 'distinct alignment patterns'", outFiles[i]), intern=T))
     Missing <-gsub("[A-Za-z:]+|[%]$", "", system(paste("grep 'Proportion of gaps and completely undetermined characters in this alignment:'", outFiles[i]), intern=T), perl=T)
-    BootstrapTime <- strsplit(system(paste("grep 'Overall Time for 1000 Rapid Bootstraps'", outFiles[i]), intern=T), split="[A-Za-z:]+|[%]$", perl=T)[[1]][6]
+    BootstrapTime <- strsplit(system(paste("grep 'Overall Time for '", outFiles[i]), intern=T), split="[A-Za-z:]+|[%]$", perl=T)[[1]][6]
     Likelihood <- strsplit(system(paste("grep 'Final ML Optimization Likelihood:'", outFiles[i]), intern=T), split="[A-Za-z:]+|[%]$", perl=T)[[1]][5]
     #Alpha <- gsub("[alpha: ]", "", system(paste("grep alpha: ", outFiles[i]), intern=T), perl=T)
     Alpha <- "0"
@@ -403,6 +404,9 @@ GetRAxMLStatsPostAnalysis <- function(workingDirectoryOfResults) {
   return(results)
 }
 
+GetLinesToSkip <- function(file){
+  return(length(system(paste("grep 'ID:' ", file, sep=""), intern=TRUE)))
+}
 
 GetMrBayesStatsPostAnalysis <- function(workingDirectoryOfResults){
   startingDir <- getwd()
@@ -417,7 +421,7 @@ GetMrBayesStatsPostAnalysis <- function(workingDirectoryOfResults){
     numLociLine <- system(paste("grep DIMENSIONS", nexFiles[i]), intern=TRUE)
     numberLoci <- strsplit(numLociLine, "\\D+")[[1]][3]
     dataName <- paste(whichModel, "_c", strsplit(nexFiles[i], "\\D+")[[1]][2], "p3", sep="")
-    pstats <- read.csv(pstatFiles[grep(dataName, pstatFiles)], sep="")
+    pstats <- read.csv(pstatFiles[grep(dataName, pstatFiles)], sep="", skip=GetLinesToSkip(pstatFiles[grep(dataName, pstatFiles)]))
     treelength <- pstats[1,2]
     treelength.lowCI <- pstats[1,4]
     treelength.uppCI <- pstats[1,5]
