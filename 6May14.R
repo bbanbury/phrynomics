@@ -5,7 +5,7 @@
 ##                                            ##
 ################################################
 
-install.packages("~/phrynomics/phrynomics_1.0.tar.gz", type="source")
+install.packages("~/phrynomics/phrynomics_1.2.tar.gz", type="source")
 library(phrynomics)
 library(ape)
 setwd("~/Dropbox/UWstuff/phrynomics/")  #original pyRAD files located here

@@ -1,4 +1,4 @@
-##Set of functions to deal with SNP data and compare results
+Get##Set of functions to deal with SNP data and compare results
 ##Barb Banbury  14Nov13
 ##RAxMLsetup and RAxMLanalysis for the SNP setup and tree analysis
 
