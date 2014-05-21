@@ -201,11 +201,21 @@ for(i in sequence(dim(treeMatrix)[1])) {
 MB.results <- GetMrBayesStatsPostAnalysis(".")
 
 
+# Complete runs for indexing
+levels <-NULL
+for(i in sequence(length(files))){
+  levels <- as.numeric(c(levels, strsplit(files[i], "\\D+")[[1]][2]))
+}
+whichDatasets <- paste("c", levels, "p3", sep="")  #datasets from file names
+AllOrder <- paste("c", seq(5, 70, 5), "p3", sep="") #datasets from sequence
+orderToGo <- AllOrder[AllOrder %in% whichDatasets]  #datasets of sequence that exist
+
+
 # Make Table 2. Summary ddRadSeq data. 
 
 dataset <- seq(from=70, to=5, by=-5)
 ASC.ML.results <- ML.results[which(ML.results[,2] == "ASC"),]
-table2 <- matrix(nrow=14, ncol=6)
+table2 <- matrix(nrow=length(dataset), ncol=6)
 rownames(table2) <- paste("c", dataset, "p3", sep="")
 colnames(table2) <- c("Matrix", "Loci", "VariableSites", "Missing(%)", "PhrynoOverlap", "non-PhrynoOverlap")
 table2[,1] <- paste("s", dataset, sep="")
@@ -225,7 +235,44 @@ for(m in sequence(dim(table2)[1])){
 }
 
 
-#Make Figure 2. Acquisition bias and tree length
+# Make Figure 2. Acquisition bias and tree length
+
+layout(matrix(1:2, nrow=1, byrow=TRUE), respect=TRUE)
+plot(c(levels, levels), ML.results$TreeLength, type="n", ylab="Tree Length", xlab="Missing Data")
+title(main="RAxML")
+legend("topright", legend=c("GTR", "GTR + ASC"), col=c("blue", "lightblue"), lwd=1, merge=TRUE, bty="n", xjust=1, inset=0.02, cex=1) 
+for(i in sequence(length(whichDatasets)-1)){
+  dataToUse <- which(whichDatasets[i] == ML.results$Level)
+  nextDataToUse <- which(whichDatasets[i+1] == ML.results$Level)
+  segments(levels[i], ML.results$TreeLength[dataToUse[1]], levels[i+1], ML.results$TreeLength[nextDataToUse[1]], col="lightblue")
+  segments(levels[i], ML.results$TreeLength[dataToUse[2]], levels[i+1], ML.results$TreeLength[nextDataToUse[2]], col="blue")  
+}
+for(i in sequence(length(whichDatasets))){
+  dataToUse <- which(whichDatasets[i] == ML.results$Level)
+  points(levels[i], ML.results$TreeLength[dataToUse[1]], pch=21, bg="lightblue")
+  points(levels[i], ML.results$TreeLength[dataToUse[2]], pch=21, bg="blue")
+}
+Ymin <- min(MB.results$TreeLength.lowCI)
+Ymax <- max(MB.results$TreeLength.uppCI)
+plot(c(levels, levels), MB.results$TreeLength, type="n", ylab="Tree Length", xlab="Missing Data", ylim=c(Ymin, Ymax))
+title(main="MrBayes")
+legend("topright", legend=c("GTR", "GTR + ASC"), col=c("blue", "lightblue"), lwd=1, merge=TRUE, bty="n", xjust=1, inset=0.02, cex=1) 
+for(i in sequence(length(whichDatasets)-1)){
+  dataToUse <- which(whichDatasets[i] == MB.results$Level)
+  nextDataToUse <- which(whichDatasets[i+1] == MB.results$Level)
+  segments(levels[i], MB.results$TreeLength[dataToUse[1]], levels[i+1], MB.results$TreeLength[nextDataToUse[1]], col="lightblue")
+  segments(levels[i], MB.results$TreeLength[dataToUse[2]], levels[i+1], MB.results$TreeLength[nextDataToUse[2]], col="blue")  
+}
+for(i in sequence(length(whichDatasets))){
+  dataToUse <- which(whichDatasets[i] == MB.results$Level)
+  arrows(levels[i], MB.results$TreeLength.lowCI[dataToUse[1]], levels[i], MB.results$TreeLength.uppCI[dataToUse[1]], code=3, length=0.05, col="lightblue", angle=90)
+  arrows(levels[i], MB.results$TreeLength.lowCI[dataToUse[2]], levels[i], MB.results$TreeLength.uppCI[dataToUse[2]], code=3, length=0.05, col="blue", angle=90)
+  points(levels[i], MB.results$TreeLength[dataToUse[1]], pch=21, bg="lightblue")
+  points(levels[i], MB.results$TreeLength[dataToUse[2]], pch=21, bg="blue")
+}
+
+
+# Make Figure 3. Scatterplot branch lengths
 
 
 
@@ -235,6 +282,61 @@ for(m in sequence(dim(table2)[1])){
 
 
 
+
+
+
+
+
+
+
+
+
+
+# Make Figure 4. Colored branch SNP phylogenies
+##DOESN'T WORK YET!!!
+
+for(analysis in c("RAxML", "MrBayes")){ 
+  for(i in sequence(length(orderToGo))){
+    letters <- as.character(sequence(length(orderToGo)))
+    dataToUse <- which(rownames(treeMatrix) == orderToGo[i])
+    pdf(file=paste(analysis, ".", rownames(treeMatrix)[dataToUse], "trees.pdf", sep=""), width=8.5, height=11)
+    tree1 <- assTrees(treeMatrix3[dataToUse,1], TreeList)[[1]]
+    tree1$tip.label[which(tree1$tip.label == "UMNO1")] <- "CADR2"  #change taxon
+    tree2 <- assTrees(treeMatrix3[dataToUse,2], TreeList)[[1]]
+    tree2$tip.label[which(tree2$tip.label == "UMNO1")] <- "CADR2" #change taxon in tree2
+    plot(tree1, edge.lty=BL.AllTrees[[dataToUse]]$edgelty, edge.color=BL.AllTrees[[dataToUse]]$edgeColor, cex=0.5, edge.width=2)
+    legtxt <- c("Discordant", "< -10%", "-10% to 10%", "> 10%", "> 20%", "> 30%", "> 40%", "> 50%")
+    legcolors <- c("gray", rgb(51,51,255, max=255), "gray", rgb(255,255,102, max=255), rgb(255,178,102, max=255), rgb(225,128,0, max=255), rgb(225,0,0, max=255), rgb(153,0,0, max=255))
+    legend("bottomleft", legend=legtxt, col=legcolors, lty=c(2,rep(1,7)), lwd=2, merge = TRUE, bty="n", xjust=1, inset=0.02, cex=0.75, title=expression(underline("Branchlength Difference"))) 
+    nodelabels(text=BL.AllTrees[[dataToUse]]$support[which(BL.AllTrees[[dataToUse]]$class == "internal")], node=BL.AllTrees[[dataToUse]]$desc[which(BL.AllTrees[[dataToUse]]$class == "internal")], cex=0.5, col="black", bg="white", frame="none", adj=c(1.1, -0.1))
+    nodelabels(text=BL.AllTrees[[dataToUse]]$corr.support[which(BL.AllTrees[[dataToUse]]$class == "internal")], node=BL.AllTrees[[dataToUse]]$desc[which(BL.AllTrees[[dataToUse]]$class == "internal")], cex=0.5, col="black", bg="white", frame="none", adj=c(1.1, 1.1))
+    if(analysis == "RAxML"){
+      bquote1 <- bquote(bold("Supplemental Figure S" * .(letters[i]) * ".") * " Maximum likelihood phylogeny for the ascertainment-corrected dataset s" * .(strsplit(orderToGo[i], "\\D")[[1]][2]) ~ "(" * .(makeNumberwithcommas(RAxMLresults[which(RAxMLresults$Level == orderToGo[i]), 4][1])) ~ "variable sites," ~ "\n" )
+      bquote2 <- bquote(.(unique(RAxMLresults[which(RAxMLresults$Level == orderToGo[i]), 6])) * "% missing data). Bootstrap values are shown on nodes (ascertainment-corrected above, no correction below). Branch")
+      bquote3 <- bquote("color coding reflects the degree of relative length difference between ascertainment and non-ascertainment estimates.")
+    }
+    if(analysis == "MrBayes"){
+      bquote1 <- bquote(bold("Supplemental Figure S2" * .(letters[i]) * ".") * " Bayesian consensus phylogeny for the ascertainment-corrected dataset s" * .(strsplit(orderToGo[i], "\\D")[[1]][2]) ~ "(" * .(makeNumberwithcommas(RAxMLresults[which(RAxMLresults$Level == orderToGo[i]), 4][1])) ~ "variable sites," ~ "\n" )
+      bquote2 <- bquote(.(unique(RAxMLresults[which(RAxMLresults$Level == orderToGo[i]), 6])) * "% missing data). Posterior probability values are shown on nodes (ascertainment-corrected above, no correction below). Branch")
+      bquote3 <- bquote("color coding reflects the degree of relative length difference between ascertainment and non-ascertainment estimates.")
+    }
+    mtext(bquote1, side=3, cex=.75, adj=c(0), line=2)
+    mtext(bquote2, side=3, cex=.75, adj=c(0), line=1)
+    mtext(bquote3, side=3, cex=.75, adj=c(0), line=0)
+    dev.off()
+  }
+}
+
+
+
+
+
+
+
+
+# Make Figure 5. Mean branch length error (%)
+
+# Make Figure 6. Scatterplot branch length support 
 
 
 
