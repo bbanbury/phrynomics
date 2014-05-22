@@ -26,6 +26,7 @@
 \alias{nodeOffspring}
 \alias{ReturnMaxCI}
 \alias{ReturnMinCI}
+\alias{GetLinesToSkip}
 
 \title{A collection of pita tools for phrynomics that pertain to just us
 }
@@ -62,6 +63,7 @@ nodeLeaves(tree, anc.node)
 nodeOffspring(tree, anc.node)
 ReturnMaxCI(x, vstat)
 ReturnMinCI(x, vstat)
+GetLinesToSkip(file)
 }
 
 \arguments{
@@ -98,6 +100,7 @@ ReturnMinCI(x, vstat)
   \item{anc.node}{ancestral node}
   \item{x}{don't remember}
   \item{vstat}{something having to do with vstat}  
+  \item{file}{a single input file}
 }
 
 \details{These are a collection of functions that we used for our paper, but probably need to be altered for the package.}

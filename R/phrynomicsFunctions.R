@@ -240,12 +240,16 @@ GetSupportValue <- function(lineNumber, tstat.table){
 CompareMrBayesPosteriors <- function(run1, run2, ntax=73){
 #run1 and run2 should correspond with ASC and GTR models
 #should be able to give it the treeMatrix and have it find the associated files
-  ASCbipartsFile <- read.table(system(paste("ls ",strsplit(run1, ".", fixed=TRUE)[[1]][1], "*.parts", sep=""), intern=TRUE), stringsAsFactors=FALSE, skip=1)
+  linesToSkip <- GetLinesToSkip(paste(strsplit(run1, ".", fixed=TRUE)[[1]][1], "*.parts", sep=""))
+  ASCbipartsFile <- read.table(system(paste("ls ",strsplit(run1, ".", fixed=TRUE)[[1]][1], "*.parts", sep=""), intern=TRUE), stringsAsFactors=FALSE, skip=linesToSkip+1)
   ASCbipartsFile <- ASCbipartsFile[-which(ASCbipartsFile == "ID"):-dim(ASCbipartsFile)[1],]
-  GTRbipartsFile <- read.table(system(paste("ls ",strsplit(run2, ".", fixed=TRUE)[[1]][1], "*.parts", sep=""), intern=TRUE), skip=1, stringsAsFactors=FALSE)
+  linesToSkip <- GetLinesToSkip(paste(strsplit(run2, ".", fixed=TRUE)[[1]][1], "*.parts", sep=""))
+  GTRbipartsFile <- read.table(system(paste("ls ",strsplit(run2, ".", fixed=TRUE)[[1]][1], "*.parts", sep=""), intern=TRUE), skip=linesToSkip+1, stringsAsFactors=FALSE)
   GTRbipartsFile <- GTRbipartsFile[-which(GTRbipartsFile == "ID"):-dim(GTRbipartsFile)[1],]
-  ASCtstatFile <- read.table(system(paste("ls ",strsplit(run1, ".", fixed=TRUE)[[1]][1], "*.tstat", sep=""), intern=TRUE), skip=1, stringsAsFactors=FALSE)
-  GTRtstatFile <- read.table(system(paste("ls ",strsplit(run2, ".", fixed=TRUE)[[1]][1], "*.tstat", sep=""), intern=TRUE), skip=1, stringsAsFactors=FALSE)  
+  linesToSkip <- GetLinesToSkip(paste(strsplit(run1, ".", fixed=TRUE)[[1]][1], "*.tstat", sep=""))
+  ASCtstatFile <- read.table(system(paste("ls ", strsplit(run1, ".", fixed=TRUE)[[1]][1], "*.tstat", sep=""), intern=TRUE), skip=linesToSkip+1, stringsAsFactors=FALSE)
+  linesToSkip <- GetLinesToSkip(paste(strsplit(run2, ".", fixed=TRUE)[[1]][1], "*.tstat", sep=""))
+  GTRtstatFile <- read.table(system(paste("ls ", strsplit(run2, ".", fixed=TRUE)[[1]][1], "*.tstat", sep=""), intern=TRUE), skip=linesToSkip+1, stringsAsFactors=FALSE)  
   ASC.bipartInternalNodes <- (ntax+1):max(as.numeric(ASCbipartsFile[,1]))
   ASC.results <- matrix(nrow=length(ASC.bipartInternalNodes), ncol=5)
   ASC.results[,1] <- ASC.bipartInternalNodes
