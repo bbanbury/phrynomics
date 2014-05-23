@@ -781,6 +781,248 @@ MrBayesresults <- GetMrBayesStatsPostAnalysis("~/Dropbox/UWstuff/phrynomics/Anal
 
 
 
+####   DEBUGGING SUPPORT VALS   ####
+## Can also find this in dropbox
+
+library(ape)
+library(phangorn)
+library(geiger)
+
+source("~/phrynomics/trunk/phrynomicsFunctions.R")
+analysis <- "RAxML"
+setwd("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/RAxMLruns.noGamma")
+analysis <- "RAxML"
+setwd("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/RAxMLruns.noGamma")
+trees <- system("ls RAxML_bipartitions.*", intern=T)  #trees with bootstrap support
+TreeList <- CreateTreeList(trees, "RAxML")
+treeMatrix <- CreateTreeMatrix(trees)
+treeMatrix2 <- AddTreeDist(treeMatrix, TreeList)
+treeMatrix3 <- AddBLD(treeMatrix2, TreeList)
+BL.AllTrees <- list()
+for(i in sequence(dim(treeMatrix)[1])) {
+  tree1 <- assTrees(treeMatrix3[i,1], TreeList)[[1]]
+  tree2 <- assTrees(treeMatrix3[i,2], TreeList)[[1]]
+  BL.AllTrees[[i]] <- MakeBranchLengthMatrix(tree1, tree2, analysis=analysis, dataset=rownames(treeMatrix)[i])
+  names(BL.AllTrees)[[i]] <- rownames(treeMatrix)[i]
+}
+setwd("~/Dropbox/UWstuff/phrynomics/Analyses/newFigs")
+orderToGo <- c("c5p3")
+RAxMLresults1 <- GetRAxMLStatsPostAnalysis("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/RAxMLruns.noGamma")
+
+letters <- as.character(sequence(length(orderToGo)))
+dataToUse <- which(rownames(treeMatrix) == orderToGo)
+tree1 <- assTrees(treeMatrix3[dataToUse,1], TreeList)[[1]]
+tree2 <- assTrees(treeMatrix3[dataToUse,2], TreeList)[[1]]
+plot(tree1, edge.lty=BL.AllTrees[[dataToUse]]$edgelty, edge.color=BL.AllTrees[[dataToUse]]$edgeColor, cex=0.5, edge.width=2)
+nodelabels(c(NA, BL.AllTrees[[dataToUse]]$support[which(BL.AllTrees[[dataToUse]]$class == "internal")]), cex=0.5, col="black", bg="white", frame="none", adj=c(1.1, -0.1))
+nodelabels(c(NA, BL.AllTrees[[dataToUse]]$corr.support[which(BL.AllTrees[[dataToUse]]$class == "internal")]), cex=0.5, col="black", bg="white", frame="none", adj=c(1.1, 1.1))
+
+
+#compare plot above to the one adam sent
+adamTree <- read.nexus("~/Downloads/test.tre")
+dev.new()
+plot(ladderize(adamTree), show.node.label=T, cex=0.5)  
+
+sameFormat <- paste(BL.AllTrees[[dataToUse]]$support, "/", BL.AllTrees[[dataToUse]]$corr.support, sep="")
+myTree.nodelabels <- sameFormat[-which(sameFormat == "0/0")]
+adamTree$node.label
+compare <- cbind(myTree.nodelabels, adamTree$node.label)
+compare
+
+BL.AllTrees[[dataToUse]]
+ascnodes <- paste(BL.AllTrees[[dataToUse]]$anc, "-", BL.AllTrees[[dataToUse]]$desc, sep="")
+gtrnodes <- paste(BL.AllTrees[[dataToUse]]$corr.anc, "-", BL.AllTrees[[dataToUse]]$corr.desc, sep="")
+nodes <- cbind(ascnodes, gtrnodes, BL.AllTrees[[dataToUse]]$support)
+
+#focus in on node with 41 support in tree1--get taxa and compare to tree2
+#from nodes we can see that anc-desc nodes for the split with 41 support is 139-145
+nodeLeaves(tree1, 139)
+nodeLeaves(tree2, 76)  #returns same as above
+nodeLeaves(tree1, 145)
+nodeLeaves(tree2, 82)  #returns same as above
+
+CheckSharedMonophy(145, tree1, tree2)
+
+GetCorrespondingEdge(139, tree1, tree2)  #should get 76
+GetCorrespondingEdge(145, tree1, tree2)  #should get 82
+
+#now that corresponding branches are right...what is going on with support?
+t1 <- GetEdgeList(tree1)
+t2 <- GetEdgeList(tree2)
+desc.nodes <- t1[,2]
+t1$present <- sapply(desc.nodes, CheckSharedMonophy, tree1=tree1, tree2=tree2) 
+t1$corr.anc <- sapply(t1[,1], GetCorrespondingEdge, tree1=tree1, tree2=tree2)
+t1$corr.desc <- sapply(desc.nodes, GetCorrespondingEdge, tree1=tree1, tree2=tree2)
+t1$corr.BL <- rep(0, dim(t1)[1])
+t1$corr.support <- rep(0, dim(t1)[1])
+for(i in which(t1$present)){
+  t1$corr.BL[i] <- GetCorresonding(t1$corr.desc[i], t2)[[4]] 
+  t1$corr.support[i] <- GetCorresonding(t1$corr.desc[i], t2)[[5]]    
+}
+
+
+
+#GetCorresonding not returning the correct info...so maybe it is the edge list that is off...
+  tipList <- cbind(tree2$edge, tree2$edge[, 2] %in% tree2$edge[, 1], tree2$edge.length)
+  tipList <- as.data.frame(tipList, stringsAsFactors=F)
+  colnames(tipList) <- c("anc", "desc", "class", "branchlength")
+  tipList[which(tipList[,3] == 0), 3] <- "tip"
+  tipList[which(tipList[, 3] == 1), 3] <- "internal"
+  tipList$support <- rep(0, dim(tipList)[1])
+  tipList$support[which(tipList$class == "internal")] <- as.numeric(tree2$node.label)[-1] #node support comes in with an extra space in the beginning, so it has to be cleaved then readded for plotting.
+  options(digits=15)
+  tipList$branchlength <- as.numeric(tipList$branchlength)
+ # return(data.frame(tipList, stringsAsFactors = F))
+
+
+#new function line that reorganizes the nodes.
+GetEdgeList <- function(tree) {
+  tipList <- cbind(tree$edge, tree$edge[, 2] %in% tree$edge[, 1], tree$edge.length)
+  tipList <- as.data.frame(tipList, stringsAsFactors=F)
+  colnames(tipList) <- c("anc", "desc", "class", "branchlength")
+  tipList[which(tipList[,3] == 0), 3] <- "tip"
+  tipList[which(tipList[, 3] == 1), 3] <- "internal"
+  tipList$support <- rep(0, dim(tipList)[1])
+  tipList  <- tipList[order(tipList[,2]), ]  ##NOT comfy with this...  :s
+  tipList$support[which(tipList$class == "internal")] <- as.numeric(tree$node.label)[-1] #node support comes in with an extra space in the beginning, so it has to be cleaved then readded for plotting.
+  options(digits=15)
+  tipList$branchlength <- as.numeric(tipList$branchlength)
+  return(data.frame(tipList, stringsAsFactors = F))
+}
+
+
+
+
+
+
+
+
+
+
+
+#checking branch lengths (why do the tree colors look different than the original)
+pruningToClade<-function(phy, node) {
+#author: B. Banbury
+#function for pruning a tree to a single clade
+	g<-as.matrix(c(nodeLeaves(phy, node)))
+	rownames(g)<-g[,1]
+	d<-name.check(phy, g)
+	phy2<-drop.tip(phy, d[[1]])
+	return(phy2)
+}
+tr1 <- pruningToClade(tree1, 139)
+tr2 <- pruningToClade(tree2, GetCorrespondingEdge(139, tree1, tree2))
+
+plot(tr1, cex=0.5)
+edgelabels(tr1$edge.length, cex=0.5)
+title("tree1")
+dev.new()
+plot(tr2, cex=0.5)
+edgelabels(tr2$edge.length, cex=0.5)
+title("tree2")
+
+newWay <- MakeBranchLengthMatrix(tr1, tr2, analysis=analysis, dataset="c5p3")
+
+#Now repeat with old EdgeList
+GetEdgeList <- function(tree) {
+  tipList <- cbind(tree$edge, tree$edge[, 2] %in% tree$edge[, 1], tree$edge.length)
+  tipList <- as.data.frame(tipList, stringsAsFactors=F)
+  colnames(tipList) <- c("anc", "desc", "class", "branchlength")
+  tipList[which(tipList[,3] == 0), 3] <- "tip"
+  tipList[which(tipList[, 3] == 1), 3] <- "internal"
+  tipList$support <- rep(0, dim(tipList)[1])
+# tipList  <- tipList[order(tipList[,2]), ]  ##NOT comfy with this...  :s
+  tipList$support[which(tipList$class == "internal")] <- as.numeric(tree$node.label)[-1] #node support comes in with an extra space in the beginning, so it has to be cleaved then readded for plotting.
+  options(digits=15)
+  tipList$branchlength <- as.numeric(tipList$branchlength)
+  return(data.frame(tipList, stringsAsFactors = F))
+}
+
+oldWay <- MakeBranchLengthMatrix(tr1, tr2, analysis=analysis, dataset="c5p3")
+
+#correlation plots
+plot(newWay$branchlength, newWay$corr.BL, pch=4)
+points(oldWay$branchlength, oldWay$corr.BL, col="red")  #exact same
+
+plot(newWay$branchlength, newWay$BL.DIFF, pch=4)
+points(oldWay$branchlength, oldWay$BL.DIFF, col="red")  
+
+plot(newWay$desc, newWay$relativeBLdiff, pch=4)
+points(oldWay$desc, oldWay$relativeBLdiff, col="red")
+
+#all of these are ok...so now do the entire matrix and compare color differences
+# BL.AllTrees.new are using new EdgeList
+# BL.AllTrees.old are using old EdgeList
+
+cbind(BL.AllTrees.new[[11]]$edgeColor, BL.AllTrees.old[[11]]$edgeColor)
+
+#function to make sure that all relative differences between new and old way are the same
+for(i in 1:dim(BL.AllTrees.new[[11]][1])){
+  m <- BL.AllTrees.new[[11]][which(BL.AllTrees.new[[11]]$desc == i),]$relativeBLdiff - BL.AllTrees.old[[11]][which(BL.AllTrees.old[[11]]$desc == i),]$relativeBLdiff
+ print(m)
+}
+
+#test branch length colors on the order of the matrix...using something small like tr1
+test <- read.tree("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/RAxMLruns.noGamma/RAxML_bipartitions.c5p3_ASC_GTRCAT")
+test <- pruningToClade(test, 76)
+test$edge
+ladderize(test)$edge
+
+colors1 <- c(rep("black", 8), "pink", rep("black", 5))
+l <- cbind(test$edge, colors1)
+plot(test, edge.color=l[,3], cex=0.5, edge.width=2)
+
+l2 <- l[order(l[,2]), ] 
+plot(test, edge.color=l2[,3], cex=0.5, edge.width=2)
+
+GetEdgeList(test)
+# test for idetifying clade support by pointing
+plot(ladderize(test), show.node.label=T)
+GetEdgeList(test)[which(GetEdgeList(test)[,2] == identify.phylo(test)),][5]
+
+
+#Focus on tree1, node 141 (taxa = "URBI1" "UROR1")
+GetEdgeList(tree1)[which(GetEdgeList(tree1)[,2] == identify.phylo(tree1)),][5]  #these are RIGHT, but they are plotting wrong
+
+plot(tree1, cex=0.5)
+plot(tree1, cex=0.5, show.node.label=T)
+nodelabels(c(NA, t1[,5][which(t1[,3] == "internal")]), cex=0.5)
+GetEdgeList(tree1)[which(GetEdgeList(tree1)[,2] == identify.phylo(tree1)),][5]
+
+nodelabels(c(NA, t1[,5][which(t1[,3] == "internal")]), cex=0.5)  #should be wrong! Not defining the node
+nodelabels(text=t1[,5][which(t1[,3] == "internal")], cex=0.5, node=t1[,2][which(t1[,3] == "internal")])  #should work
+
+cbind(t1[,5][which(t1[,3] == "internal")], t1[,2][which(t1[,3] == "internal")])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

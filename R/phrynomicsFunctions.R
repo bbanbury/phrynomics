@@ -409,7 +409,7 @@ GetRAxMLStatsPostAnalysis <- function(workingDirectoryOfResults) {
 }
 
 GetLinesToSkip <- function(file){
-  return(length(system(paste("grep 'ID:' ", file, sep=""), intern=TRUE)))
+  return(length(suppressWarnings(system(paste("grep 'ID:' ", file, sep=""), intern=TRUE))))
 }
 
 GetMrBayesStatsPostAnalysis <- function(workingDirectoryOfResults){

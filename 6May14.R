@@ -8,7 +8,7 @@
 install.packages("~/phrynomics/phrynomics_1.3.tar.gz", type="source")
 library(phrynomics)
 library(ape)
-setwd("~/Dropbox/UWstuff/phrynomics/")  #original pyRAD files located here
+setwd("/Users/Barb/Dropbox/UWstuff/phrynomics/Analyses/DataForPaper")  #original pyRAD files located here
 
 
 
@@ -18,7 +18,7 @@ setwd("~/Dropbox/UWstuff/phrynomics/")  #original pyRAD files located here
 
 #  Remove invariant sites and write phylip formatted data to file
 
-snpFiles <- system("ls c*", intern=T)
+snpFiles <- system("ls c*p3.snps", intern=T)
 minSamples <- NULL
 NuSNPs <- NULL
 NuLoci <- NULL
@@ -203,8 +203,9 @@ MB.results <- GetMrBayesStatsPostAnalysis(".")
 
 levels <-NULL
 for(i in sequence(length(files))){
-  levels <- as.numeric(c(levels, strsplit(files[i], "\\D+")[[1]][2]))
+  levels <- as.numeric(c(levels, strsplit(files[i], "\\D+")[[1]][2])) #numerical datasets from file names
 }
+orderedLevels <- sort(levels)  #numerical datasets from file names
 whichDatasets <- paste("c", levels, "p3", sep="")  #datasets from file names
 AllOrder <- paste("c", seq(5, 70, 5), "p3", sep="") #datasets from sequence
 orderToGo <- AllOrder[AllOrder %in% whichDatasets]  #datasets of sequence that exist
@@ -235,7 +236,7 @@ table2 <- matrix(nrow=length(dataset), ncol=6)
 rownames(table2) <- paste("c", dataset, "p3", sep="")
 colnames(table2) <- c("Matrix", "Loci", "VariableSites", "Missing(%)", "PhrynoOverlap", "non-PhrynoOverlap")
 table2[,1] <- paste("s", dataset, sep="")
-rows <- match(rownames(table2), ASC.ML.results[,1])
+rows <- match(ASC.ML.results[,1], rownames(table2))
 table2 <- table2[!is.na(rows),]  
 table2[,c(2,3,4)] <- as.matrix(ASC.ML.results[order(rows[which(!is.na(rows))]), c(3,4,6)])
 dataOverlap <- list()
@@ -249,49 +250,52 @@ for(m in sequence(dim(table2)[1])){
   table2[m,6] <- mean(dataOverlap[[whichDataset]][-grep(pattern="PH", names(dataOverlap[[whichDataset]]))])
   table2[m,5] <- mean(dataOverlap[[whichDataset]][grep(pattern="PH", names(dataOverlap[[whichDataset]]))])
 }
+write.table(table2, file="table2.txt", quote=FALSE, row.names=FALSE)  
 
 
 # Make Figure 2. Acquisition bias and tree length
 
+pdf(file="Figure2.pdf", width=8.5, height=5)
 layout(matrix(1:2, nrow=1, byrow=TRUE), respect=TRUE)
-plot(c(levels, levels), ML.results$TreeLength, type="n", ylab="Tree Length", xlab="Missing Data")
+plot(c(orderedLevels, orderedLevels), ML.results$TreeLength, type="n", ylab="Tree Length", xlab="Missing Data")
 title(main="RAxML")
 legend("topright", legend=c("GTR", "GTR + ASC"), col=c("blue", "lightblue"), lwd=1, merge=TRUE, bty="n", xjust=1, inset=0.02, cex=1) 
-for(i in sequence(length(whichDatasets)-1)){
-  dataToUse <- which(whichDatasets[i] == ML.results$Level)
-  nextDataToUse <- which(whichDatasets[i+1] == ML.results$Level)
-  segments(levels[i], ML.results$TreeLength[dataToUse[1]], levels[i+1], ML.results$TreeLength[nextDataToUse[1]], col="lightblue")
-  segments(levels[i], ML.results$TreeLength[dataToUse[2]], levels[i+1], ML.results$TreeLength[nextDataToUse[2]], col="blue")  
+for(i in sequence(length(orderToGo)-1)){
+  dataToUse <- which(orderToGo[i] == ML.results$Level)
+  nextDataToUse <- which(orderToGo[i+1] == ML.results$Level)
+  segments(orderedLevels[i], ML.results$TreeLength[dataToUse[1]], orderedLevels[i+1], ML.results$TreeLength[nextDataToUse[1]], col="lightblue")
+  segments(orderedLevels[i], ML.results$TreeLength[dataToUse[2]], orderedLevels[i+1], ML.results$TreeLength[nextDataToUse[2]], col="blue")  
 }
-for(i in sequence(length(whichDatasets))){
-  dataToUse <- which(whichDatasets[i] == ML.results$Level)
-  points(levels[i], ML.results$TreeLength[dataToUse[1]], pch=21, bg="lightblue")
-  points(levels[i], ML.results$TreeLength[dataToUse[2]], pch=21, bg="blue")
+for(i in sequence(length(orderToGo))){
+  dataToUse <- which(orderToGo[i] == ML.results$Level)
+  points(orderedLevels[i], ML.results$TreeLength[dataToUse[1]], pch=21, bg="lightblue")
+  points(orderedLevels[i], ML.results$TreeLength[dataToUse[2]], pch=21, bg="blue")
 }
 Ymin <- min(MB.results$TreeLength.lowCI)
 Ymax <- max(MB.results$TreeLength.uppCI)
-plot(c(levels, levels), MB.results$TreeLength, type="n", ylab="Tree Length", xlab="Missing Data", ylim=c(Ymin, Ymax))
+plot(c(orderedLevels, orderedLevels), MB.results$TreeLength, type="n", ylab="Tree Length", xlab="Missing Data", ylim=c(Ymin, Ymax))
 title(main="MrBayes")
 legend("topright", legend=c("GTR", "GTR + ASC"), col=c("blue", "lightblue"), lwd=1, merge=TRUE, bty="n", xjust=1, inset=0.02, cex=1) 
-for(i in sequence(length(whichDatasets)-1)){
-  dataToUse <- which(whichDatasets[i] == MB.results$Level)
-  nextDataToUse <- which(whichDatasets[i+1] == MB.results$Level)
-  segments(levels[i], MB.results$TreeLength[dataToUse[1]], levels[i+1], MB.results$TreeLength[nextDataToUse[1]], col="lightblue")
-  segments(levels[i], MB.results$TreeLength[dataToUse[2]], levels[i+1], MB.results$TreeLength[nextDataToUse[2]], col="blue")  
+for(i in sequence(length(orderToGo)-1)){
+  dataToUse <- which(orderToGo[i] == MB.results$Level)
+  nextDataToUse <- which(orderToGo[i+1] == MB.results$Level)
+  segments(orderedLevels[i], MB.results$TreeLength[dataToUse[1]], orderedLevels[i+1], MB.results$TreeLength[nextDataToUse[1]], col="lightblue")
+  segments(orderedLevels[i], MB.results$TreeLength[dataToUse[2]], orderedLevels[i+1], MB.results$TreeLength[nextDataToUse[2]], col="blue")  
 }
-for(i in sequence(length(whichDatasets))){
-  dataToUse <- which(whichDatasets[i] == MB.results$Level)
-  arrows(levels[i], MB.results$TreeLength.lowCI[dataToUse[1]], levels[i], MB.results$TreeLength.uppCI[dataToUse[1]], code=3, length=0.05, col="lightblue", angle=90)
-  arrows(levels[i], MB.results$TreeLength.lowCI[dataToUse[2]], levels[i], MB.results$TreeLength.uppCI[dataToUse[2]], code=3, length=0.05, col="blue", angle=90)
-  points(levels[i], MB.results$TreeLength[dataToUse[1]], pch=21, bg="lightblue")
-  points(levels[i], MB.results$TreeLength[dataToUse[2]], pch=21, bg="blue")
+for(i in sequence(length(orderToGo))){
+  dataToUse <- which(orderToGo[i] == MB.results$Level)
+  arrows(orderedLevels[i], MB.results$TreeLength.lowCI[dataToUse[1]], orderedLevels[i], MB.results$TreeLength.uppCI[dataToUse[1]], code=3, length=0.05, col="lightblue", angle=90)
+  arrows(orderedLevels[i], MB.results$TreeLength.lowCI[dataToUse[2]], orderedLevels[i], MB.results$TreeLength.uppCI[dataToUse[2]], code=3, length=0.05, col="blue", angle=90)
+  points(orderedLevels[i], MB.results$TreeLength[dataToUse[1]], pch=21, bg="lightblue")
+  points(orderedLevels[i], MB.results$TreeLength[dataToUse[2]], pch=21, bg="blue")
 }
-
+dev.off()
 
 # Make Figure 3. Scatterplot branch lengths
 
 usr2dev <- function(x) 180/pi*atan(x*diff(par("usr")[1:2])/diff(par("usr")[3:4]))
 getX <- function(y, linmod) (y-linmod$coefficients[1])/linmod$coefficients[2]  #(y -b)/m = x
+pdf(file="Figure3.pdf", width=8.5, height=5)
 op <- par(mar=par("mar")/1.7)
 layout(matrix(1:8, nrow=2, byrow=TRUE), respect=TRUE)  
 for(anal in 1:length(analyses)){
@@ -315,9 +319,10 @@ for(anal in 1:length(analyses)){
     title(main=paste("s", strsplit(whichDatasets[[i]], "\\D")[[1]][2], sep=""))
   }
 }
+dev.off()
 
+# Figure 4 parts. Colored branch SNP phylogenies
 
-# Make Figure 4. Colored branch SNP phylogenies
 figIndex <- 0
 for(anal in 1:length(analyses)){
   whichAnalysis <- analyses[anal] 
@@ -330,7 +335,7 @@ for(anal in 1:length(analyses)){
     BL.AllTrees <- BL.AllTrees.MrBayes
   }
   for(i in sequence(length(orderToGo))){
-    dev.new()
+    pdf(file=paste(whichAnalysis, ".", orderToGo[i], "trees.pdf", sep=""), width=8.5, height=11)
     figIndex <- figIndex+1
     dataToUse <- which(rownames(treeMatrices[[anal]]) == orderToGo[i])
     tree1 <- assTrees(treeMatrices[[anal]][dataToUse,1], TreeList)[[1]]
@@ -356,14 +361,14 @@ for(anal in 1:length(analyses)){
     mtext(bquote1, side=3, cex=.75, adj=c(0), line=2)
     mtext(bquote2, side=3, cex=.75, adj=c(0), line=1)
     mtext(bquote3, side=3, cex=.75, adj=c(0), line=0)
+    dev.off()
   }
 }
 
 
 # Make Figure 5. Mean branch length error (%)
-##Also includes MrBayes runs??
 
-layout(matrix(1:2, nrow=1, byrow=TRUE), respect=TRUE)  
+pdf(file="Figure5.pdf", width=8.5, height=5)
 for(anal in 1:length(analyses)){
   whichAnalysis <- analyses[anal] 
   if(whichAnalysis == "RAxML")
@@ -396,59 +401,51 @@ for(anal in 1:length(analyses)){
   }
   if(any(rownames(mean.var.data) == "c70p3"))
     mean.var.data <- mean.var.data[-which(rownames(mean.var.data) == "c70p3"),]
-  q <- sequence(dim(mean.var.data)[1])
-  par(mar=c(5,5,2,5))
-  plot(q, mean.var.data[,2], type="n", ylim=c(min(c(mean.var.data[,4], mean.var.data[,2])), max(c(mean.var.data[,4], mean.var.data[,2]))), ylab="mean", xlab="", axes=FALSE)
-  axis(side=2)
-  axis(side=1, at=q, labels=orderToGo[-which(orderToGo == "c70p3")])
-  points(q, mean.var.data[,2], col="gray")
-  points(q, mean.var.data[,4], col="black")
-  for(i in sequence(dim(mean.var.data)[1]-1)){
-    segments(i, mean.var.data[i,2], i+1, mean.var.data[i+1,2], col="gray")
-    segments(i, mean.var.data[i,4], i+1, mean.var.data[i+1,4], col="black")
-  }
+  if(whichAnalysis == "RAxML")
+    RAxML.mean.var.data <- mean.var.data
+  if(whichAnalysis == "MrBayes")
+    MrBayes.mean.var.data <- mean.var.data
 }
+q <- sequence(dim(mean.var.data)[1])
+par(mar=c(5,5,2,5))
+plot(rep(q, 2), c(RAxML.mean.var.data[,2], MrBayes.mean.var.data[,2]), type="n", ylim=c(min(c(MrBayes.mean.var.data[,4], MrBayes.mean.var.data[,2])), max(c(MrBayes.mean.var.data[,4], MrBayes.mean.var.data[,2]))), ylab="mean", xlab="", axes=FALSE)
+axis(side=2)
+axis(side=1, at=q, labels=orderToGo[-which(orderToGo == "c70p3")])
+points(q, RAxML.mean.var.data[,2], col="gray")
+points(q, RAxML.mean.var.data[,4], col="black")
+points(q, MrBayes.mean.var.data[,2], col="gray")
+points(q, MrBayes.mean.var.data[,4], col="black")
+for(i in sequence(dim(RAxML.mean.var.data)[1]-1)){
+  segments(i, RAxML.mean.var.data[i,2], i+1, RAxML.mean.var.data[i+1,2], col="gray", lty=1)
+  segments(i, RAxML.mean.var.data[i,4], i+1, RAxML.mean.var.data[i+1,4], col="black", lty=1)
+}
+for(i in sequence(dim(MrBayes.mean.var.data)[1]-1)){
+  segments(i, MrBayes.mean.var.data[i,2], i+1, MrBayes.mean.var.data[i+1,2], col="gray", lty=2)
+  segments(i, MrBayes.mean.var.data[i,4], i+1, MrBayes.mean.var.data[i+1,4], col="black", lty=2)
+}
+dev.off()
 
 
-# Make Figure 6. Scatterplot branch length support 
+# Make Figure 6 a-d. Scatterplot branch length support 
+# Figure 6 e-h was done using AWTY online to account for values < 50% and bipartition files not matching up correctly. 
 
+pdf(file="Figure6a-d.pdf", width=8.5, height=5)
 op <- par(mar=par("mar")/1.7)
-layout(matrix(1:8, nrow=2, byrow=TRUE), respect=TRUE)
-for(anal in 1:length(analyses)){
-  whichAnalysis <- analyses[anal] 
-  if(whichAnalysis == "RAxML"){
-    treeMatrix <- RAxML.treeMatrix
-    BL.AllTrees <- BL.AllTrees.RAxML
-  }
-  if(whichAnalysis == "MrBayes"){
-    treeMatrix <- MrBayes.treeMatrix
-    BL.AllTrees <- BL.AllTrees.MrBayes
-  }
-  if(whichAnalysis == "RAxML"){
-    for(i in sequence(dim(treeMatrix)[1])){
-      dataToUse <- which(whichDatasets[i] == names(BL.AllTrees))
-      datarows <- which(BL.AllTrees[[dataToUse]]$present)[which(BL.AllTrees[[dataToUse]]$present) %in% which(BL.AllTrees[[dataToUse]]$support != 0)]  #don't want all the tip support 0s or non homologous clades
-      support <- BL.AllTrees[[dataToUse]]$support[datarows]
-      corr.support <- BL.AllTrees[[dataToUse]]$corr.support[datarows]
-      xlims <- ylims <- c(1,100)
-      plot(support, corr.support, ylab="GTR Tree", xlab="ASC Tree", pch=21, bg="gray", xlim=xlims, ylim=ylims)
-      title(main=paste("s", strsplit(whichDatasets[[i]], "\\D")[[1]][2], sep=""))
-    }
-  }
-  if(whichAnalysis == "MrBayes"){
-    for(i in sequence(dim(treeMatrix)[1])){
-      dataToUse <- which(whichDatasets[i] == rownames(treeMatrix))
-      supportMatrix <- CompareMrBayesPosteriors(treeMatrix[dataToUse,1], treeMatrix[dataToUse,2])
-      xlims <- ylims <- c(0,1)
-      plot(supportMatrix$ASC.support, supportMatrix$GTR.support, ylab="GTR Tree", xlab="ASC Tree", pch=21, bg="gray", xlim=xlims, ylim=ylims)
-      title(main=paste("s", strsplit(whichDatasets[[i]], "\\D")[[1]][2], sep=""))
-    }
-  }
+layout(matrix(1:4, nrow=1, byrow=TRUE), respect=TRUE)
+whichAnalysis <- "RAxML"
+treeMatrix <- RAxML.treeMatrix
+BL.AllTrees <- BL.AllTrees.RAxML
+for(i in sequence(length(focalDatasets))){
+  dataToUse <- which(focalDatasets[i] == names(BL.AllTrees))
+  datarows <- which(BL.AllTrees[[dataToUse]]$present)[which(BL.AllTrees[[dataToUse]]$present) %in% which(BL.AllTrees[[dataToUse]]$support != 0)]  #don't want all the tip support 0s or non homologous clades
+  support <- BL.AllTrees[[dataToUse]]$support[datarows]
+  corr.support <- BL.AllTrees[[dataToUse]]$corr.support[datarows]
+  xlims <- ylims <- c(1,100)
+  plot(support, corr.support, ylab="GTR Tree", xlab="ASC Tree", pch=21, bg="gray", xlim=xlims, ylim=ylims)
+  #text(support, corr.support, labels=BL.AllTrees[[dataToUse]][datarows,1])
+  title(main=paste("s", strsplit(focalDatasets[[i]], "\\D")[[1]][2], sep=""))
 }
-
-
-
-
+dev.off()
 
 
 
