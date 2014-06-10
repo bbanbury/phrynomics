@@ -1,7 +1,7 @@
 ##  --------------------------------  ##
 ##  ---      shinyPhrynomics     ---  ##
 ##  ---    written by B.Banbury  ---  ##
-##  ---     v1.1  27May2014    ---  ##
+##  ---     v1.2  10June2014    ---  ##
 ##  --------------------------------  ##
 
 
@@ -13,7 +13,7 @@ library(devtools)
 #devtools::install_github("bbanbury/phrynomics")
 library(phrynomics)
 
-vers <- "v1.1"
+vers <- "v1.2"
 
 
 ##  ---     Server Functions     ---  ##
