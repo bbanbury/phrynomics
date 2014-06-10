@@ -27,6 +27,7 @@
 \alias{ReturnMaxCI}
 \alias{ReturnMinCI}
 \alias{GetLinesToSkip}
+\alias{GetJustTipBLError}
 
 \title{A collection of pita tools for phrynomics that pertain to just us
 }
@@ -64,6 +65,7 @@ nodeOffspring(tree, anc.node)
 ReturnMaxCI(x, vstat)
 ReturnMinCI(x, vstat)
 GetLinesToSkip(file)
+GetJustTipBLError(BL.AllTrees)
 }
 
 \arguments{

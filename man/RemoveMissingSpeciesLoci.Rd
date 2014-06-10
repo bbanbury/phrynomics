@@ -3,10 +3,11 @@
 \title{RemoveMissingSpeciesLoci}
 \description{This function will remove entire loci (including multiple SNPs) when a species is missing data}
 \usage{
-RemoveMissingSpeciesLoci(data)
+RemoveMissingSpeciesLoci(data, chatty=FALSE)
 }
 \arguments{
   \item{data}{A SNP dataset}
+  \item{chatty}{Optional print to screen update}
 }
 \details{For SNAPP analyses (maybe more) an entire species can not be missing loci. If all of the individuals within a species are missing data, then the entire locus is dropped from the dataset.}
 \value{Returns a subset data frame}
