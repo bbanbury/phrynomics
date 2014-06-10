@@ -1,24 +1,26 @@
 ##  --------------------------------  ##
 ##  ---      shinyPhrynomics     ---  ##
 ##  ---    written by B.Banbury  ---  ##
-##  ---     v1.0  22April2014    ---  ##
+##  ---     v1.1  27May2014    ---  ##
 ##  --------------------------------  ##
 
 
 ##  ---         Load Code        ---  ##
 library(shiny)
-vers <- "v1.0"
-loadSourceFiles <- function(path){
-  filesToLoad <- list.files(path)
-  sapply(paste(path, filesToLoad, sep=""), source)
-}
-loadSourceFiles("../../R/")
+library(ape)
+library(phangorn)
+library(devtools)
+#devtools::install_github("bbanbury/phrynomics")
+library(phrynomics)
+
+vers <- "v1.1"
+
 
 ##  ---     Server Functions     ---  ##
 fileFormat <- function(file){
   # returns "phy" or "nex" depending on the file type
   format <- NULL
-  if(any(grep("Error", try(read.table(file, skip=1), silent=TRUE), ignore.case=TRUE))) {
+  if(any(grep("Error", try(read.table(file, skip=GetLinesToSkip(file)+1), silent=TRUE), ignore.case=TRUE))) {
     if(!any(grep("Error", try(read.nexus.data(file)), ignore.case=TRUE)))
       format <- "nex"
   } else{
@@ -74,7 +76,7 @@ shinyServer(function(input, output) {
   initializeTable <- reactive({
     inFile <- input$SNPdataset
     inputFileType <- fileFormat(inFile$datapath)
-    if (is.null(inFile))
+    if (is.null(inputFileType))
       return(NULL)
     if(inputFileType == "phy")
       initializeTable <- read.table(inFile$datapath, row.names=1, skip=1, stringsAsFactors=FALSE)

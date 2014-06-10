@@ -1,12 +1,17 @@
 ##  --------------------------------  ##
 ##  ---      shinyPhrynomics     ---  ##
 ##  ---    written by B.Banbury  ---  ##
-##  ---     v 1.0  22April2014   ---  ##
+##  ---     v 1.1  27May2014   ---  ##
 ##  --------------------------------  ##
 
 
 ##  Load packages and source code
 library(shiny)
+library(ape)
+library(phangorn)
+library(devtools)
+#devtools::install_github("bbanbury/phrynomics")
+library(phrynomics)
 
 ##  shiny user interface
 shinyUI(pageWithSidebar(  
@@ -27,8 +32,7 @@ shinyUI(pageWithSidebar(
     br(),
     h4("Original Dastset"),
     textInput("datasetName", "Enter SNP Dataset Name:", value="SNPdata"), 
-    fileInput("SNPdataset", "Choose File To Upload (.phy, .nex, .txt, .snps):", accept=c("text/csv", "text/comma-separated-values", "text/plain", ".txt", ".nex", ".snps")),
-#    a("See example input", href="https://raw.githubusercontent.com/bbanbury/phrynomics/master/shinyPhrynomics/example.txt"),
+    fileInput("SNPdataset", "Choose File To Upload (.phy, .nex, .txt, .snps):", accept=c(".snps", ".nex", ".txt", ".phy")),
     numericInput("obs", "Number Of Taxa to Preview:", 5),
     checkboxInput("rmInvSites", "Remove Invariant Sites", value=TRUE),
     checkboxInput("rmNonBin", "Remove Non-Binary Sites", value=TRUE),
