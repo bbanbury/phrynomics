@@ -55,8 +55,10 @@ shinyUI(pageWithSidebar(
 ##  ---         main bar         ---  ##
   mainPanel(
     h4("Preview Original Dataset"),
+    textOutput("OrigDataStats"),
     tableOutput("inputPreview"),
     h4("Preview Results"),
+    textOutput("resultsDataStats"),
     tableOutput("resultsPreview"),
     verbatimTextOutput("communicationWindow"),
     hr(),

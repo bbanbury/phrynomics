@@ -110,6 +110,20 @@ shinyServer(function(input, output) {
     }
   return(list(results, textOutput))    
   })
+
+  output$OrigDataStats <- renderText ({
+    forStats <- initializeTable()
+    if(is.null(forStats))
+      return(NULL)
+    return(paste("Original Data contains", dim(forStats)[1], "taxa,", dim(forStats)[2], "sites, and", GetNumberSNPs(forStats[1,]), "SNPs"))
+  })
+
+  output$resultsDataStats <- renderText ({
+    resultsStats <- contents()[[1]]
+    if(is.null(resultsStats))
+      return(NULL)
+    return(paste("Transformed Data contains", dim(resultsStats)[1], "taxa,", dim(resultsStats)[2], "sites, and", GetNumberSNPs(resultsStats[1,]), "SNPs"))
+  })
       
   output$inputPreview <- renderTable({  
     head(initializeTable(), n=input$obs)
