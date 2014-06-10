@@ -1,4 +1,4 @@
-RemoveInvariantSites <- function(SNPdataset){
+RemoveInvariantSites <- function(SNPdataset, chatty=FALSE){
 #This function will remove sites with less than two bases
 #one base plus ambiguity code (that icludes base) will be dropped 
   SNPdataset <- PreProcess(SNPdataset)
@@ -9,6 +9,7 @@ RemoveInvariantSites <- function(SNPdataset){
   breaks <- which(splitdata[1,] == " ")
   newSNPdataset <- cSNP(splitdata, KeepVector=KeepVector, maintainLoci=TRUE)
   newLoci <- length(which(newSNPdataset[1,] != ""))  #number of new loci 
-  print(paste("removed", loci-newLoci, "of", loci, "loci"))
+  if(chatty)
+    print(paste("removed", loci-newLoci, "of", loci, "loci"))
   return(newSNPdataset)
 }
