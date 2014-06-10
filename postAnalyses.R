@@ -996,6 +996,53 @@ cbind(t1[,5][which(t1[,3] == "internal")], t1[,2][which(t1[,3] == "internal")])
 
 
 
+# TC-IC imports (if we add these in, then add it to the 6May14 file AND the method for getting TC-IC vals)
+# RAxML TC-IC correlations (rather than bootstrap values)
+setwd("~/Dropbox/UWstuff/phrynomics/Analyses/RAxMLruns/RAxMLruns.noGamma/TC-IC/")
+pdf(file="TC-IC.pdf", width=8.5, height=5)
+whichAnalysis <- "RAxML"
+TCIC.trees <- system("ls RAxML_MajorityRuleConsensusTree*", intern=TRUE)
+#need to get rid of extra info in brackets
+for(i in sequence(length(TCIC.trees))){
+  newTree <- gsub(",.\\...]", "]", scan(TCIC.trees[i], what = "", sep = "\n", quiet = TRUE)) #sub out the extra IC val at the end of the bracket
+  newTree <- gsub(":", "", newTree)
+  newTree <- gsub("1.0\\[", "", newTree)
+  newTree <- gsub("\\]", "", newTree)
+  write(newTree, file=paste("new.", TCIC.trees[i], sep=""))
+}
+TCIC.trees <- system("ls new.RAxML_MajorityRuleConsensusTree*", intern=TRUE)
+TCIC.TreeList <- CreateTreeList(TCIC.trees, "RAxML")
+TCIC.TreeList <- lapply(TCIC.TreeList, multi2di)
+for(i in sequence(length(TCIC.TreeList))){
+  TCIC.TreeList[i][[1]]$edge.length <- rep(1, dim(TCIC.TreeList[i][[1]]$edge)[1])
+}
+
+treeMatrix <- CreateTreeMatrix(TCIC.trees)
+treeMatrix2 <- AddTreeDist(treeMatrix, TCIC.TreeList)
+#TCIC.treeMatrix <- AddBLD(treeMatrix2, TCIC.TreeList) #not working...add some na cols
+TCIC.treeMatrix <- cbind(treeMatrix2, matrix(ncol=4, nrow=14, dimnames=NULL))
+BL.AllTrees.TCIC <- list()
+for(i in sequence(dim(treeMatrix)[1])) {
+  tree1 <- assTrees(treeMatrix[i,1], TCIC.TreeList)[[1]]
+  tree2 <- assTrees(treeMatrix[i,2], TCIC.TreeList)[[1]]
+  BL.AllTrees.TCIC[[i]] <- MakeBranchLengthMatrix(tree1, tree2, analysis=analysis, dataset=rownames(treeMatrix)[i])
+  names(BL.AllTrees.TCIC)[[i]] <- rownames(treeMatrix)[i]
+}
+BL.AllTrees <- BL.AllTrees.TCIC
+op <- par(mar=par("mar")/1.7)
+layout(matrix(1:4, nrow=1, byrow=TRUE), respect=TRUE)
+for(i in sequence(length(focalDatasets))){
+  dataToUse <- which(focalDatasets[i] == names(BL.AllTrees))
+  datarows <- which(BL.AllTrees[[dataToUse]]$present)[which(BL.AllTrees[[dataToUse]]$present) %in% which(BL.AllTrees[[dataToUse]]$support != 0)]  #don't want all the tip support 0s or non homologous clades
+  support <- BL.AllTrees[[dataToUse]]$support[datarows]
+  corr.support <- BL.AllTrees[[dataToUse]]$corr.support[datarows]
+  xlims <- ylims <- c(0,1)
+  plot(support, corr.support, ylab="GTR Tree", xlab="ASC Tree", pch=21, bg="gray", xlim=xlims, ylim=ylims)
+  print(paste(focalDatasets[i], "=", cor(support, corr.support, use="complete.obs")))
+  text(0.1, 0.9, paste("R = ", round(cor(support, corr.support, use="complete.obs"), digits=3)))
+  title(main=paste("s", strsplit(focalDatasets[[i]], "\\D")[[1]][2], sep=""))
+}
+dev.off()
 
 
 

@@ -340,8 +340,12 @@ for(anal in 1:length(analyses)){
     dataToUse <- which(rownames(treeMatrices[[anal]]) == orderToGo[i])
     tree1 <- assTrees(treeMatrices[[anal]][dataToUse,1], TreeList)[[1]]
     tree1$tip.label[which(tree1$tip.label == "UMNO1")] <- "CADR2"  #change taxon
+    tree1$tip.label[which(tree1$tip.label == "PHCO1")] <- "PHCE5"  #change taxon
+    tree1$tip.label[which(tree1$tip.label == "PHCO3")] <- "PHCE6"  #change taxon
     tree2 <- assTrees(treeMatrices[[anal]][dataToUse,2], TreeList)[[1]]
     tree2$tip.label[which(tree2$tip.label == "UMNO1")] <- "CADR2" #change taxon in tree2
+    tree2$tip.label[which(tree2$tip.label == "PHCO1")] <- "PHCE5" #change taxon in tree2
+    tree2$tip.label[which(tree2$tip.label == "PHCO3")] <- "PHCE6" #change taxon in tree2
     plot(tree1, edge.lty=BL.AllTrees[[dataToUse]]$edgelty, edge.color=BL.AllTrees[[dataToUse]]$edgeColor, cex=0.5, edge.width=2)
     legtxt <- c("Discordant", "< -10%", "-10% to 10%", "> 10%", "> 20%", "> 30%", "> 40%", "> 50%")
     legcolors <- c("gray", rgb(51,51,255, max=255), "gray", rgb(255,255,102, max=255), rgb(255,178,102, max=255), rgb(225,128,0, max=255), rgb(225,0,0, max=255), rgb(153,0,0, max=255))
@@ -442,10 +446,36 @@ for(i in sequence(length(focalDatasets))){
   corr.support <- BL.AllTrees[[dataToUse]]$corr.support[datarows]
   xlims <- ylims <- c(1,100)
   plot(support, corr.support, ylab="GTR Tree", xlab="ASC Tree", pch=21, bg="gray", xlim=xlims, ylim=ylims)
+  
   #text(support, corr.support, labels=BL.AllTrees[[dataToUse]][datarows,1])
   title(main=paste("s", strsplit(focalDatasets[[i]], "\\D")[[1]][2], sep=""))
 }
 dev.off()
+
+
+# Get correlations
+
+corrs <- matrix(nrow=8, ncol=3)
+corrs[,1] <- c(rep("ML", 4), rep("Bayes", 4))
+corrs[,2] <- rep(focalDatasets, 2)
+s5 <- read.table("~/Dropbox/UWstuff/phrynomics/branchsupportPLOTS/mb_s5.txt", skip=2)
+s25 <- read.table("~/Dropbox/UWstuff/phrynomics/branchsupportPLOTS/mb_s25.txt", skip=2)
+s45 <- read.table("~/Dropbox/UWstuff/phrynomics/branchsupportPLOTS/mb_s45.txt", skip=2)
+s65 <- read.table("~/Dropbox/UWstuff/phrynomics/branchsupportPLOTS/mb_s65.txt", skip=2)
+for(i in sequence(length(focalDatasets))){
+  dataToUse <- which(focalDatasets[i] == names(BL.AllTrees.RAxML))
+  datarows <- which(BL.AllTrees.RAxML[[dataToUse]]$present)[which(BL.AllTrees.RAxML[[dataToUse]]$present) %in% which(BL.AllTrees.RAxML[[dataToUse]]$support != 0)]  #don't want all the tip support 0s or non homologous clades
+  support <- BL.AllTrees.RAxML[[dataToUse]]$support[datarows]
+  corr.support <- BL.AllTrees.RAxML[[dataToUse]]$corr.support[datarows]
+  corrs[i,3] <- cor(support, corr.support)
+}
+corrs[5,3] <- cor(s5[,1], s5[,2])
+corrs[6,3] <- cor(s25[,1], s25[,2])
+corrs[7,3] <- cor(s45[,1], s45[,2])
+corrs[8,3] <- cor(s65[,1], s65[,2])
+write.table(corrs, file="~/Dropbox/UWstuff/phrynomics/Analyses/Figs/corValues.txt", quote=FALSE, row.names=FALSE)  
+
+
 
 
 

@@ -434,7 +434,7 @@ GetMrBayesStatsPostAnalysis <- function(workingDirectoryOfResults){
     alpha.lowCI <- pstats[2,4]
     alpha.uppCI <- pstats[2,5]
     alphaESS <- pstats[2,8]
-    stdSplitLine <- system(paste("grep -A 1 'Summary statistics for partitions with frequency' ", logFiles[grep(dataName, pstatFiles)], sep=""), intern=T)[2]
+    stdSplitLine <- system(paste("grep -A 1 'Summary statistics for partitions with frequency' ", logFiles[grep(dataName, logFiles)], sep=""), intern=T)[2]
 
     stdSplits <- gsub("          Average standard deviation of split frequencies = ", "", stdSplitLine)
     results[i,] <- c(MissingDataLevel, whichModel, numberLoci, treelength, treelength.lowCI, treelength.uppCI, treelengthESS, alpha, alpha.lowCI, alpha.uppCI, alphaESS, stdSplits)
