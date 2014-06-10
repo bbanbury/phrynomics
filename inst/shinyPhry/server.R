@@ -52,11 +52,14 @@ GetNumberSNPs <- function(taxon){
 }
 
 WriteNexus <- function(phyData, file, missing) {
-  nchars <- min(apply(phyData, 1, GetNumberSNPs))
+  if(class(phyData) == "data.frame" || class(phyData) == "matrix")
+    if(dim(phyData)[2] > 1)
+      phyData <- apply(phyData, 1, paste, collapse="")
+  nchars <- min(sapply(phyData, GetNumberSNPs))
   write(paste("#NEXUS"), file)
   write(paste("[Written ", Sys.Date(), " via shinyPhrynomics]", sep=""), file, append=TRUE)
   write(paste("BEGIN Data;"), file, append=TRUE)
-  write(paste("   DIMENSIONS NTAX=", dim(phyData)[1], " NCHAR=", nchars, ";", sep=""), file, append=TRUE)
+  write(paste("   DIMENSIONS NTAX=", length(phyData), " NCHAR=", nchars, ";", sep=""), file, append=TRUE)
   write(paste("   FORMAT DATATYPE=Standard INTERLEAVE=no missing=", missing, ";", sep=""), file, append=TRUE)
   write(paste("Matrix"), file, append=TRUE)
   write.table(phyData, file, append=TRUE, quote=FALSE, col.names=FALSE)  
