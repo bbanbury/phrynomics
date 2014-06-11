@@ -69,6 +69,13 @@ WriteNexus <- function(phyData, file, missing) {
   write(paste(""), file, append=TRUE)
 }
 
+sum_along <- function(x){
+  sums <- rep(NA, length(x))
+  for(i in sequence(length(sums))){
+    sums[i] <- sum(x[1:i])
+  }
+return(sums)
+}
 
 ##  ---   Server Communication   ---  ##
 shinyServer(function(input, output) {
@@ -124,24 +131,21 @@ shinyServer(function(input, output) {
       return(NULL)
     return(paste("Transformed Data contains", dim(resultsStats)[1], "taxa,", dim(resultsStats)[2], "sites, and", GetNumberSNPs(resultsStats[1,]), "SNPs"))
   })
-      
+
   output$inputPreview <- renderTable({  
-    head(initializeTable(), n=input$obs)
+    prev <- head(initializeTable(), n=input$obs)
+    newDim <- min(sum(nchar(prev[1,])), input$snpobs) 
+    if(!is.null(prev))
+      return(cSNP(SplitSNP(prev)[,1:newDim]))
   }, include.colnames=FALSE, size=1)
   
   output$resultsPreview <- renderTable({   
     outPrev <- head(contents()[[1]], n=input$obs)
-#    maxnchars <- max(apply(outPrev, 1, GetNumberSNPs))
-#    spacesToAdd <- maxnchars - apply(outPrev, 1, GetNumberSNPs)
-#    for(i in 1:dim(outPrev)[1]){
-#      spacesToAdd[i] <- paste(rep("0", spacesToAdd[i]), collapse="")
-#      #outPrev[i] <- paste(outPrev[i,], spacesToAdd[i], sep="")
-#    }
-#    save(outPrev, file="outPrev.rdata")
+    newDim2 <- min(sum(nchar(outPrev[1,])), input$snpobs)      
     if(input$transMrBayes)
       return(NULL)
     if(!is.null(outPrev))
-      outPrev <- cSNP(SplitSNP(outPrev))
+      outPrev <- cSNP(SplitSNP(outPrev)[,1:newDim2])
   }, include.colnames=FALSE, size=1)
   
   output$downloadPhy <- downloadHandler(

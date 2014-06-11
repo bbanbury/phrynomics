@@ -34,6 +34,7 @@ shinyUI(pageWithSidebar(
     textInput("datasetName", "Enter SNP Dataset Name:", value="SNPdata"), 
     fileInput("SNPdataset", "Choose File To Upload (.phy, .nex, .txt, .snps):", accept=c(".snps", ".nex", ".txt", ".phy")),
     numericInput("obs", "Number Of Taxa to Preview:", 5),
+    numericInput("snpobs", "Number Of SNPs to Preview:", 500),
     checkboxInput("rmInvSites", "Remove Invariant Sites", value=TRUE),
     checkboxInput("rmNonBin", "Remove Non-Binary Sites", value=TRUE),
     checkboxInput("takeRandom", "Take a single SNP from each locus (loci must be separated by a space)", value=FALSE),
