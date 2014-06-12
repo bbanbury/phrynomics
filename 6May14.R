@@ -5,7 +5,7 @@
 ##                                            ##
 ################################################
 
-install.packages("~/phrynomics/phrynomics_1.3.tar.gz", type="source")
+install.packages("~/phrynomics/phrynomics_1.4.tar.gz", type="source")
 library(phrynomics)
 library(ape)
 setwd("/Users/Barb/Dropbox/UWstuff/phrynomics/Analyses/DataForPaper")  #original pyRAD files located here
@@ -43,7 +43,7 @@ for(i in sequence(length(snpFiles))) {
 }
 
 
-# Writing RAxML invocation calls   
+# Writing RAxML invocation calls with bootstrapping
 ####change this to be exactly what the final script will write
 
 files <- system("ls c*noAmbigs.snps", intern=T)
@@ -71,6 +71,31 @@ for(model in sequence(length(models))) {
 save(systemSeeds, treeSeeds, filenames, file="seeds.rdata")
 write(jobArgs, file=paste("RAXML_JobArgs", sep=""))
 }
+
+
+# Writing RAxML invocation calls for repeat runs (no bootstrapping)
+
+files <- system("ls c*noAmbigs.snps", intern=T)
+writejobArgs <- function(files, pathToRAxML="raxmlHPC-PTHREADS-SSE3", NumCores=6, NumRuns=20){
+  models <- c("ASC_GTRCAT", "GTRCAT")
+  jobArgs <- NULL
+  for(whichFile in sequence(length(files))){ 
+    file <- files[whichFile]
+    for(model in sequence(length(models))){
+      for(i in sequence(NumRuns)){
+        outgroup <- "GAWI1"
+        systemSeed <- floor(runif(1, min=1, max=10^6))
+        treeSeed <- floor(runif(1, min=1, max=10^6))
+        bootstrapReps <- 1
+        outputName <- paste(gsub("\\D+$", "", file), "_", models[model], "_REP", i, sep="")
+        systemCall <- paste(pathToRAxML, " -T ", NumCores, " -s ", file, " -m ", models[model], " -V -o ", outgroup, " -p ", treeSeed, " -n ", outputName, sep="")
+        jobArgs <- append(jobArgs, systemCall)            
+      }
+    }
+  }
+  write(jobArgs, file=paste("repeat.RAXML_JobArgs", sep=""))
+}
+writejobArgs(files)
 
 
 # Write MrBayes nexus formatted input files
@@ -139,6 +164,10 @@ for(i in sequence(length(toRun))){
   system(toRun[i])
 }
 
+toRun <- scan(file="repeat.RAXML_JobArgs", what="character", sep="\n")
+for(i in sequence(length(toRun))){
+  system(toRun[i])
+}
 
 # Run MrBayes via R (not parallelized)
 

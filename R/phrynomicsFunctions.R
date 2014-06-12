@@ -347,7 +347,7 @@ CalculateTotalTipBLError <- function(BL.AllTrees) {
 }
 
 GetJustTipBLError <- function(BL.AllTrees){
-#this function will return a vector of BL differences for just tips
+# this function will return a vector of BL differences for just tips
   tips <- BL.AllTrees[which(BL.AllTrees$class == "tip"), 2]
   tipDifferences <- rep(0, length(tips))
   for(i in tips){
@@ -356,6 +356,77 @@ GetJustTipBLError <- function(BL.AllTrees){
   }
   return(tipDifferences)
 }
+
+
+getBestTrees <- function(model, dataset, analysis){
+# sloppy function that returns file names for raxml and 20 randoms for MrBayes.
+# used for making an RF matrix
+  if(analysis == "RAxML")
+    return(system(paste("ls RAxML_bestTree*", dataset, "*", model, "_REP*", sep=""), intern=TRUE))
+  if(analysis == "MrBayes"){
+    #gather 20 random trees from posterior
+    file <- system(paste("ls ", model, "_", dataset, "noAmbigs.nex.run1.t", sep=""), intern=TRUE)
+    random20 <- floor(runif(20, min=1, max=length(names(read.nexus(file)))))
+    #allBItrees <- names(read.nexus(file))  #will take 185 days to run
+    return(list(file=file, random20=random20))
+  }
+}
+
+makeRFdistanceMatrix <- function(treeList, analysis){
+# this function will take a list of file names (treeList)
+# creates a pairwise matrix comparing each tree and calculating RF
+  if(analysis == "RAxML")
+    compare <- matrix(nrow=length(treeList), ncol=length(treeList))
+  if(analysis == "MrBayes")
+    compare <- matrix(nrow=length(treeList$random20), ncol=length(treeList$random20))
+  for(i in sequence(dim(compare)[1])){
+    if(analysis == "RAxML")
+      tree1 <- read.tree(treeList[i])    
+    if(analysis == "MrBayes"){
+      trees <- read.nexus(treeList$file)
+      tree1 <- trees[treeList$random20[i]][[1]]
+    }
+      for(j in sequence(dim(compare)[1])){
+        if(i != j){
+          if(analysis == "RAxML")
+            tree2 <- read.tree(treeList[j])    
+          if(analysis == "MrBayes")
+            tree2 <- trees[treeList$random20[j]][[1]]
+          compare[i,j] <- phangorn::treedist(tree1, tree2)[[1]]  #symmetric difference
+        }
+      }
+    }
+return(compare)
+}
+
+GetRFmatrix <- function(analysis) {
+#this function will take 
+  models <- c("ASC", "GTR")
+  dataset <- paste("c", seq(from=5, to=70, by=5), "p3", sep="")
+  RFdists <- NULL
+  RFdistnames <- NULL
+  RFdistMatrix <- matrix(nrow=28, ncol=4)
+  place <- 0
+  for(i in sequence(length(models))){
+    for(j in sequence(length(dataset))){
+      startTime <- Sys.time()[[3]]
+      place <- place+1
+      print(place)
+      RFdist <- NULL
+      RFdistname <- NULL
+      RFdist <- mean(makeRFdistanceMatrix(getBestTrees(models[i], dataset[j], analysis), analysis), na.rm=TRUE)    
+      print(Sys.time()[[3]]-startTime)
+      RFdists <- c(RFdists, RFdist)
+      RFdistname <- paste(models[i], dataset[j], sep="")
+      print(paste(models[i], dataset[j], sep=""))
+      RFdistnames <- c(RFdistnames, RFdistname)
+      RFdistMatrix[place,] <- c(models[i], dataset[j], j, RFdist)
+    }
+    names(RFdists) <- RFdistnames
+  }
+  return(RFdists)
+}
+
 
 
 
@@ -455,6 +526,55 @@ GetMrBayesStatsPostAnalysis <- function(workingDirectoryOfResults){
   return(results)
 }
 
+
+CheckInvocations <- function(workingDir){
+# only works for RAxML
+# read in info filenames - scrape out model, dataset, and rep from name
+# then grep for invocation line and scrape model and dataset to make sure it matches
+  origWD <- getwd()
+  setwd(workingDir)
+  seeds <- NULL
+  infoFiles <- system("ls *info*", intern=T)
+  for(i in sequence(length(infoFiles))){
+    modLine <- strsplit(infoFiles[i], "[.,_]")[[1]]
+    if(any(grep("ASC", modLine)))
+      mod1 <- "ASC_GTRCAT"
+    else 
+      mod1 <- "GTRCAT"
+    dat1 <- strsplit(infoFiles[i], "[.,_]")[[1]][grep("\\d+", strsplit(infoFiles[i], "[.,_]")[[1]])[1]]
+    dat1 <- gsub("noAmbigs", "", dat1)
+    run <- strsplit(infoFiles[i], "[.,_]")[[1]][grep("\\d+", strsplit(infoFiles[i], "[.,_]")[[1]])[2]]
+    invocLine <- strsplit(system(paste("grep -A 2 'RAxML was called as follows:'", infoFiles[i]), intern=TRUE)[3], split=" ")[[1]]
+    mod2 <- invocLine[7]
+    seeds <- c(seeds, invocLine[12])
+    dat2 <- gsub("noAmbigs.snps", "", invocLine[5])
+    if(mod1 != mod2)  
+      print(paste("model invocation is wrong:", infoFiles[i]))
+    if(dat1 != dat2)
+      print(paste("dataset invocation is wrong:", infoFiles[i]))
+  }
+  setwd(origWD)
+  return(as.numeric(seeds))
+}
+
+CheckSeeds <- function(seeds) {
+# takes a simple string and checks for repeats
+  x1 <- NULL
+  sorted.seeds <- sort(seeds)
+  for (i in 1: length(seeds)-1) {
+    x2 <- c(abs(sorted.seeds[i])-abs(sorted.seeds[i+1]))
+    x1 <- c(x1, x2)
+  }
+  if (0 %in% x1)
+    print(as.matrix(paste("repeat",  sort(seeds)[which(x1 == 0)])))
+  if (!0 %in% x1)
+    print("yahoo all are good!")
+} 
+
+if(analysis == "RAxML"){
+  systemCallSeeds <- CheckInvocations(workingDir)
+  CheckSeeds(systemCallSeeds)
+}
 
 
 

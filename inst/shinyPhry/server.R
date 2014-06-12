@@ -10,7 +10,7 @@ library(shiny)
 library(ape)
 library(phangorn)
 library(devtools)
-#devtools::install_github("bbanbury/phrynomics")
+devtools::install_github("bbanbury/phrynomics")
 library(phrynomics)
 
 vers <- "v1.2"

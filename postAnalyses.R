@@ -4,9 +4,7 @@
 
 library(ape)
 library(phangorn)
-path <- "~/phrynomics/trunk/R/"
-files <- list.files(path)
-sapply(paste(path, files, sep=""), source)
+devtools::load_all("~/phrynomics/trunk/")
 
 # Load RAxML Trees (GTRGAMMA model) -- OLD
 # analysis <- "RAxML"
