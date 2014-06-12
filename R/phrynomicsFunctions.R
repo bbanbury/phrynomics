@@ -545,8 +545,8 @@ CheckInvocations <- function(workingDir){
     dat1 <- gsub("noAmbigs", "", dat1)
     run <- strsplit(infoFiles[i], "[.,_]")[[1]][grep("\\d+", strsplit(infoFiles[i], "[.,_]")[[1]])[2]]
     invocLine <- strsplit(system(paste("grep -A 2 'RAxML was called as follows:'", infoFiles[i]), intern=TRUE)[3], split=" ")[[1]]
-    mod2 <- invocLine[7]
-    seeds <- c(seeds, invocLine[12])
+    mod2 <- invocLine[grep("GTR", invocLine)[1]]
+    seeds <- c(seeds, invocLine[grep("^\\d\\d\\d+$", invocLine)][invocLine[grep("^\\d\\d\\d+$", invocLine)] != "1000"])
     dat2 <- gsub("noAmbigs.snps", "", invocLine[5])
     if(mod1 != mod2)  
       print(paste("model invocation is wrong:", infoFiles[i]))
@@ -571,10 +571,6 @@ CheckSeeds <- function(seeds) {
     print("yahoo all are good!")
 } 
 
-if(analysis == "RAxML"){
-  systemCallSeeds <- CheckInvocations(workingDir)
-  CheckSeeds(systemCallSeeds)
-}
 
 
 

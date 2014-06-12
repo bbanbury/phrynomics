@@ -561,6 +561,35 @@ for(i in sequence(length(whichDatasets))){
 
 
 
+
+# Get correlations
+
+corrs <- matrix(nrow=8, ncol=3)
+corrs[,1] <- c(rep("ML", 4), rep("Bayes", 4))
+corrs[,2] <- rep(focalDatasets, 2)
+s5 <- read.table("~/Dropbox/UWstuff/phrynomics/branchsupportPLOTS/mb_s5.txt", skip=2)
+s25 <- read.table("~/Dropbox/UWstuff/phrynomics/branchsupportPLOTS/mb_s25.txt", skip=2)
+s45 <- read.table("~/Dropbox/UWstuff/phrynomics/branchsupportPLOTS/mb_s45.txt", skip=2)
+s65 <- read.table("~/Dropbox/UWstuff/phrynomics/branchsupportPLOTS/mb_s65.txt", skip=2)
+for(i in sequence(length(focalDatasets))){
+  dataToUse <- which(focalDatasets[i] == names(BL.AllTrees.RAxML))
+  datarows <- which(BL.AllTrees.RAxML[[dataToUse]]$present)[which(BL.AllTrees.RAxML[[dataToUse]]$present) %in% which(BL.AllTrees.RAxML[[dataToUse]]$support != 0)]  #don't want all the tip support 0s or non homologous clades
+  support <- BL.AllTrees.RAxML[[dataToUse]]$support[datarows]
+  corr.support <- BL.AllTrees.RAxML[[dataToUse]]$corr.support[datarows]
+  corrs[i,3] <- cor(support, corr.support)
+}
+corrs[5,3] <- cor(s5[,1], s5[,2])
+corrs[6,3] <- cor(s25[,1], s25[,2])
+corrs[7,3] <- cor(s45[,1], s45[,2])
+corrs[8,3] <- cor(s65[,1], s65[,2])
+write.table(corrs, file="~/Dropbox/UWstuff/phrynomics/Analyses/Figs/corValues.txt", quote=FALSE, row.names=FALSE)  
+
+
+
+
+
+
+
 ############################################
 ###  Examine the effect of using all  ######
 ###  sites, not just variables   ###########

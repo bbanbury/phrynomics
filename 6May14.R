@@ -1,20 +1,24 @@
-################################################
+##  ----------------------------------------  ##
 ##                                            ##
 ##          Phrynomics Functions              ##
 ##           edited: 6 May 2014               ##
 ##                                            ##
-################################################
+##  ----------------------------------------  ##
 
-install.packages("~/phrynomics/phrynomics_1.4.tar.gz", type="source")
+devtools::install_github("bbanbury/phrynomics")
 library(phrynomics)
 library(ape)
-setwd("/Users/Barb/Dropbox/UWstuff/phrynomics/Analyses/DataForPaper")  #original pyRAD files located here
+
+# Set location to where original pyrad files are located.
+# This script will create 
+
+setwd("/Users/Barb/Dropbox/UWstuff/phrynomics/Analyses/DataForPaper")  
 
 
 
-################################################
+##  ----------------------------------------  ##
 ##            Begin File Creation             ##
-################################################
+##  ----------------------------------------  ##
 
 #  Remove invariant sites and write phylip formatted data to file
 
@@ -144,18 +148,18 @@ for(model in sequence(length(models))){
 }
 
 
-################################################
+##  ----------------------------------------  ##
 ##            End File Creation               ##
-################################################
+##  ----------------------------------------  ##
 
 
 
 
 
 
-################################################
+##  ----------------------------------------  ##
 ##            Begin Run Analyses              ##
-################################################
+##  ----------------------------------------  ##
 
 # Run RAxML via R (not parallelized)
 
@@ -177,18 +181,18 @@ for(i in sequence(length(toRun))){
 }
 
 
-################################################
+##  ----------------------------------------  ##
 ##            End Run Analyses                ##
-################################################
+##  ----------------------------------------  ##
 
 
 
 
 
 
-################################################
+##  ----------------------------------------  ##
 ##       Post-Analyses Trees and Data         ##
-################################################
+##  ----------------------------------------  ##
 
 
 # Load RAxML Trees and post-analyses scraping
@@ -244,18 +248,21 @@ treeMatrices <- list(RAxML.treeMatrix, MrBayes.treeMatrix)
 analyses <- c("RAxML", "MrBayes")
 
 
-################################################
+##  ----------------------------------------  ##
 ##      End Post-Analyses Trees and Data      ##
-################################################
+##  ----------------------------------------  ##
 
 
 
 
 
 
-################################################
+##  ----------------------------------------  ##
 ##            Make Tables and Figs            ##
-################################################
+##  ----------------------------------------  ##
+
+# Table 1 was made by hand
+
 
 # Make Table 2. Summary ddRadSeq data. 
 
@@ -280,6 +287,12 @@ for(m in sequence(dim(table2)[1])){
   table2[m,5] <- mean(dataOverlap[[whichDataset]][grep(pattern="PH", names(dataOverlap[[whichDataset]]))])
 }
 write.table(table2, file="table2.txt", quote=FALSE, row.names=FALSE)  
+
+
+# Table 3 was made by hand
+
+
+# Figure 1 was made by hand
 
 
 # Make Figure 2. Acquisition bias and tree length
@@ -320,6 +333,7 @@ for(i in sequence(length(orderToGo))){
 }
 dev.off()
 
+
 # Make Figure 3. Scatterplot branch lengths
 
 usr2dev <- function(x) 180/pi*atan(x*diff(par("usr")[1:2])/diff(par("usr")[3:4]))
@@ -349,6 +363,7 @@ for(anal in 1:length(analyses)){
   }
 }
 dev.off()
+
 
 # Figure 4 parts. Colored branch SNP phylogenies
 
@@ -482,48 +497,62 @@ for(i in sequence(length(focalDatasets))){
 dev.off()
 
 
-# Get correlations
+# Make Figure 7 a-b. Average RF distances among replicate runs.
+# Figure 7c was made using Mesquite. 
 
-corrs <- matrix(nrow=8, ncol=3)
-corrs[,1] <- c(rep("ML", 4), rep("Bayes", 4))
-corrs[,2] <- rep(focalDatasets, 2)
-s5 <- read.table("~/Dropbox/UWstuff/phrynomics/branchsupportPLOTS/mb_s5.txt", skip=2)
-s25 <- read.table("~/Dropbox/UWstuff/phrynomics/branchsupportPLOTS/mb_s25.txt", skip=2)
-s45 <- read.table("~/Dropbox/UWstuff/phrynomics/branchsupportPLOTS/mb_s45.txt", skip=2)
-s65 <- read.table("~/Dropbox/UWstuff/phrynomics/branchsupportPLOTS/mb_s65.txt", skip=2)
-for(i in sequence(length(focalDatasets))){
-  dataToUse <- which(focalDatasets[i] == names(BL.AllTrees.RAxML))
-  datarows <- which(BL.AllTrees.RAxML[[dataToUse]]$present)[which(BL.AllTrees.RAxML[[dataToUse]]$present) %in% which(BL.AllTrees.RAxML[[dataToUse]]$support != 0)]  #don't want all the tip support 0s or non homologous clades
-  support <- BL.AllTrees.RAxML[[dataToUse]]$support[datarows]
-  corr.support <- BL.AllTrees.RAxML[[dataToUse]]$corr.support[datarows]
-  corrs[i,3] <- cor(support, corr.support)
+MLRFdistMatrix <- GetRFmatrix("RAxML")
+BIRFdistMatrix <- GetRFmatrix("MrBayes")
+RFdistMatrix <- list(ML=MLRFdistMatrix, BI=BIRFdistMatrix)
+pdf(file="Figure7a-b.pdf", width=5, height=8.5)
+layout(matrix(1:2, nrow=2, byrow=TRUE), respect=TRUE)
+titles <- c("Ave. RF - 20 Independent Runs", "Ave. RF - 20 Posterior Trees")
+for(dist in sequence(length(RFdistMatrix))){
+  plot(as.numeric(RFdistMatrix[[dist]][,3]), as.numeric(RFdistMatrix[[dist]][,4]), xlab="dataset", ylab="Average RF", xaxt="n", type="n", ylim=c(0,130))
+  title(main= titles[[dist]])
+  cols <- c("lightblue", "blue")
+  pchs <- c(15, 19)
+  axis(side=1, at=1:14, labels=RFdistMatrix[[dist]][1:14, 2])
+  ascsub <- RFdistMatrix[[dist]][which(RFdistMatrix[[dist]][,1] == "ASC"),]
+  gtrsub <- RFdistMatrix[[dist]][which(RFdistMatrix[[dist]][,1] == "GTR"),]
+  points(as.numeric(ascsub[,3]), as.numeric(ascsub[,4]), col=cols[1], pch=pchs[[dist]])
+  points(as.numeric(gtrsub[,3]), as.numeric(gtrsub[,4]), col=cols[2], pch=pchs[[dist]])
+  for(i in 1:13){
+    segments(as.numeric(ascsub[i,3]), as.numeric(ascsub[i,4]), as.numeric(ascsub[i+1,3]), as.numeric(ascsub[i+1,4]), col=cols[1])
+    segments(as.numeric(gtrsub[i,3]), as.numeric(gtrsub[i,4]), as.numeric(gtrsub[i+1,3]), as.numeric(gtrsub[i+1,4]), col=cols[2])
+  }
+  legtxt <- c("ASC", "GTR")
+  legcolors <- c(cols[1], cols[2])
+  legend("topleft", legend=legtxt, col=legcolors, lwd=2, merge = TRUE, bty="n", xjust=1, inset=0.02, cex=0.75, title=expression(underline("Model"))) 
 }
-corrs[5,3] <- cor(s5[,1], s5[,2])
-corrs[6,3] <- cor(s25[,1], s25[,2])
-corrs[7,3] <- cor(s45[,1], s45[,2])
-corrs[8,3] <- cor(s65[,1], s65[,2])
-write.table(corrs, file="~/Dropbox/UWstuff/phrynomics/Analyses/Figs/corValues.txt", quote=FALSE, row.names=FALSE)  
+dev.off()
+
+
+# Figure 8 was made by hand
 
 
 
-
-
-################################################
+##  ----------------------------------------  ##
 ##         End Make Tables and Figs           ##
-################################################
+##  ----------------------------------------  ##
 
 
 
 
 
+##  ----------------------------------------  ##
+##      Double check RAxML Invocations        ##
+##  ----------------------------------------  ##
+
+if(analysis == "RAxML"){
+  systemCallSeeds <- CheckInvocations(getwd())
+  CheckSeeds(systemCallSeeds)
+}
 
 
 
-
-
-
-
-
+##  ----------------------------------------  ##
+##     End Double check RAxML Invocations     ##
+##  ----------------------------------------  ##
 
 
 
