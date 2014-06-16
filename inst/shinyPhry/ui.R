@@ -33,10 +33,11 @@ shinyUI(pageWithSidebar(
     h4("Original Dastset"),
     textInput("datasetName", "Enter SNP Dataset Name:", value="SNPdata"), 
     fileInput("SNPdataset", "Choose File To Upload (.phy, .nex, .txt, .snps):", accept=c(".snps", ".nex", ".txt", ".phy")),
+    #checkboxInput("maxFileSize", "Check if you have files over 5MB", value=TRUE),
     numericInput("obs", "Number Of Taxa to Preview:", 5),
-    numericInput("snpobs", "Number Of SNPs to Preview:", 500),
-    checkboxInput("rmInvSites", "Remove Invariant Sites", value=TRUE),
-    checkboxInput("rmNonBin", "Remove Non-Binary Sites", value=TRUE),
+    numericInput("snpobs", "Number Of SNPs to Preview:", 50),
+    checkboxInput("rmInvSites", "Remove Invariant Sites", value=FALSE),
+    checkboxInput("rmNonBin", "Remove Non-Binary Sites", value=FALSE),
     checkboxInput("takeRandom", "Take a single SNP from each locus (loci must be separated by a space)", value=FALSE),
     br(),
     h4("Transformations"),
@@ -52,6 +53,7 @@ shinyUI(pageWithSidebar(
     img(src="phryno.png", width=350),
     helpText("Photo by Jared Grummer"),
     verbatimTextOutput("phrynoversion")),
+
 
 ##  ---         main bar         ---  ##
   mainPanel(

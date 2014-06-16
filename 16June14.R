@@ -168,10 +168,12 @@ for(i in sequence(length(toRun))){
   system(toRun[i])
 }
 
+
 toRun <- scan(file="repeat.RAXML_JobArgs", what="character", sep="\n")
 for(i in sequence(length(toRun))){
   system(toRun[i])
 }
+
 
 # Run MrBayes via R (not parallelized)
 
@@ -193,7 +195,6 @@ for(i in sequence(length(toRun))){
 ##  ----------------------------------------  ##
 ##       Post-Analyses Trees and Data         ##
 ##  ----------------------------------------  ##
-
 
 # Load RAxML Trees and post-analyses scraping
 
@@ -258,7 +259,7 @@ analyses <- c("RAxML", "MrBayes")
 
 
 ##  ----------------------------------------  ##
-##            Make Tables and Figs            ##
+##                 Make Tables                ##
 ##  ----------------------------------------  ##
 
 # Table 1 was made by hand
@@ -290,6 +291,20 @@ write.table(table2, file="table2.txt", quote=FALSE, row.names=FALSE)
 
 
 # Table 3 was made by hand
+
+
+##  ----------------------------------------  ##
+##               End Make Tables              ##
+##  ----------------------------------------  ##
+
+
+
+
+
+
+##  ----------------------------------------  ##
+##                Make Figures                ##
+##  ----------------------------------------  ##
 
 
 # Figure 1 was made by hand
@@ -530,10 +545,10 @@ dev.off()
 # Figure 8 was made by hand
 
 
+##  ----------------------------------------  ##
+##             End Make Figures               ##
+##  ----------------------------------------  ##
 
-##  ----------------------------------------  ##
-##         End Make Tables and Figs           ##
-##  ----------------------------------------  ##
 
 
 
@@ -549,20 +564,9 @@ if(analysis == "RAxML"){
 }
 
 
-
 ##  ----------------------------------------  ##
 ##     End Double check RAxML Invocations     ##
 ##  ----------------------------------------  ##
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -10,7 +10,7 @@ library(shiny)
 library(ape)
 library(phangorn)
 library(devtools)
-devtools::install_github("bbanbury/phrynomics")
+#devtools::install_github("bbanbury/phrynomics")
 library(phrynomics)
 
 vers <- "v1.2"
@@ -77,14 +77,20 @@ sum_along <- function(x){
 return(sums)
 }
 
+
 ##  ---   Server Communication   ---  ##
 shinyServer(function(input, output) {
+  
+  # For files that are over 5MB, we can set the acceptance to 15. 
+  options(shiny.maxRequestSize=15*1024^2)
+
   output$phrynoversion <- renderText({
     paste("Made with Phrynoversion", vers)
   })
 
   initializeTable <- reactive({
     inFile <- input$SNPdataset
+    fileSize <- inFile$size
     inputFileType <- fileFormat(inFile$datapath)
     if (is.null(inputFileType))
       return(NULL)
