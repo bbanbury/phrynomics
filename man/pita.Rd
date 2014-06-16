@@ -28,6 +28,12 @@
 \alias{ReturnMinCI}
 \alias{GetLinesToSkip}
 \alias{GetJustTipBLError}
+\alias{CheckInvocations}
+\alias{CheckSeeds}
+\alias{GetRFmatrix}
+\alias{getBestTrees}
+\alias{makeRFdistanceMatrix}
+
 
 \title{A collection of pita tools for phrynomics that pertain to just us
 }
@@ -66,6 +72,11 @@ ReturnMaxCI(x, vstat)
 ReturnMinCI(x, vstat)
 GetLinesToSkip(file)
 GetJustTipBLError(BL.AllTrees)
+CheckInvocations(workingDir)
+CheckSeeds(seeds)
+GetRFmatrix(analysis)
+getBestTrees(model, dataset, analysis)
+makeRFdistanceMatrix(treeList, analysis)
 }
 
 \arguments{
@@ -103,6 +114,10 @@ GetJustTipBLError(BL.AllTrees)
   \item{x}{don't remember}
   \item{vstat}{something having to do with vstat}  
   \item{file}{a single input file}
+  \item{workingDir}{path to working directory of RAxML runs}
+  \item{seeds}{Vector of numbers}
+  \item{model}{Either "ASC" or "GTR"}
+  \item{treeList}{vector of file names that call trees}  
 }
 
 \details{These are a collection of functions that we used for our paper, but probably need to be altered for the package.}
