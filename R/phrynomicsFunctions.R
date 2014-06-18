@@ -362,7 +362,7 @@ getBestTrees <- function(model, dataset, analysis){
 # sloppy function that returns file names for raxml and 20 randoms for MrBayes.
 # used for making an RF matrix
   if(analysis == "RAxML")
-    return(system(paste("ls RAxML_bestTree*", dataset, "*", model, "_REP*", sep=""), intern=TRUE))
+    return(system(paste("ls RAxML_bestTree*", dataset, "*", model, "*_REP*", sep=""), intern=TRUE))
   if(analysis == "MrBayes"){
     #gather 20 random trees from posterior
     file <- system(paste("ls ", model, "_", dataset, "noAmbigs.nex.run1.t", sep=""), intern=TRUE)
@@ -409,13 +409,13 @@ GetRFmatrix <- function(analysis) {
   place <- 0
   for(i in sequence(length(models))){
     for(j in sequence(length(dataset))){
-      startTime <- Sys.time()[[3]]
+      startTime <- proc.time()[[3]]
       place <- place+1
       print(place)
       RFdist <- NULL
       RFdistname <- NULL
       RFdist <- mean(makeRFdistanceMatrix(getBestTrees(models[i], dataset[j], analysis), analysis), na.rm=TRUE)    
-      print(Sys.time()[[3]]-startTime)
+      print(proc.time()[[3]]-startTime)
       RFdists <- c(RFdists, RFdist)
       RFdistname <- paste(models[i], dataset[j], sep="")
       print(paste(models[i], dataset[j], sep=""))
