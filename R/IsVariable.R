@@ -1,7 +1,15 @@
+#' Is Variable
+#' 
+#' This function will determine if a SNP site is variable (TRUE) or not (FALSE). Ambiguity codes are taken into account to mean either heterozygotes or uncertainty. For example, c("A", "A", "S") will return TRUE, because "S" reduces to "G" and "C" and so either of those is variable with "A"; c("A", "A", "M") will return FALSE, because M can be either A or C. If the "M" is uncertain and is an "A" then it is not variable.  
+#' @param SNP A single SNP, as a vector of bases
+#' @export
+#' @return Boolean response of variability
+#' @seealso \link{ReadSNP} \link{WriteSNP}
+#' @examples
+#' IsVariable(c("A", "A", "A", "S"))
+#' IsVariable(c("A", "A", "A", "M"))
+
 IsVariable <- function(SNP){
-# Checks ambiguous sites for certain unique bases
-# AAAM will return FALSE (because M can be either A or C--not unique)
-# But AAAS will return T
   var <- FALSE
   bases <- c("A", "C", "G", "T", "U")
   basesInSNP <- bases[which(bases %in% SNP)]

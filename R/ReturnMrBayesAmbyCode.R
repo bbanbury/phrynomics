@@ -1,3 +1,14 @@
+#' Return MrBayes Ambiguity Codes
+#' 
+#' This function will take an IUPAC ambiguity code and return a set of bases in MrBayes parenthetical format
+#' @param NucCode An ambiguity code
+#' @export
+#' @return Returns a character vector with numerical base possibilities surrounded by parentheses. SNPs will be transformed where A=1, T=2, G=3, and C=4.
+#' @seealso \link{ReadSNP} \link{WriteSNP} \link{ReturnAmbyCode}
+#' @examples
+#' ReturnMrBayesAmbyCode("A")
+#' ReturnMrBayesAmbyCode("R")
+
 ReturnMrBayesAmbyCode <- function(NucCode) {
 #Function for returning numerical bases in parentheses
   possibilities <- NULL
