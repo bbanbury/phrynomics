@@ -1,11 +1,26 @@
-MissingSpeciesVector <- function(data, SpeciesNames){
-#returns T/F vector, TRUE is good to use
+#' Missing Species Vector
+#' 
+#' This function will determine if entire species are missing data (across all SNPs of a locus). Species names are important for this function, so if they are read in incorrectly, if could affect the results. They should be in the format where each species shares a unique flag and are then numbered (for example, species1, species2, species3 would be three individuals of the same species). If you want to check species see the function \code{GetSpecies}. 
+#' @param SNPlocus A single SNP locus (can have multiple SNPs)
+#' @param SpeciesNames Vector of species names that will cluster individuals. This will likely be rownames(SNPdataset)
+#' @export
+#' @return Returns a TRUE/FALSE vector for each locus in the dataset 
+#' @seealso \link{ReadSNP} \link{WriteSNP} \link{GetSpecies} \link{RemoveMissingSpeciesLoci}
+#' @examples
+#' data(fakeData)
+#' Spnames <- rownames(fakeData)
+#' MissingSpeciesVector(fakeData[,1], Spnames)
+#' MissingSpeciesVector(fakeData[,2], Spnames)
+#' MissingSpeciesVector(fakeData[,3], Spnames)
+
+MissingSpeciesVector <- function(SNPlocus, SpeciesNames){
   species <- GetSpecies(SpeciesNames)
   for(i in sequence(length(species))) {
-    combinedLocus <- paste(data[grep(species[i], names(data))], collapse="")
+    combinedLocus <- paste(SNPlocus[grep(species[i], names(SNPlocus))], collapse="")
     if(all(strsplit(combinedLocus, "")[[1]] == "N")) {
       return(FALSE)
     }
   }
   return(TRUE)
 }
+#potentially rename this function as it does not return a vector

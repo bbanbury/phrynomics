@@ -11,7 +11,9 @@
 #' removeOutgroups(fakeData, taxon="in")
 
 removeOutgroups <- function(SNPdataset, taxon="PH"){
-  if(class(SNPdataset) == "snp")
-    SNPdataset <- SNPdataset$data
+  if(class(SNPdataset) == "snp"){
+    SNPdataset$data <- SNPdataset$data[grep(taxon, rownames(SNPdataset$data)),]
+    return(SNPdataset)
+  }
   return(SNPdataset[grep(taxon, rownames(SNPdataset)),])
 }
