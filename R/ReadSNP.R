@@ -2,7 +2,7 @@
 #' 
 #' Read a SNP File
 #'
-#' This function reads in SNP datasets into R from nexus or phylip formatted files. 
+#' This function reads in SNP datasets into R from nexus or phylip formatted files or converts an R object dataset into one of the class "snp".  
 #'
 #' @aliases snp
 #' @param file A file name specified by either a variable or a double-quoted string (ie, file=""). Also accepts R objects that are data frames or matrices and converts to the class "snp".  

@@ -12,8 +12,6 @@
 #' ReturnNucs("K")
 
 ReturnNucs <- function(NucCode, forSNAPP=FALSE) {
-#Function for returning possible bases
-#SNAPP missing data needs to be handled differently, so for now just return "-"
   possibilities <- NULL
   if(NucCode == "A" || NucCode == "G" || NucCode == "C" || NucCode == "T" || NucCode == "U")
     possibilities <- NucCode

@@ -10,7 +10,6 @@
 #' DataOverlap(fakeData)
 
 DataOverlap <- function (SNPdataset){
-#This function will calculate the amount of shared SNPs
   if(class(SNPdataset) == "snp")
     SNPdataset <- SNPdataset$data
   presAbsentDataset <- MakePresentAbsent(SNPdataset)

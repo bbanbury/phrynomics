@@ -12,8 +12,6 @@
 #' RemoveInvariantSites(fakeData, chatty=TRUE)
 
 RemoveInvariantSites <- function(SNPdataset, chatty=FALSE){
-#This function will remove sites with less than two bases
-#one base plus ambiguity code (that icludes base) will be dropped 
   if(class(SNPdataset) == "snp")
     SNPdataset <- SNPdataset$data
   snps <- sum(nchar(SNPdataset[1,]))

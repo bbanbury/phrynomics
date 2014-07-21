@@ -10,7 +10,6 @@
 #' ReturnMrBayesAmbyCode("R")
 
 ReturnMrBayesAmbyCode <- function(NucCode) {
-#Function for returning numerical bases in parentheses
   possibilities <- NULL
   if(NucCode == "A" || NucCode == "G" || NucCode == "C" || NucCode == "T" || NucCode == "U")
     return(ReturnMrBayesCode(NucCode))
