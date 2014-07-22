@@ -12,8 +12,11 @@
 #' RemoveInvariantSites(fakeData, chatty=TRUE)
 
 RemoveInvariantSites <- function(SNPdataset, chatty=FALSE){
-  if(class(SNPdataset) == "snp")
+  snpclass <- "table"
+  if(class(SNPdataset) == "snp"){
+    snpclass <- "snp"
     SNPdataset <- SNPdataset$data
+  }
   snps <- sum(nchar(SNPdataset[1,]))
   initialLociLengths <- nchar(SNPdataset[1,])
   splitdata <- SplitSNP(SNPdataset)
@@ -22,6 +25,9 @@ RemoveInvariantSites <- function(SNPdataset, chatty=FALSE){
   newSNPdataset <- cSNP(splitdata, KeepVector=KeepVector, maintainLoci=TRUE)
   newsnps <- sum(nchar(newSNPdataset[1,]))
   if(chatty)
-    message(paste("removed", snps-newsnps, "of", loci, "loci"))
-  return(newSNPdataset)
+    message(paste("removed", snps-newsnps, "of", loci, "SNPs"))
+  if(snpclass == "snp")
+    return(ReadSNP(newSNPdataset))
+  else
+    return(newSNPdataset)
 }

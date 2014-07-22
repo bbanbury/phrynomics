@@ -20,12 +20,13 @@
 #' TranslateBases(fakeData, translateMissing=TRUE, ordered=TRUE)
 
 TranslateBases <- function(SNPdataset, translateMissing=TRUE, translateMissingChar="-", ordered=FALSE){
-#here "ordered" characters means that per SNP, 0 will be the most frequent base, 1 will be the heterozygote, and 2 will be the less frequent base.  Used for SNAPP.  
-#If ordered=FALSE, then A will always return a 1, T=2, G=3, C=4, and amby codes get parentheses.  Used for MrBayes.  
-  if(class(SNPdataset) == "snp")
+  snpclass <- "table"
+  if(class(SNPdataset) == "snp"){
+    snpclass <- "snp"
     SNPdataset <- SNPdataset$data
+  }
   catData <- cSNP(SNPdataset, maintainLoci=FALSE)
-  splitdata <- SplitSNP(catSNPdataset)
+  splitdata <- SplitSNP(catData)
   if(translateMissing){
     splitdata[which(splitdata == "N")] <- translateMissingChar  #translate missing data
     splitdata[which(splitdata == "-")] <- translateMissingChar  
@@ -60,5 +61,8 @@ TranslateBases <- function(SNPdataset, translateMissing=TRUE, translateMissingCh
       splitdata[i,] <- sapply(splitdata[i,], ReturnMrBayesAmbyCode)
     }
   }
-  return(cSNP(splitdata))
+  if(snpclass == "snp")
+    return(ReadSNP(cSNP(splitdata)))
+  else
+    return(cSNP(splitdata))
 }

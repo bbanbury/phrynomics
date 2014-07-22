@@ -11,8 +11,11 @@
 #' TakeSingleSNPfromEachLocus(fakeData)[[1]]
 
 TakeSingleSNPfromEachLocus <- function(SNPdataset) { 
-  if(class(SNPdataset) == "snp")
+  snpclass <- "table"
+  if(class(SNPdataset) == "snp"){
+    snpclass <- "snp"
     SNPdataset <- SNPdataset$data
+  }
   nuSites <- GetNumberOfSitesForLocus(SNPdataset)
   singleSNPfromLocus <- matrix(nrow=dim(SNPdataset)[1], ncol=length(nuSites))
   rownames(singleSNPfromLocus) <- rownames(SNPdataset)
@@ -34,5 +37,7 @@ TakeSingleSNPfromEachLocus <- function(SNPdataset) {
     }
   }
   singleSNPfromLocus <- cSNP(singleSNPfromLocus)
-  return(list(singleSNPfromLocus, whichRandomSites, randomOrMax))
+  if(snpclass == "snp")
+    return(list(snpdata=ReadSNP(singleSNPfromLocus), position=whichRandomSites, randomOrMax=randomOrMax))
+  return(list(snpdata=singleSNPfromLocus, position=whichRandomSites, randomOrMax=randomOrMax))
 }

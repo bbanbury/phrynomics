@@ -12,10 +12,16 @@
 #' ConvertMissingData(fakeData)
 
 ConvertMissingData <- function(SNPdataset, oldmissing="N", newmissing="?"){
-  if(class(SNPdataset) == "snp")
+  snpclass <- "table"
+  if(class(SNPdataset) == "snp"){
+    snpclass <- "snp"
     SNPdataset <- SNPdataset$data
+  }
   for(i in sequence(dim(SNPdataset)[1])){
     SNPdataset[i,] <- gsub(oldmissing, newmissing, SNPdataset[i,])
   }
-  return(SNPdataset)
+  if(snpclass == "snp")
+    return(ReadSNP(SNPdataset))
+  else
+    return(SNPdataset)
 }

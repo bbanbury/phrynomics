@@ -13,13 +13,17 @@
 #' cSNP(SplitSNP(fakeData))
 #' cSNP(SplitSNP(fakeData), maintainLoci=FALSE)
 #' 
-#' cSNP(matrix(data=c("A", "T", "C", "A", "S", "N"), nrow=2))
+#' coolData <- matrix(data=c("A", "T", "C", "A", "S", "N"), nrow=2)
+#' cSNP(coolData)
 
 cSNP <- function(splitSNP, KeepVector=NULL, maintainLoci=TRUE){
- if(class(splitSNP) == "snp")
-    splitSNP <- splitSNP$data
- if(is.null(KeepVector))
-    KeepVector <- rep(TRUE, dim(splitSNP)[2])
+  snpclass <- "table"
+  if(class(splitSNP) == "snp"){
+      snpclass <- "snp"
+      splitSNP <- splitSNP$data
+  }
+   if(is.null(KeepVector))
+      KeepVector <- rep(TRUE, dim(splitSNP)[2])
   catSNP <- matrix(nrow=dim(splitSNP)[1], ncol=length(which(splitSNP[1,] == " "))+1) 
   rownames(catSNP) <- rownames(splitSNP)
   for(j in sequence(dim(catSNP)[1])) {
@@ -34,5 +38,8 @@ cSNP <- function(splitSNP, KeepVector=NULL, maintainLoci=TRUE){
     catSNP <- catSNP[,-which(catSNP[1,] == "")]  #rewrite with lost loci
   if(!maintainLoci)
     catSNP <- apply(catSNP, 1, paste, collapse="")
-  return(data.frame(catSNP, stringsAsFactors=FALSE))
+  if(snpclass == "snp")
+    return(ReadSNP(data.frame(catSNP, stringsAsFactors=FALSE)))
+  else
+    return(data.frame(catSNP, stringsAsFactors=FALSE))
 }

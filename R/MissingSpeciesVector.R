@@ -9,11 +9,11 @@
 #' @examples
 #' data(fakeData)
 #' Spnames <- rownames(fakeData)
-#' MissingSpeciesVector(fakeData[,1], Spnames)
-#' MissingSpeciesVector(fakeData[,2], Spnames)
-#' MissingSpeciesVector(fakeData[,3], Spnames)
+#' IsMissingSpecies(fakeData[,1], Spnames)
+#' IsMissingSpecies(fakeData[,2], Spnames)
+#' IsMissingSpecies(fakeData[,3], Spnames)
 
-MissingSpeciesVector <- function(SNPlocus, SpeciesNames){
+IsMissingSpecies <- function(SNPlocus, SpeciesNames){
   species <- GetSpecies(SpeciesNames)
   for(i in sequence(length(species))) {
     combinedLocus <- paste(SNPlocus[grep(species[i], names(SNPlocus))], collapse="")
@@ -23,4 +23,11 @@ MissingSpeciesVector <- function(SNPlocus, SpeciesNames){
   }
   return(TRUE)
 }
-#potentially rename this function as it does not return a vector
+#fix plotting function
+#add third panel with missing data info
+#add binary/variable site data for plot
+#change "snp" to "sites"
+#proofread in textwrangler
+#create package
+#test/check package
+#check shiny site using new functions

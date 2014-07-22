@@ -8,9 +8,6 @@
 #' @seealso \link{ReadSNP} 
 
 ConvertNexDataToPhyData <- function(nexData) {
-  if(class(nexData) == "snp"){
-    nexData <- nexData$data
-  }
   phyData <- data.frame(matrix(lapply(lapply(nexData, toupper), paste, collapse="")))
   rownames(phyData) <- names(nexData)
   return(phyData)

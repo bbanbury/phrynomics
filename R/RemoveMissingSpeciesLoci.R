@@ -5,19 +5,25 @@
 #' @param chatty Optional print to screen messages
 #' @export
 #' @return Returns a subset dataset with sites where at least one individual has data. 
-#' @seealso \link{ReadSNP} \link{WriteSNP} \link{GetSpecies} \link{MissingSpeciesVector}
+#' @seealso \link{ReadSNP} \link{WriteSNP} \link{GetSpecies} \link{IsMissingSpecies}
 #' @examples
 #' data(fakeData)
 #' RemoveMissingSpeciesLoci(fakeData)
 #' RemoveMissingSpeciesLoci(fakeData, chatty=TRUE)
 
 RemoveMissingSpeciesLoci <- function(SNPdataset, chatty=FALSE) {
-  if(class(SNPdataset) == "snp")
+  snpclass <- "table"
+  if(class(SNPdataset) == "snp"){
+    snpclass <- "snp"
     SNPdataset <- SNPdataset$data
-  speciesWithN <- apply(SNPdataset, 2, MissingSpeciesVector, SpeciesNames=rownames(data))
+  }
+  speciesWithN <- apply(SNPdataset, 2, IsMissingSpecies, SpeciesNames=rownames(SNPdataset))
   if(chatty)
-    message(paste("removed", length(which(speciesWithN == "FALSE")), "of", length(speciesWithN), "loci"))
+    message(paste("removed", length(which(speciesWithN == "FALSE")), "of", length(speciesWithN), "SNPs"))
   newSNPdataset <- as.data.frame(SNPdataset[,speciesWithN])
   rownames(newSNPdataset) <- rownames(SNPdataset)  
-  return(newSNPdataset) 
+  if(snpclass == "snp")
+    return(ReadSNP(newSNPdataset))
+  else
+    return(newSNPdataset) 
 }
