@@ -1,7 +1,7 @@
 ##' Get Base Frequencies
 #' 
-#' This function will calculate base frequencies for any single SNP. It will not return missing or ambiguous data, so values may not add up to one.  
-#' @param SNP Single SNP as a vector
+#' This function will calculate base frequencies for any single site. It will not return missing or ambiguous data, so values may not add up to one.  
+#' @param site Single SNP site as a vector
 #' @export
 #' @return Returns a named vector of frequencies.
 #' @seealso \link{ReadSNP} \link{ReturnUniqueBases}
@@ -12,7 +12,7 @@
 #' GetBaseFrequencies(splitfakeData[,2])
 #' GetBaseFrequencies(splitfakeData[,3])
 
-GetBaseFrequencies <- function(SNP){
-  bases <- ReturnUniqueBases(SNP)
-  return(sapply(bases, function(x) length(which(SNP == x))/length(SNP)))
+GetBaseFrequencies <- function(site){
+  bases <- ReturnUniqueBases(site)
+  return(sapply(bases, function(x) length(which(site == x))/length(site)))
 }

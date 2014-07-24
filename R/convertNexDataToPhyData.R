@@ -4,7 +4,7 @@
 
 #' @param nexData Nexus formatted dataset
 #' @export
-#' @return Returns a phylip format SNP matrix
+#' @return Returns a phylip formated matrix
 #' @seealso \link{ReadSNP} 
 
 ConvertNexDataToPhyData <- function(nexData) {

@@ -1,6 +1,6 @@
 #' Remove Non-binary Sites
 #' 
-#' This function will determine if a SNP site is binary (TRUE) or not (FALSE) and remove those sites that are not binary.  For example, c("A", "A", "T") will be kept; c("A", "A", "A") or c("A", "G", "T") will be removed. Ambiguity codes are taken into account to mean either heterozygotes or uncertainty. 
+#' This function will determine if a site is binary (TRUE) or not (FALSE) and remove those sites that are not binary.  For example, c("A", "A", "T") will be kept; c("A", "A", "A") or c("A", "G", "T") will be removed. Ambiguity codes are taken into account to mean either heterozygotes or uncertainty. 
 #' @param SNPdataset SNP data in the class "matrix", "data.frame", or "snp"
 #' @param chatty Optional print to screen messages
 #' @export

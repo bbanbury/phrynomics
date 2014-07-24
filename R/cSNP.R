@@ -1,11 +1,11 @@
 #' Combine SNP
 #' 
-#' Combine split SNP character strings into single character elements. For example, the string "A" "T" "A" will return "ATA". Breaks in loci are maintained using \code{maintainLoci=TRUE}.
-#' @param splitSNP SNP data matrix in the class "data.frame", "matrix", or "snp", where each SNP is a separate column
-#' @param KeepVector A boolean vector for returning specific SNPs.  If left to NULL, all SNPs will be returned. 
-#' @param maintainLoci If \code{maintainLoci=TRUE}, loci will be split by a space in the returned SNP matrix. 
+#' Combine split character strings into single character elements. For example, the string "A" "T" "A" will return "ATA". Breaks in loci are maintained using \code{maintainLoci=TRUE}.
+#' @param splitSNP SNP data matrix in the class "data.frame", "matrix", or "snp", where each site is a separate column
+#' @param KeepVector A boolean vector for returning specific sites.  If left to NULL, all SNPs will be returned. 
+#' @param maintainLoci If \code{maintainLoci=TRUE}, loci will be split by a space in the returned matrix. 
 #' @export
-#' @return Returns a data frame of SNPs either with or without spaces indicating breaks in loci.  
+#' @return Returns a data frame of sites either with or without spaces indicating breaks in loci.  
 #' @seealso \link{ReadSNP} \link{SplitSNP}
 #' @examples
 #' data(fakeData)

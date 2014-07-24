@@ -1,10 +1,10 @@
-##' Get The Number SNPs in a Locus
+##' Get The Number Sites in a Locus
 #' 
-#' This function will calculate The number of SNPs for a given locus. 
+#' This function will calculate The number of sites for a given locus. 
 #' @param SNPdataset SNP dataset in the class "matrix", "data.frame", or "snp"
 #' @param locus Which locus to calculate
 #' @export
-#' @return Returns a number of SNPs 
+#' @return Returns a number of sites 
 #' @seealso \link{ReadSNP} \link{TakeSingleSNPfromEachLocus}
 #' @examples
 #' data(fakeData)

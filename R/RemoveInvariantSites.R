@@ -1,10 +1,10 @@
 #' Remove Invariant Sites
 #' 
-#' This function will determine if a SNP site is variable (TRUE) or not (FALSE) and remove those sites that are not variable. Ambiguity codes are taken into account to mean either heterozygotes or uncertainty. For example, c("A", "A", "S") will return TRUE, because "S" reduces to "G" and "C" and so either of those is variable with "A"; c("A", "A", "M") will return FALSE, because M can be either A or C. If the "M" is uncertain and is an "A" then it is not variable.  
+#' This function will determine if a site is variable (TRUE) or not (FALSE) and remove those sites that are not variable. Ambiguity codes are taken into account to mean either heterozygotes or uncertainty. For example, c("A", "A", "S") will return TRUE, because "S" reduces to "G" and "C" and so either of those is variable with "A"; c("A", "A", "M") will return FALSE, because M can be either A or C. If the "M" is uncertain and is an "A" then it is not variable.  
 #' @param SNPdataset SNP data in the class "matrix", "data.frame", or "snp"
 #' @param chatty Optional print to screen messages
 #' @export
-#' @return Returns a subset dataset with only variable sites. 
+#' @return Returns a subset dataset with only variable sites (ie SNPs). 
 #' @seealso \link{ReadSNP} \link{WriteSNP} \link{IsVariable}
 #' @examples
 #' data(fakeData)

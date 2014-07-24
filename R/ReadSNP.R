@@ -11,19 +11,19 @@
 #' @export
 #' @return Returns an object in the class "snp" with the following components:
 #' \itemize{
-#' \item \code{data} The SNP data matrix
+#' \item \code{data} The data matrix
 #' \item \code{ntax} Number of total taxa present in data matrix
 #' \item \code{nloci} Number of loci present in the data matrix
-#' \item \code{nsnps} A vector of the number of SNPs present in each locus
+#' \item \code{nsites} A vector of the number of sites present in each locus
 #' }
 #' @seealso \link{WriteSNP} 
 #' @examples
-#' #Read in a SNP matrix from file
+#' #Read in data from file
 #' a <- matrix(data=c("AANNTGG", "AATTTGC", "TAAATGC"), dimnames=list(c("A", "B", "C"), "locus"))
 #' write.table(a, file="ex.data", col.names=FALSE)
 #' ReadSNP("ex.data")
 #' 
-#' #Read in a SNP matrix from an R object
+#' #Read in data from an R object
 #' data(fakeData)
 #' ReadSNP(fakeData)
 
@@ -49,8 +49,8 @@ ReadSNP <- function(file, row.names=1, preprocess=TRUE){
   }
   ntax <- dim(initializeTable)[1]
   nloci <- dim(initializeTable)[2]
-  nsnps <- nchar(initializeTable[1,])
-  snpdata <- list(data=initializeTable, ntax=ntax, nloci=nloci, nsnps=nsnps)
+  nsites <- nchar(initializeTable[1,])
+  snpdata <- list(data=initializeTable, ntax=ntax, nloci=nloci, nsites=nsites)
   class(snpdata) <- "snp"
   return(snpdata)
 }

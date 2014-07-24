@@ -16,11 +16,11 @@
 
 summary.snp <- function (x, ...){
   cat("\nSNP dataset:", deparse(substitute(x)), "\n")
-  cat(paste("\nSNP dataset contains",  x$ntax, "taxa,", x$nloci, "loci, and", sum(x$nsnps), "SNPs\n\n"))
+  cat(paste("\nSNP dataset contains",  x$ntax, "taxa,", x$nloci, "loci, and", sum(x$nsites), "SNPs\n\n"))
   cat("\tNumber of taxa:", x$ntax, "\n")
   cat("\tNumber of loci:", x$nloci, "\n")
-  cat("\tNumber of snps:", sum(x$nsnps), "\n")
-  cat("\n\tAverage number of SNPs per locus:", mean(x$nsnps), "\n")
-  cat("\tMinimum number of SNPs per locus:", min(x$nsnps), "\n")
-  cat("\tMaximum number of SNPs per locus:", max(x$nsnps), "\n")
+  cat("\tNumber of sites:", sum(x$nsites), "\n")
+  cat("\n\tAverage number of sites per locus:", mean(x$nsites), "\n")
+  cat("\tMinimum number of sites per locus:", min(x$nsites), "\n")
+  cat("\tMaximum number of sites per locus:", max(x$nsites), "\n")
 }

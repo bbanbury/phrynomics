@@ -1,6 +1,6 @@
 #' Split SNP
 #' 
-#' Split SNP breaks character strings into single character elements. For example, the string "ATA" will return "A" "T" "A". Breaks in loci are maintained.
+#' SplitSNP breaks character strings into single character elements. For example, the string "ATA" will return "A" "T" "A". Breaks in loci are maintained.
 #' @param SNPdataset SNP data in the class "matrix", "data.frame", or "snp"
 #' @export
 #' @return Returns a matrix with a single SNP in each colomn. Empty columns represent breaks in loci. 

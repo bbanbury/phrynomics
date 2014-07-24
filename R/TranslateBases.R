@@ -4,7 +4,7 @@
 #' @param SNPdataset SNP data in the class "matrix", "data.frame", or "snp"
 #' @param translateMissing Logical. Will transform missing characters if TRUE
 #' @param translateMissingChar The character missing data will transform to. This has limited functionality, in that any missing data character (ie, "N", "-", and "?") will be transformed to the named character. For more options see \code{ConvertMissingData}.
-#' @param ordered Logical. If ordered = FALSE (default), SNPs will be transformed where A=1, T=2, G=3, and C=4. In the case of ambiguous characters, the possible bases are returned in parentheses. This is the format for MrBayes MkV models. If ordered = TRUE, each SNP is evaluated for base frequencies and the base with the most frequent occurence is assigned a 0 and the less frequent base is assigned a 1.  THis only works for binary traits.  Any heterozygotes (ambiguity with the present two bases) are assigned a 1.  This is the format for SNAPP analyses.  
+#' @param ordered Logical. If ordered = FALSE (default), Sites will be transformed where A=1, T=2, G=3, and C=4. In the case of ambiguous characters, the possible bases are returned in parentheses. This is the format for MrBayes MkV models. If ordered = TRUE, each site is evaluated for base frequencies and the base with the most frequent occurence is assigned a 0 and the less frequent base is assigned a 1.  THis only works for binary traits.  Any heterozygotes (ambiguity with the present two bases) are assigned a 1.  This is the format for SNAPP analyses.  
 #' @export
 #' @return Returns a translated dataset.
 #' @seealso \link{ReadSNP} \link{WriteSNP} \link{RemoveNonBinary}

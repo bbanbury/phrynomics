@@ -5,7 +5,7 @@
 #' This function writes SNP datasets into nexus or phylip formatted files. 
 #'
 #' @param SNPdataset A data matrix of the class "matrix", "data.frame", or "snp"
-#' @param file A file name specified by either a variable or a double-quoted string. If not specified (ie, file=""), then snp data is printed to the console. 
+#' @param file A file name specified by either a variable or a double-quoted string. If not specified (ie, file=""), then  data is printed to the console. 
 #' @param format Format for file, either "nexus" or "phylip"
 #' @param missing A character denoting missing data, usually "N", "?", or "-"
 #' @export
