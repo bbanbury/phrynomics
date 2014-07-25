@@ -31,7 +31,7 @@ plot.snp <- function(x, calc="loci", ...){
   title(main="Frequency of Sites per Locus")
 
   ## panel 3 ##
-  numSpecies <- MakePresentAbsent(x, calc=calc)
+  numSpecies <- MakePresentAbsent(x, calc=calc, returnData="presabsentdata")
   sums <- apply(numSpecies, 2, sum)
   spec <- sequence(dim(numSpecies)[1])
   y <- sapply(spec, function(z) length(which(sums >= z))) 

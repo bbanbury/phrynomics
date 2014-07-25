@@ -12,7 +12,7 @@
 DataOverlap <- function (SNPdataset){
   if(class(SNPdataset) == "snp")
     SNPdataset <- SNPdataset$data
-  presAbsentDataset <- MakePresentAbsent(SNPdataset)
+  presAbsentDataset <- MakePresentAbsent(SNPdataset, calc="loci", returnData="presabsentdata")
   rownames(presAbsentDataset) <- rownames(SNPdataset)
   totals <- apply(presAbsentDataset, 2, sum)
   probs <- totals/dim(SNPdataset)[1]

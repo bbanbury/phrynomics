@@ -18,7 +18,7 @@
 plotMissing <- function(SNPdataset, calc="loci", ...){
   if(class(SNPdataset) == "snp")
     SNPdataset <- SNPdataset$data
-  numSpecies <- MakePresentAbsent(SNPdataset, calc)
+  numSpecies <- MakePresentAbsent(SNPdataset, calc=calc, returnData="presabsentdata")
   sums <- apply(numSpecies, 2, sum)
   x <- sequence(dim(numSpecies)[1])
   y <- sapply(x, function(x) length(which(sums >= x))) 
