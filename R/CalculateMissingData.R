@@ -10,7 +10,7 @@
 #' @examples
 #' data(fakeData)
 #' CalculateMissingData(fakeData, calc="sites")
-#' CalculateMissingData(fakeData, clac="loci")
+#' CalculateMissingData(fakeData, calc="loci")
 
 CalculateMissingData <- function(SNPdataset, calc="sites", missingChar="any"){
   if (missingChar == "any")

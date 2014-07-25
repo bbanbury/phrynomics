@@ -15,7 +15,7 @@
 #' plotMissing(myData, calc="loci")
 #' plotMissing(myData, calc="sites")
 
-plotMissing <- function(SNPdataset, calc="loci"){
+plotMissing <- function(SNPdataset, calc="loci", ...){
   if(class(SNPdataset) == "snp")
     SNPdataset <- SNPdataset$data
   numSpecies <- MakePresentAbsent(SNPdataset, calc)

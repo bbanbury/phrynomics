@@ -7,6 +7,8 @@
 }
 \arguments{
 \item{x}{an object in the class "snp"}
+
+\item{...}{additional arguments passed to \code{plot}}
 }
 \description{
 Compact Display of SNP Matrix

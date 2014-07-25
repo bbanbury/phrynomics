@@ -21,7 +21,7 @@ This function will calculate what percentage of the dataset is missing.  You mus
 \examples{
 data(fakeData)
 CalculateMissingData(fakeData, calc="sites")
-CalculateMissingData(fakeData, clac="loci")
+CalculateMissingData(fakeData, calc="loci")
 }
 \seealso{
 \link{ReadSNP} \link{SplitSNP}

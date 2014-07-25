@@ -3,10 +3,12 @@
 \alias{summary.snp}
 \title{summary.snp}
 \usage{
-\method{summary}{snp}(x, ...)
+\method{summary}{snp}(object, ...)
 }
 \arguments{
-\item{x}{an object in the class "snp"}
+\item{object}{an object in the class "snp"}
+
+\item{...}{additional arguments passed to \code{plot}}
 }
 \description{
 Print Summary of SNP Matrix

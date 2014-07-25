@@ -3,7 +3,7 @@
 \alias{plotMissing}
 \title{plot.snp}
 \usage{
-plotMissing(SNPdataset, calc = "loci")
+plotMissing(SNPdataset, calc = "loci", ...)
 }
 \arguments{
 \item{SNPdataset}{SNP dataset in the class "matrix", "data.frame", or "snp"}

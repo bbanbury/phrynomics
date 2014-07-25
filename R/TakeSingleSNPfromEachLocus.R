@@ -23,7 +23,7 @@ TakeSingleSNPfromEachLocus <- function(SNPdataset) {
   randomOrMax <- NULL
   for(locus in sequence(length(nuSites))){
     singleLocus <- as.matrix(SNPdataset[,locus])
-    keepSNPs <- which(CalculateMissingData(singleLocus) == min(CalculateMissingData(singleLocus)))
+    keepSNPs <- which(CalculateMissingData(singleLocus, "sites") == min(CalculateMissingData(singleLocus, "sites")))
     if(length(keepSNPs) > 1) {
       randomSite <- floor(runif(1, min=1, max=1+length(keepSNPs)))
       whichRandomSites <- c(whichRandomSites, randomSite)

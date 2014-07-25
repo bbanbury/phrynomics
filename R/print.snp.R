@@ -5,6 +5,7 @@
 #' This function prints a short summary of the SNP matrix to the console.  
 #'
 #' @param x an object in the class "snp"
+#' @param ... additional arguments passed to \code{plot}
 #' @export
 #' @seealso \link{ReadSNP} \link{WriteSNP} \link{summary.snp} 
 #' @examples

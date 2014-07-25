@@ -25,7 +25,7 @@ RemoveInvariantSites <- function(SNPdataset, chatty=FALSE){
   newSNPdataset <- cSNP(splitdata, KeepVector=KeepVector, maintainLoci=TRUE)
   newsnps <- sum(nchar(newSNPdataset[1,]))
   if(chatty)
-    message(paste("removed", snps-newsnps, "of", loci, "SNPs"))
+    message(paste("removed", snps-newsnps, "of", snps, "sites"))
   if(snpclass == "snp")
     return(ReadSNP(newSNPdataset))
   else

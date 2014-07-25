@@ -17,7 +17,8 @@ MakePresentAbsent <- function(SNPdataset, calc="loci", missingChar="any"){
     SNPdataset <- SNPdataset$data
   if(calc == "sites"){
     SNPdataset <- SplitSNP(SNPdataset)
-    SNPdataset <- SNPdataset[,-which(SNPdataset[1,] == " ")]
+    if(length(which(SNPdataset[1,] == " ")) > 0)
+      SNPdataset <- SNPdataset[,-which(SNPdataset[1,] == " ")]
   }
   presabsentdata <- apply(SNPdataset, c(1,2), IsMissing, missingChar=missingChar)
   return(presabsentdata)
