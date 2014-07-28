@@ -22,7 +22,7 @@ plotMissing <- function(SNPdataset, calc="loci", ...){
   sums <- apply(numSpecies, 2, sum)
   x <- sequence(dim(numSpecies)[1])
   y <- sapply(x, function(x) length(which(sums >= x))) 
-  plot(x, y, pch=16, col="blue", xlab="Minimum Number of Individuals", ylab=paste("Number of", calc, "Retained"))
+  plot(x, y, pch=16, col="blue", xlab="Minimum Number of Individuals", ylab=paste("Number of", calc, "Retained"), ...)
   lines(x, y, col="blue")
   title(main="Missing Data")
 }

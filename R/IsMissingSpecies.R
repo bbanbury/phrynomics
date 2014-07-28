@@ -23,10 +23,3 @@ IsMissingSpecies <- function(locus, SpeciesNames){
   }
   return(TRUE)
 }
-#fix plotting function
-#add binary/variable site data for plot
-#change "snp" to "sites"
-#proofread in textwrangler
-#create package
-#test/check package
-#check shiny site using new functions

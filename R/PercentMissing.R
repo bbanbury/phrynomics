@@ -9,7 +9,7 @@
 #' @examples
 #' data(fakeData)
 #' PercentMissing(fakeData[1,1])
-#' IsMissing(fakeData[1,3])
+#' PercentMissing(fakeData[1,3])
 
 PercentMissing <- function(locus, missingChar="any"){
   if (missingChar == "any")
