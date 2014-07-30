@@ -8,7 +8,7 @@
 #' @param chatty Optional print to screen messages
 #' @export
 #' @return Returns a subset dataset.  
-#' @seealso \link{ReadSNP} \link{ConvertMissingData} \link{CalculateMissingData} \link{MakePresentAbsent}
+#' @seealso \link{ReadSNP} \link{MakeMinIndTable} \link{CalculateMissingData} \link{plotMissing}
 #' @examples
 #' data(fakeData)
 #' MakePresentAbsent(fakeData, "sites")
