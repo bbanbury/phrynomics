@@ -51,7 +51,7 @@ ReadSNP <- function(file, row.names=1, preprocess=TRUE){
   ntax <- dim(initializeTable)[1]
   nloci <- dim(initializeTable)[2]
   nsites <- nchar(initializeTable[1,])
-  snpdata <- list(data=data.frame(lapply(initializeTable, as.character), stringsAsFactors=FALSE), ntax=ntax, nloci=nloci, nsites=nsites)
+  snpdata <- list(data=initializeTable, ntax=ntax, nloci=nloci, nsites=nsites)
   class(snpdata) <- "snp"
   return(snpdata)
 }
