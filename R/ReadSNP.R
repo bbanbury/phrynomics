@@ -38,7 +38,8 @@ ReadSNP <- function(file, row.names=1, preprocess=TRUE){
       stop("Having a hard time reading the file")
   }
   if(class(file) == "data.frame" || class(file) == "matrix"){ 
-    initializeTable <- file
+    initializeTable <- data.frame(lapply(file, as.character), stringsAsFactors=FALSE)
+    rownames(initializeTable) <- rownames(file)
   }
   colnames(initializeTable) <- paste("locus", 1:ncol(initializeTable), sep="")
   if(preprocess){
@@ -50,7 +51,11 @@ ReadSNP <- function(file, row.names=1, preprocess=TRUE){
   ntax <- dim(initializeTable)[1]
   nloci <- dim(initializeTable)[2]
   nsites <- nchar(initializeTable[1,])
-  snpdata <- list(data=initializeTable, ntax=ntax, nloci=nloci, nsites=nsites)
+  snpdata <- list(data=data.frame(lapply(initializeTable, as.character), stringsAsFactors=FALSE), ntax=ntax, nloci=nloci, nsites=nsites)
   class(snpdata) <- "snp"
   return(snpdata)
 }
+
+
+
+

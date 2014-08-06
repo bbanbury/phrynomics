@@ -1,9 +1,10 @@
 #' Reduce Data by Minimum Individuals
 #' 
 #' This function will reduce a dataset to include sites or loci that meet the minimum number of individuals.  For example, if you want only data for which at least 75% of the individuals in your dataset are represented, then it will remove those loci/sites that have less.     
+#'
 #' @param SNPdataset SNP dataset in the class "matrix", "data.frame", or "snp"
 #' @param calc Calculate missing data either by individual "sites" or "loci". If you choose to calculate missing data by loci, any site with information will count (for example, "NNNNA" will count as non-missing)
-#' @param threshold The minimum number of individuals that must be present for data to be retained.  This can be either a percent of individuals or a whole integer. When threshold=1, it means at least one individual, not 100% of the data.  
+#' @param threshold The minimum number of individuals that must be present for data to be retained.  This can be either a percent of individuals or a whole integer. When threshold=1, it means at least one individual, not 100\% of the data.  
 #' @param missingChar The character that represents missing data, This function will search for missing data ("N", "-" or "?"). You can choose to leave the default "any" which will search for all three variables or select whichever are present in your dataset. 
 #' @param chatty Optional print to screen messages
 #' @export

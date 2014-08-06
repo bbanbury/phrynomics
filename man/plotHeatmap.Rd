@@ -22,7 +22,7 @@ plotHeatmap(SNPdataset, calc = "loci", col = "black",
 \item{...}{additional arguments passed to \code{plot}}
 }
 \description{
-This function will create a heatmap plot of the level of missing data. Colors represent degrees of missing data, 100% missing is opaque color.
+This function will create a heatmap plot of the level of missing data. Colors represent degrees of missing data, completely missing is opaque color.
 }
 \examples{
 data(fakeData)

@@ -11,7 +11,7 @@ ReduceMinInd(SNPdataset, calc = "loci", threshold = 0.9,
 
 \item{calc}{Calculate missing data either by individual "sites" or "loci". If you choose to calculate missing data by loci, any site with information will count (for example, "NNNNA" will count as non-missing)}
 
-\item{threshold}{The minimum number of individuals that must be present for data to be retained.  This can be either a percent of individuals or a whole integer. When threshold=1, it means at least one individual, not 100% of the data.}
+\item{threshold}{The minimum number of individuals that must be present for data to be retained.  This can be either a percent of individuals or a whole integer. When threshold=1, it means at least one individual, not 100\% of the data.}
 
 \item{missingChar}{The character that represents missing data, This function will search for missing data ("N", "-" or "?"). You can choose to leave the default "any" which will search for all three variables or select whichever are present in your dataset.}
 

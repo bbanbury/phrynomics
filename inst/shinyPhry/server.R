@@ -12,8 +12,9 @@ library(phangorn)
 library(devtools)
 #devtools::install_github("bbanbury/phrynomics")
 library(phrynomics)
+load_all("~/phrynomics/branches/OOP")
 
-vers <- "v1.2"
+vers <- "v1.3"
 
 
 ##  ---     Server Functions     ---  ##
@@ -91,11 +92,12 @@ shinyServer(function(input, output) {
   initializeTable <- reactive({
     inFile <- input$SNPdataset
     fileSize <- inFile$size
-    inputFileType <- fileFormat(inFile$datapath)
-    if (is.null(inputFileType))
+    inputFileType <- FileFormat(inFile$datapath)
+    if(is.null(inputFileType))
       return(NULL)
     if(inputFileType == "phy")
-      initializeTable <- read.table(inFile$datapath, row.names=1, skip=1, stringsAsFactors=FALSE)
+      initializeTable <- ReadSNP(inFile)
+      #initializeTable <- read.table(inFile$datapath, row.names=1, skip=1, stringsAsFactors=FALSE)
     if(inputFileType == "nex") 
       initializeTable <- convertNexDataToPhyData(read.nexus.data(inFile$datapath))
     return(initializeTable)
@@ -124,22 +126,22 @@ shinyServer(function(input, output) {
   return(list(results, textOutput))    
   })
 
-  output$OrigDataStats <- renderText ({
+  output$OrigDataStats <- renderText({
     forStats <- initializeTable()
     if(is.null(forStats))
       return(NULL)
-    return(paste("Original Data contains", dim(forStats)[1], "taxa,", dim(forStats)[2], "sites, and", GetNumberSNPs(forStats[1,]), "SNPs"))
+    return(paste("Original Data contains", forStats$ntax, "taxa,", forStats$nloci, "loci, and", forStats$nsites, "sites"))
   })
 
-  output$resultsDataStats <- renderText ({
+  output$resultsDataStats <- renderText({
     resultsStats <- contents()[[1]]
     if(is.null(resultsStats))
       return(NULL)
-    return(paste("Transformed Data contains", dim(resultsStats)[1], "taxa,", dim(resultsStats)[2], "sites, and", GetNumberSNPs(resultsStats[1,]), "SNPs"))
+    return(paste("Transformed Data contains", resultsStats$ntax, "taxa,", resultsStats$nloci, "loci, and", resultsStats$nsites, "sites"))
   })
 
   output$inputPreview <- renderTable({  
-    prev <- head(initializeTable(), n=input$obs)
+    prev <- head(initializeTable()$data, n=input$obs)
     newDim <- min(sum(nchar(prev[1,])), input$snpobs) 
     if(!is.null(prev))
       return(cSNP(SplitSNP(prev)[,1:newDim]))
@@ -155,17 +157,17 @@ shinyServer(function(input, output) {
   }, include.colnames=FALSE, size=1)
   
   output$downloadPhy <- downloadHandler(
-    filename = function() { paste(input$datasetName, ".txt", sep="") },
+    filename = function() {paste(input$datasetName, ".txt", sep="")},
     content = function(file) {
       fileContent <- paste(dim(contents()[[1]])[1], sum(nchar(contents()[[1]][1,])))
-      write(fileContent, file)
-      write.table(contents()[[1]], file, quote=FALSE, append=TRUE, col.names=FALSE)
+      write(fileContent, file)  #change with new vers
+      write.table(contents()[[1]], file, quote=FALSE, append=TRUE, col.names=FALSE)  #change with new vers
     })
 
   output$downloadNex <- downloadHandler(
     filename = function() { paste(input$datasetName, ".nex", sep="") },
     content = function(file) {
-      fileContent <- WriteNexus(contents()[[1]], file, missing=input$transformChar)
+      fileContent <- WriteNexus(contents()[[1]], file, missing=input$transformChar)  #change with new vers
   })
 
 output$communicationWindow <- renderText ({

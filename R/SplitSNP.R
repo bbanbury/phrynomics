@@ -9,6 +9,7 @@
 #' data(fakeData)
 #' fakeData <- ReadSNP(fakeData)
 #' SplitSNP(fakeData)
+#' SplitSNP(fakeData)$data
 
 SplitSNP <- function(SNPdataset){
   snpclass <- "table"
@@ -18,7 +19,7 @@ SplitSNP <- function(SNPdataset){
   }
   loci <- dim(SNPdataset)[2]
   initialLociLengths <- nchar(SNPdataset[1,])
-  splitSNP <- matrix(nrow=dim(SNPdataset)[1], ncol=sum(initialLociLengths)+loci-1)
+  splitSNP <- data.frame(matrix(nrow=dim(SNPdataset)[1], ncol=sum(initialLociLengths)+loci-1))
   for(j in sequence(dim(SNPdataset)[1])) {
     splitSNP[j,] <- strsplit(paste(SNPdataset[j,], collapse=" "), "")[[1]]
   }

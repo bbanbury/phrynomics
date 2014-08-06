@@ -18,6 +18,7 @@ SplitSNP breaks character strings into single character elements. For example, t
 data(fakeData)
 fakeData <- ReadSNP(fakeData)
 SplitSNP(fakeData)
+SplitSNP(fakeData)$data
 }
 \seealso{
 \link{ReadSNP} \link{cSNP}
