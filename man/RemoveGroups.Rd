@@ -18,7 +18,7 @@ This function will remove taxon names that do not match with an ingroup ID.  For
 }
 \examples{
 data(fakeData)
-removeGroup(fakeData, taxon="in")
+RemoveGroups(fakeData, groupFlag ="in")
 }
 \seealso{
 \link{ReadSNP} \link{WriteSNP}

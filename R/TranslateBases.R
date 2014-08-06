@@ -26,11 +26,10 @@ TranslateBases <- function(SNPdataset, translateMissing=TRUE, translateMissingCh
     SNPdataset <- SNPdataset$data
   }
   catData <- cSNP(SNPdataset, maintainLoci=FALSE)
-  splitdata <- SplitSNP(catData)
+  splitdata <- as.matrix(SplitSNP(catData))
   if(translateMissing){
-    splitdata[which(splitdata == "N")] <- translateMissingChar  #translate missing data
-    splitdata[which(splitdata == "-")] <- translateMissingChar  
-    splitdata[which(splitdata == "?")] <- translateMissingChar
+    splitdata <- ConvertMissingData(splitdata, "-", translateMissingChar)  #translate missing data
+    splitdata <- ConvertMissingData(splitdata, "N", translateMissingChar)  #translate missing data
   }
   if(ordered){
     bases <- apply(splitdata, 2, ReturnUniqueBases)

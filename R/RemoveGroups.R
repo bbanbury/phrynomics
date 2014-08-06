@@ -8,7 +8,7 @@
 #' @seealso \link{ReadSNP} \link{WriteSNP}
 #' @examples
 #' data(fakeData)
-#' removeGroup(fakeData, taxon="in")
+#' RemoveGroups(fakeData, groupFlag ="in")
 
 RemoveGroups <- function(SNPdataset, groupFlag=""){
   snpclass <- "table"

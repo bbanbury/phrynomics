@@ -3,7 +3,7 @@
 \alias{ConvertMissingData}
 \title{Convert Missing Data Character}
 \usage{
-ConvertMissingData(SNPdataset, oldmissing = "N", newmissing = "?")
+ConvertMissingData(SNPdataset, oldmissing = c("-", "N"), newmissing = "N")
 }
 \arguments{
 \item{SNPdataset}{SNP data in the class "matrix", "data.frame", or "snp"}
@@ -20,7 +20,9 @@ This function will convert any character in a dataset to another.  This is helpf
 }
 \examples{
 data(fakeData)
-ConvertMissingData(fakeData)
+ConvertMissingData(fakeData, "N", "O")
+ConvertMissingData(fakeData, c("N", "-"), "?")
+ConvertMissingData(fakeData, "any", "?")
 }
 \seealso{
 \link{ReadSNP} \link{CalculateMissingData}

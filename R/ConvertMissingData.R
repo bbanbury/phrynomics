@@ -9,19 +9,26 @@
 #' @seealso \link{ReadSNP} \link{CalculateMissingData}
 #' @examples
 #' data(fakeData)
-#' ConvertMissingData(fakeData)
+#' ConvertMissingData(fakeData, "N", "O")
+#' ConvertMissingData(fakeData, c("N", "-"), "?")
+#' ConvertMissingData(fakeData, "any", "?")
 
-ConvertMissingData <- function(SNPdataset, oldmissing="N", newmissing="?"){
+ConvertMissingData <- function(SNPdataset, oldmissing=c("-","N"), newmissing="N"){
   snpclass <- "table"
   if(class(SNPdataset) == "snp"){
     snpclass <- "snp"
     SNPdataset <- SNPdataset$data
   }
-  for(i in sequence(dim(SNPdataset)[1])){
-    SNPdataset[i,] <- gsub(oldmissing, newmissing, SNPdataset[i,])
-  }
+  if(any(oldmissing == "any"))
+    oldmissing <- c("N", "-", "\\?")
+  char <- match.arg(arg=oldmissing, choices=c("N", "-", "\\?"), several.ok=TRUE)
+  pattern <- paste("[", paste(char, collapse=""), "]", sep="")
+  newSNPdataset <- data.frame(lapply(SplitSNP(SNPdataset), gsub, pattern=pattern, replacement=newmissing), stringsAsFactors=FALSE)
+  newSNPdataset <- cSNP(newSNPdataset)
+  rownames(newSNPdataset) <- rownames(SNPdataset)
+  colnames(newSNPdataset) <- colnames(SNPdataset)
   if(snpclass == "snp")
-    return(ReadSNP(SNPdataset))
+    return(ReadSNP(newSNPdataset))
   else
-    return(SNPdataset)
+    return(newSNPdataset)
 }

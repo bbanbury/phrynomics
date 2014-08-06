@@ -6,9 +6,9 @@
 addazero(alleleCounts, rownamesOriginal)
 }
 \arguments{
-\item{SNPdataset}{SNP data in the class "matrix", "data.frame", or "snp"}
+\item{alleleCounts}{allele count list out of ReturnAlleleCounts()}
 
-\item{rownamesOriginal}{rownames from the original full dataset.  These will be used to compare the subset to.}
+\item{rownamesOriginal}{rownames from full dataset in ReturnAlleleCounts()}
 }
 \value{
 Returns a new alleleCounts list with zeros in the right position

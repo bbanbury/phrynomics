@@ -1,8 +1,8 @@
 #' Add A Zero to alleleCounts list
 #' 
 #' This function will add a zero if allele counts are missing from subpops
-#' @param SNPdataset SNP data in the class "matrix", "data.frame", or "snp"
-#' @param rownamesOriginal rownames from the original full dataset.  These will be used to compare the subset to. 
+#' @param alleleCounts allele count list out of ReturnAlleleCounts()
+#' @param rownamesOriginal rownames from full dataset in ReturnAlleleCounts()
 #' @export
 #' @return Returns a new alleleCounts list with zeros in the right position
 #' @seealso \link{ReadSNP} \link{WriteSNP} \link{ExportPops}
