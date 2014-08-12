@@ -1,7 +1,7 @@
 ##  --------------------------------  ##
 ##  ---      shinyPhrynomics     ---  ##
 ##  ---    written by B.Banbury  ---  ##
-##  ---     v1.2  10June2014    ---  ##
+##  ---     v1.3  8August2014    ---  ##
 ##  --------------------------------  ##
 
 
@@ -11,24 +11,15 @@ library(ape)
 library(phangorn)
 library(devtools)
 #devtools::install_github("bbanbury/phrynomics")
-library(phrynomics)
+#library(phrynomics)
 load_all("~/phrynomics/branches/OOP")
+library(shinyIncubator)  #maybe use for the progress bar
 
 vers <- "v1.3"
 
 
 ##  ---     Server Functions     ---  ##
-fileFormat <- function(file){
-  # returns "phy" or "nex" depending on the file type
-  format <- NULL
-  if(any(grep("Error", try(read.table(file, skip=GetLinesToSkip(file)+1), silent=TRUE), ignore.case=TRUE))) {
-    if(!any(grep("Error", try(read.nexus.data(file)), ignore.case=TRUE)))
-      format <- "nex"
-  } else{
-    format <- "phy"
-  }
-  return(format)
-}
+
 
 convertNexDataToPhyData <- function(nexData) {
   phyData <- data.frame(matrix(lapply(lapply(nexData, toupper), paste, collapse="")))
@@ -36,47 +27,6 @@ convertNexDataToPhyData <- function(nexData) {
   return(phyData)
 }
 
-convertPhyDataToNexData <- function(phyData) {
-  phyData <- SplitSNP(phyData)
-  if(any(phyData[1,] == " "))
-    phyData <- SplitSNP(phyData)[,-which(SplitSNP(phyData)[1,] == " ")]
-  nexData <- vector("list", dim(phyData)[1])
-  for(i in 1:length(nexData)){
-    nexData[[i]] <- phyData[i,] #nexus parser doesn't like spaces between loci
-    names(nexData)[i] <- rownames(phyData)[i]
-  }
-  return(nexData)
-}
-
-GetNumberSNPs <- function(taxon){
-  return(nchar(paste(taxon, collapse="")))
-}
-
-WriteNexus <- function(phyData, file, missing) {
-  if(class(phyData) == "data.frame" || class(phyData) == "matrix")
-    if(dim(phyData)[2] > 1)
-      phyData <- apply(phyData, 1, paste, collapse="")
-  nchars <- min(sapply(phyData, GetNumberSNPs))
-  write(paste("#NEXUS"), file)
-  write(paste("[Written ", Sys.Date(), " via shinyPhrynomics]", sep=""), file, append=TRUE)
-  write(paste("BEGIN Data;"), file, append=TRUE)
-  write(paste("   DIMENSIONS NTAX=", length(phyData), " NCHAR=", nchars, ";", sep=""), file, append=TRUE)
-  write(paste("   FORMAT DATATYPE=Standard INTERLEAVE=no missing=", missing, ";", sep=""), file, append=TRUE)
-  write(paste("Matrix"), file, append=TRUE)
-  write.table(phyData, file, append=TRUE, quote=FALSE, col.names=FALSE)  
-  write(paste(""), file, append=TRUE)
-  write(paste(";"), file, append=TRUE)
-  write(paste("END;"), file, append=TRUE)
-  write(paste(""), file, append=TRUE)
-}
-
-sum_along <- function(x){
-  sums <- rep(NA, length(x))
-  for(i in sequence(length(sums))){
-    sums[i] <- sum(x[1:i])
-  }
-return(sums)
-}
 
 
 ##  ---   Server Communication   ---  ##
@@ -89,25 +39,34 @@ shinyServer(function(input, output) {
     paste("Made with Phrynoversion", vers)
   })
 
+
+  ##  ---   Initial Data   ---  ##
+
   initializeTable <- reactive({
-    inFile <- input$SNPdataset
+    if(is.null(input$OrigData))
+      return(NULL)
+    inFile <- input$OrigData
     fileSize <- inFile$size
     inputFileType <- FileFormat(inFile$datapath)
     if(is.null(inputFileType))
       return(NULL)
     if(inputFileType == "phy")
-      initializeTable <- ReadSNP(inFile)
-      #initializeTable <- read.table(inFile$datapath, row.names=1, skip=1, stringsAsFactors=FALSE)
+      initializeTable <- ReadSNP(inFile$datapath)
     if(inputFileType == "nex") 
-      initializeTable <- convertNexDataToPhyData(read.nexus.data(inFile$datapath))
+      initializeTable <- convertNexDataToPhyData(read.nexus.data(inFile$datapath))  #change this over to ReadSNP too
     return(initializeTable)
   })
   
+  ##  ---   Modified Data   ---  ##
+
   contents <- reactive({
     textOutput <- NULL
-    results <- initializeTable()
+    results <- initializeTable()$data
     if (is.null(results))
       return(NULL)
+    #if(input$minInd > 1){
+#      results <- ReduceMinInd(results, "loci", threshold=input$minInd)
+    #}
     if(input$rmInvSites)
       results <- RemoveInvariantSites(results)
     if(input$rmNonBin)
@@ -115,32 +74,72 @@ shinyServer(function(input, output) {
     if(input$takeRandom)
       results <- TakeSingleSNPfromEachLocus(results)[[1]]
     if(input$transSNAPP){
-      results <- TranslateBases(results, translateMissingChar=input$transformChar, ordered=TRUE)
-      textOutput <- c(textOutput, "Transformed to SNAPP")
+      if(all(apply(SplitSNP(results), 2, IsBinary), apply(SplitSNP(results), 2, IsVariable))){
+        textOutput <- "Calculating..."
+        results <- TranslateBases(results, translateMissingChar=input$transformChar, ordered=TRUE)
+        textOutput <- "Transformed to SNAPP"
+      }
+      else
+        textOutput <- c(textOutput, "Some sites are not binary or variable, can not translate yet!")        
     }
     if(input$transMrBayes) {
       results <- TranslateBases(results, translateMissingChar=input$transformChar, ordered=FALSE)
       textOutput <- c(textOutput, "Preview is not supported for MrBayes transformations")
       textOutput <- c(textOutput, "Download results should still work! Check it!")
     }
-  return(list(results, textOutput))    
+  return(list(ReadSNP(results), textOutput))    
+  })
+
+  output$slider <- renderUI({
+    maxTax <- contents()[[1]]$ntax
+    if(is.null(maxTax))
+      maxTax <- 10
+    sliderInput("minInd", "Minimum number of individuals with sequence data required for a locus to be included in the data set.", min=1, max=maxTax, value=(0.25*maxTax), round=TRUE, ticks=FALSE)
+  })
+
+  ##  ---    Summary Tab    ---  ##
+
+  output$summaryData <- renderUI({
+    if(is.null(contents()[[1]]))
+      return(NULL)
+    numLoci <- contents()[[1]]$nloci
+    space <- ""
+    a <- paste("Number of taxa:", contents()[[1]]$ntax)
+    b <- paste("Number of loci:", numLoci)
+    if(numLoci == 1)
+      b <- paste("One concatenated dataset")
+    c <- paste("Number of sites:", sum(contents()[[1]]$nsites))
+    d <- paste("Average number of sites per locus:", round(mean(contents()[[1]]$nsites), digits=3))
+    e <- paste("Minimum number of sites per locus:", min(contents()[[1]]$nsites))
+    f <- paste("Maximum number of sites per locus:", max(contents()[[1]]$nsites))
+    HTML(paste(a, b, c, space, d, e, f, sep="<br/>"))
+  })
+
+
+  ##  ---   Main Data Tab   ---  ##
+
+  output$communicationWindow <- renderText({
+    if(is.null(contents()[[2]]))
+      return(NULL)
+    contents()[[2]]
   })
 
   output$OrigDataStats <- renderText({
     forStats <- initializeTable()
     if(is.null(forStats))
       return(NULL)
-    return(paste("Original Data contains", forStats$ntax, "taxa,", forStats$nloci, "loci, and", forStats$nsites, "sites"))
+    return(paste("Original Data contains", forStats$ntax, "taxa,", forStats$nloci, "loci, and", sum(forStats$nsites), "sites"))
   })
 
   output$resultsDataStats <- renderText({
     resultsStats <- contents()[[1]]
     if(is.null(resultsStats))
       return(NULL)
-    return(paste("Transformed Data contains", resultsStats$ntax, "taxa,", resultsStats$nloci, "loci, and", resultsStats$nsites, "sites"))
+    return(paste("Transformed Data contains", resultsStats$ntax, "taxa,", resultsStats$nloci, "loci, and", sum(resultsStats$nsites), "sites"))
   })
 
-  output$inputPreview <- renderTable({  
+
+ output$inputPreview <- renderTable({  
     prev <- head(initializeTable()$data, n=input$obs)
     newDim <- min(sum(nchar(prev[1,])), input$snpobs) 
     if(!is.null(prev))
@@ -148,7 +147,7 @@ shinyServer(function(input, output) {
   }, include.colnames=FALSE, size=1)
   
   output$resultsPreview <- renderTable({   
-    outPrev <- head(contents()[[1]], n=input$obs)
+    outPrev <- head(contents()[[1]]$data, n=input$obs)
     newDim2 <- min(sum(nchar(outPrev[1,])), input$snpobs)      
     if(input$transMrBayes)
       return(NULL)
@@ -158,23 +157,37 @@ shinyServer(function(input, output) {
   
   output$downloadPhy <- downloadHandler(
     filename = function() {paste(input$datasetName, ".txt", sep="")},
-    content = function(file) {
-      fileContent <- paste(dim(contents()[[1]])[1], sum(nchar(contents()[[1]][1,])))
-      write(fileContent, file)  #change with new vers
-      write.table(contents()[[1]], file, quote=FALSE, append=TRUE, col.names=FALSE)  #change with new vers
-    })
+    content = function(file) {WriteSNP(contents()[[1]], file, format="phylip")})
 
   output$downloadNex <- downloadHandler(
     filename = function() { paste(input$datasetName, ".nex", sep="") },
-    content = function(file) {
-      fileContent <- WriteNexus(contents()[[1]], file, missing=input$transformChar)  #change with new vers
+    content = function(file) {WriteSNP(contents()[[1]], file, format="nexus", missing=input$transformChar)})
+
+
+  ##  ---   Plots Data Tab   ---  ##
+
+  output$summaryPlot1 <- renderPlot({
+    if(is.null(contents()[[1]]$data))
+      return(NULL)
+    x <- contents()[[1]]
+    plot(x$nsites, type="n", ylab="Number Sites", xlab="Locus", xaxt="n")
+    text(1:length(x$nsites), x$nsites, labels=1:length(x$nsites), col="blue")
+    segments(0, mean(x$nsites), length(x$nsites)+1, mean(x$nsites), col="red")
+    text(0.1+(0.1*length(x$nsites)), mean(x$nsites)+(.02*max(x$nsites)), "mean", col="red")
+    title(main="Number of Sites Per Locus")
   })
 
-output$communicationWindow <- renderText ({
-  if(is.null(contents()[[2]]))
-    return(NULL)
-  contents()[[2]]
+  output$summaryPlot2 <- renderPlot({
+    if(is.null(contents()[[1]]$data))
+      return(NULL)
+    x <- contents()[[1]]
+    plot(density(x$nsites), xlab="Number Sites", ylab="Frequency", main="", col="blue")
+    segments(mean(x$nsites), -0.1, mean(x$nsites), max(1, max(density(x$nsites)$y)), col="red")
+    title(main="Frequency of Sites per Locus")
   })
+
+
+
 
 })
 

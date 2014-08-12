@@ -12,7 +12,7 @@
 #' data(fakeData)
 #' #fakeData <- RemoveNonBinary(RemoveInvariantSites(fakeData))
 #' #fakeData <- AddAFlag(fakeData, flagToAdd="WEST", taxa=c("in1", "in2", "in3"))
-#' #ExportPops(fakeData, subsets=c("EAST"))
+#' #ExportPops(fakeData, subsets=c("WEST"))
 
 ExportPops <- function(SNPdataset, file="", subsets=c(), ...){
 #this will print to screen and write to file a treemix file.

@@ -16,7 +16,7 @@
 
 plot.snp <- function(x, calc="loci", ...){
   dev.new(width=10, height=5)
-  layout(matrix(1:3, nrow=1, byrow=TRUE), respect=TRUE)
+  layout(matrix(1:2, nrow=1, byrow=TRUE), respect=TRUE)
 
   ## panel 1 ##
   plot(x$nsites, type="n", ylab="Number Sites", xlab="Locus", xaxt="n")
@@ -31,13 +31,13 @@ plot.snp <- function(x, calc="loci", ...){
   title(main="Frequency of Sites per Locus")
 
   ## panel 3 ##
-  numSpecies <- MakePresentAbsent(x, calc=calc)
-  sums <- apply(numSpecies, 2, sum)
-  spec <- sequence(dim(numSpecies)[1])
-  y <- sapply(spec, function(z) length(which(sums >= z))) 
-  plot(spec, y, pch=16, col="blue", xlab="Minimum Number of Individuals", ylab=paste("Number of", calc, "Retained"))
-  lines(spec, y, col="blue")
-  title(main="Missing Data")
+#  numSpecies <- MakePresentAbsent(x, calc=calc)
+#  sums <- apply(numSpecies, 2, sum)
+#  spec <- sequence(dim(numSpecies)[1])
+#  y <- sapply(spec, function(z) length(which(sums >= z))) 
+#  plot(spec, y, pch=16, col="blue", xlab="Minimum Number of Individuals", ylab=paste("Number of", calc, "Retained"))
+#  lines(spec, y, col="blue")
+#  title(main="Missing Data")
 }
 
 
