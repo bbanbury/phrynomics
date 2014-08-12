@@ -11,9 +11,9 @@
 #' @seealso \link{ReadSNP} \link{AddAFlag} \link{ReturnAlleleCounts}
 #' @examples
 #' data(fakeData)
-#' #fakeData <- RemoveNonBinary(RemoveInvariantSites(fakeData))
-#' #fakeData <- AddAFlag(fakeData, flagToAdd="WEST", taxa=c("in1", "in2", "in3"))
-#' #ExportPops(fakeData, subsets=c("WEST"))
+#' fakeData <- RemoveNonBinary(RemoveInvariantSites(fakeData))
+#' fakeData <- AddAFlag(fakeData, flagToAdd="WEST", taxa=c("in1", "in2", "in3"))
+#' ExportPops(fakeData, subsets=c("WEST"))
 
 ExportPops <- function(SNPdataset, file="", subsets=c(), includeFull=FALSE, ...){
 #this will print to screen and write to file a treemix file.
@@ -27,19 +27,22 @@ ExportPops <- function(SNPdataset, file="", subsets=c(), includeFull=FALSE, ...)
     pops[i,1] <- paste(alleleCounts[[i]], collapse=",")
     newRownames <- c(newRownames, paste(names(alleleCounts[[i]]), collapse=","))
   }
-  rownames(pops) <- newRownames
   colnames(pops) <- c("full", subsets)
-    for(j in sequence(length(subsets))){
-      subsetPop <- RemoveGroups(SNPdataset, groupFlag=subsets[j])
-      alleleCounts <- lapply(SplitSNP(cSNP(subsetPop)), ReturnAlleleCounts)
-      alleleCounts <- addazero(alleleCounts, rownames(pops))
-      for(row in sequence(dim(pops)[1])){
-        pops[row,j+1] <- paste(alleleCounts[[row]], collapse=",")
-      }
+  rownames(pops) <- newRownames
+  for(j in sequence(length(subsets))){
+    subsetPop <- RemoveGroups(SNPdataset, groupFlag=subsets[j])
+    alleleCounts <- lapply(SplitSNP(cSNP(subsetPop)), ReturnAlleleCounts)
+    alleleCounts <- addazero(alleleCounts, rownames(pops))
+    for(row in sequence(dim(pops)[1])){
+      pops[row,j+1] <- paste(alleleCounts[[row]], collapse=",")
     }
-  if(!includeFull)
-    pops <- pops[,-1]  
-  if(!is.null(file))
+  }
+  if(!includeFull){
+    pops <- matrix(pops[,-1]) 
+    colnames(pops) <- subsets
+    rownames(pops) <- newRownames
+  }
+  if(file != "")
     write.table(pops, file=file, row.names=FALSE, quote=FALSE, ...)
   return(pops)
 }
