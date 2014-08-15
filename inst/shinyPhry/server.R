@@ -1,7 +1,7 @@
 ##  --------------------------------  ##
 ##  ---      shinyPhrynomics     ---  ##
 ##  ---    written by B.Banbury  ---  ##
-##  ---     v1.3  8August2014    ---  ##
+##  ---     v1.3  15August2014    ---  ##
 ##  --------------------------------  ##
 
 
@@ -11,9 +11,8 @@ library(ape)
 library(phangorn)
 library(devtools)
 #devtools::install_github("bbanbury/phrynomics")
-#library(phrynomics)
-load_all("~/phrynomics/branches/OOP")
-library(shinyIncubator)  #maybe use for the progress bar
+library(phrynomics)
+#load_all("~/phrynomics/branches/OOP")
 
 vers <- "v1.3"
 
@@ -67,87 +66,81 @@ shinyServer(function(input, output) {
     #if(input$minInd > 1){
 #      results <- ReduceMinInd(results, "loci", threshold=input$minInd)
     #}
-    if(input$rmInvSites)
-      results <- RemoveInvariantSites(results)
-    if(input$rmNonBin)
-      results <- RemoveNonBinary(results)
-    if(input$takeRandom)
-      results <- TakeSingleSNPfromEachLocus(results)[[1]]
-    if(input$transSNAPP){
-      if(all(apply(SplitSNP(results), 2, IsBinary), apply(SplitSNP(results), 2, IsVariable))){
-        textOutput <- "Calculating..."
-        results <- TranslateBases(results, translateMissingChar=input$transformChar, ordered=TRUE)
-        textOutput <- "Transformed to SNAPP"
-      }
-      else
-        textOutput <- c(textOutput, "Some sites are not binary or variable, can not translate yet!")        
+    results <- RemoveInvariantSites(results)
+  return(ReadSNP(results))
+  })
+
+  myplots <- reactive({
+    if(is.null(contents()$data))
+      return(NULL)
+    x <- contents()
+    if(input$plotIn == ""){
+      return(NULL)
     }
-    if(input$transMrBayes) {
-      results <- TranslateBases(results, translateMissingChar=input$transformChar, ordered=FALSE)
-      textOutput <- c(textOutput, "Preview is not supported for MrBayes transformations")
-      textOutput <- c(textOutput, "Download results should still work! Check it!")
+    if(input$plotIn == "Per Locus"){
+      plot(x$nsites, type="n", ylab="Number Sites", xlab="Locus", xaxt="n")
+      text(1:length(x$nsites), x$nsites, labels=1:length(x$nsites), col="blue")
+      segments(0, mean(x$nsites), length(x$nsites)+1, mean(x$nsites), col="red")
+      text(0.1+(0.1*length(x$nsites)), mean(x$nsites)+(.02*max(x$nsites)), "mean", col="red")
+      title(main="Number of Sites Per Locus")
     }
-  return(list(ReadSNP(results), textOutput))    
+    if(input$plotIn == "Frequency"){
+      plot(density(x$nsites), xlab="Number Sites", ylab="Frequency", main="", col="blue")
+      segments(mean(x$nsites), -0.1, mean(x$nsites), max(1, max(density(x$nsites)$y)), col="red")
+      title(main="Frequency of Sites per Locus")
+    }
+    if(input$plotIn == "Missing Data"){
+      plotMissing(SNPdataset)
+      #segments(mean(x$nsites), -0.1, mean(x$nsites), max(1, max(density(x$nsites)$y)), col="red")
+      #title(main="Frequency of Sites per Locus")
+    }
+    if(input$plotIn == "Heatmap"){
+      plotHeatmap(SNPdataset)
+      #segments(mean(x$nsites), -0.1, mean(x$nsites), max(1, max(density(x$nsites)$y)), col="red")
+      #title(main="Frequency of Sites per Locus")
+    }
   })
 
-  output$slider <- renderUI({
-    maxTax <- contents()[[1]]$ntax
-    if(is.null(maxTax))
-      maxTax <- 10
-    sliderInput("minInd", "Minimum number of individuals with sequence data required for a locus to be included in the data set.", min=1, max=maxTax, value=(0.25*maxTax), round=TRUE, ticks=FALSE)
-  })
-
-  ##  ---    Summary Tab    ---  ##
-
-  output$summaryData <- renderUI({
-    if(is.null(contents()[[1]]))
+  myplots2 <- function(){
+    if(is.null(contents()$data))
       return(NULL)
-    numLoci <- contents()[[1]]$nloci
-    space <- ""
-    a <- paste("Number of taxa:", contents()[[1]]$ntax)
-    b <- paste("Number of loci:", numLoci)
-    if(numLoci == 1)
-      b <- paste("One concatenated dataset")
-    c <- paste("Number of sites:", sum(contents()[[1]]$nsites))
-    d <- paste("Average number of sites per locus:", round(mean(contents()[[1]]$nsites), digits=3))
-    e <- paste("Minimum number of sites per locus:", min(contents()[[1]]$nsites))
-    f <- paste("Maximum number of sites per locus:", max(contents()[[1]]$nsites))
-    HTML(paste(a, b, c, space, d, e, f, sep="<br/>"))
-  })
-
-
-  ##  ---   Main Data Tab   ---  ##
-
-  output$communicationWindow <- renderText({
-    if(is.null(contents()[[2]]))
+    x <- contents()
+    if(input$plotIn == ""){
       return(NULL)
-    contents()[[2]]
-  })
+    }
+    if(input$plotIn == "Per Locus"){
+      plot(x$nsites, type="n", ylab="Number Sites", xlab="Locus", xaxt="n")
+      text(1:length(x$nsites), x$nsites, labels=1:length(x$nsites), col="blue")
+      segments(0, mean(x$nsites), length(x$nsites)+1, mean(x$nsites), col="red")
+      text(0.1+(0.1*length(x$nsites)), mean(x$nsites)+(.02*max(x$nsites)), "mean", col="red")
+      title(main="Number of Sites Per Locus")
+    }
+    if(input$plotIn == "Frequency"){
+      plot(density(x$nsites), xlab="Number Sites", ylab="Frequency", main="", col="blue")
+      segments(mean(x$nsites), -0.1, mean(x$nsites), max(1, max(density(x$nsites)$y)), col="red")
+      title(main="Frequency of Sites per Locus")
+    }
+    if(input$plotIn == "Missing Data"){
+      plotMissing(SNPdataset)
+      #segments(mean(x$nsites), -0.1, mean(x$nsites), max(1, max(density(x$nsites)$y)), col="red")
+      #title(main="Frequency of Sites per Locus")
+    }
+    if(input$plotIn == "Heatmap"){
+      plotHeatmap(SNPdataset)
+      #segments(mean(x$nsites), -0.1, mean(x$nsites), max(1, max(density(x$nsites)$y)), col="red")
+      #title(main="Frequency of Sites per Locus")
+    }
+  }
 
-  output$OrigDataStats <- renderText({
-    forStats <- initializeTable()
-    if(is.null(forStats))
-      return(NULL)
-    return(paste("Original Data contains", forStats$ntax, "taxa,", forStats$nloci, "loci, and", sum(forStats$nsites), "sites"))
-  })
-
-  output$resultsDataStats <- renderText({
-    resultsStats <- contents()[[1]]
-    if(is.null(resultsStats))
-      return(NULL)
-    return(paste("Transformed Data contains", resultsStats$ntax, "taxa,", resultsStats$nloci, "loci, and", sum(resultsStats$nsites), "sites"))
-  })
 
 
- output$inputPreview <- renderTable({  
-    prev <- head(initializeTable()$data, n=input$obs)
-    newDim <- min(sum(nchar(prev[1,])), input$snpobs) 
-    if(!is.null(prev))
-      return(cSNP(SplitSNP(prev)[,1:newDim]))
-  }, include.colnames=FALSE, size=1)
+
+  ##  ---   Rendering Output   ---  ##
+
+
   
   output$resultsPreview <- renderTable({   
-    outPrev <- head(contents()[[1]]$data, n=input$obs)
+    outPrev <- head(contents()$data, n=input$obs)
     newDim2 <- min(sum(nchar(outPrev[1,])), input$snpobs)      
     if(input$transMrBayes)
       return(NULL)
@@ -155,39 +148,57 @@ shinyServer(function(input, output) {
       outPrev <- cSNP(SplitSNP(outPrev)[,1:newDim2])
   }, include.colnames=FALSE, size=1)
   
-  output$downloadPhy <- downloadHandler(
-    filename = function() {paste(input$datasetName, ".txt", sep="")},
-    content = function(file) {WriteSNP(contents()[[1]], file, format="phylip")})
 
-  output$downloadNex <- downloadHandler(
-    filename = function() { paste(input$datasetName, ".nex", sep="") },
-    content = function(file) {WriteSNP(contents()[[1]], file, format="nexus", missing=input$transformChar)})
+  output$dRAxML <- downloadHandler(
+    filename = function() {paste(input$datasetName, ".RAxML.phy", sep="")},
+    content = function(file) {
+      results <- RemoveNonBinary(contents())
+      WriteSNP(results, file, format="phylip")})
+
+  output$dMrBayes <- downloadHandler(
+    filename = function() { paste(input$datasetName, ".MrBayes.nex", sep="") },
+    content = function(file) {
+      results <- TranslateBases(contents(), translateMissingChar="?", ordered=FALSE)     
+      WriteSNP(results, file, format="nexus", missing="?")
+    })
+
+  output$dsnapp <- downloadHandler(
+    filename = function() { paste(input$datasetName, ".SNAPP.nex", sep="") },
+    content = function(file) {
+      results <- RemoveNonBinary(contents())
+      results <- TakeSingleSNPfromEachLocus(results)[[1]]
+      results <- TranslateBases(results, translateMissingChar="?", ordered=TRUE)
+      WriteSNP(results, file, format="nexus", missing="?")
+    })
 
 
   ##  ---   Plots Data Tab   ---  ##
 
   output$summaryPlot1 <- renderPlot({
-    if(is.null(contents()[[1]]$data))
-      return(NULL)
-    x <- contents()[[1]]
-    plot(x$nsites, type="n", ylab="Number Sites", xlab="Locus", xaxt="n")
-    text(1:length(x$nsites), x$nsites, labels=1:length(x$nsites), col="blue")
-    segments(0, mean(x$nsites), length(x$nsites)+1, mean(x$nsites), col="red")
-    text(0.1+(0.1*length(x$nsites)), mean(x$nsites)+(.02*max(x$nsites)), "mean", col="red")
-    title(main="Number of Sites Per Locus")
+    myplots()
   })
 
-  output$summaryPlot2 <- renderPlot({
-    if(is.null(contents()[[1]]$data))
-      return(NULL)
-    x <- contents()[[1]]
-    plot(density(x$nsites), xlab="Number Sites", ylab="Frequency", main="", col="blue")
-    segments(mean(x$nsites), -0.1, mean(x$nsites), max(1, max(density(x$nsites)$y)), col="red")
-    title(main="Frequency of Sites per Locus")
-  })
-
-
+  output$downloadSummPlot <- downloadHandler(
+    filename = function() {paste0(input$datasetName, "summary.pdf")},
+    content = function(file) {
+      pdf(file, width=8.5, height=5)
+      myplots2()
+      dev.off()      
+    })
 
 
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
 
