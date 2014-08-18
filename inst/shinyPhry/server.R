@@ -63,9 +63,9 @@ shinyServer(function(input, output) {
     results <- initializeTable()$data
     if (is.null(results))
       return(NULL)
-    #if(input$minInd > 1){
-#      results <- ReduceMinInd(results, "loci", threshold=input$minInd)
-    #}
+    if(input$minInds != ""){
+      results <- ReduceMinInd(results, "loci", threshold=input$minInds)
+    }
     results <- RemoveInvariantSites(results)
   return(ReadSNP(results))
   })
@@ -90,12 +90,12 @@ shinyServer(function(input, output) {
       title(main="Frequency of Sites per Locus")
     }
     if(input$plotIn == "Missing Data"){
-      plotMissing(SNPdataset)
+      plotMissing(x)
       #segments(mean(x$nsites), -0.1, mean(x$nsites), max(1, max(density(x$nsites)$y)), col="red")
       #title(main="Frequency of Sites per Locus")
     }
     if(input$plotIn == "Heatmap"){
-      plotHeatmap(SNPdataset)
+      plotHeatmap(x)
       #segments(mean(x$nsites), -0.1, mean(x$nsites), max(1, max(density(x$nsites)$y)), col="red")
       #title(main="Frequency of Sites per Locus")
     }
@@ -121,12 +121,12 @@ shinyServer(function(input, output) {
       title(main="Frequency of Sites per Locus")
     }
     if(input$plotIn == "Missing Data"){
-      plotMissing(SNPdataset)
+      plotMissing(x)
       #segments(mean(x$nsites), -0.1, mean(x$nsites), max(1, max(density(x$nsites)$y)), col="red")
       #title(main="Frequency of Sites per Locus")
     }
     if(input$plotIn == "Heatmap"){
-      plotHeatmap(SNPdataset)
+      plotHeatmap(x)
       #segments(mean(x$nsites), -0.1, mean(x$nsites), max(1, max(density(x$nsites)$y)), col="red")
       #title(main="Frequency of Sites per Locus")
     }
