@@ -32,7 +32,7 @@ ExportPops <- function(SNPdataset, file="", subsets=c(), includeFull=FALSE, ...)
   for(j in sequence(length(subsets))){
     subsetPop <- RemoveGroups(SNPdataset, groupFlag=subsets[j])
     alleleCounts <- lapply(SplitSNP(cSNP(subsetPop)), ReturnAlleleCounts)
-    #alleleCounts <- addazero(alleleCounts, rownames(pops))
+    alleleCounts <- addazero(alleleCounts, rownames(pops))
     for(row in sequence(dim(pops)[1])){
       pops[row,j+1] <- paste(alleleCounts[[row]], collapse=",")
     }

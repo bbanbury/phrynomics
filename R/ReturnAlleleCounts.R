@@ -33,7 +33,8 @@ ReturnAlleleCounts <- function(site, allelenames=TRUE, bgc=FALSE){
     whichambys <- ReturnAmbyCode(bases)
     counts <- counts + length(which(site == uniques[whichambys]))
   }
-  if(allelenames)
-    names(counts) <- bases
+  names(counts) <- bases
+  if(any(is.na(names(counts))))
+    counts <- counts[-which(is.na(names(counts)))]
   return(counts)
 }
