@@ -3,10 +3,14 @@
 \alias{ReturnAlleleCounts}
 \title{Return Allele COunts}
 \usage{
-ReturnAlleleCounts(site)
+ReturnAlleleCounts(site, allelenames = TRUE, bgc = FALSE)
 }
 \arguments{
 \item{site}{Single SNP site as a vector}
+
+\item{allelenames}{whether to return a named vector}
+
+\item{bgc}{For Bayesian Genomic Clines (Gompert and Buerkle 2011)}
 }
 \value{
 Returns a named list of allele counts.
