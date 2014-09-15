@@ -2,6 +2,8 @@
 #' 
 #' This function will calculate the number of alleles in a population. Heterozygotes get split between their bases.   
 #' @param site Single SNP site as a vector
+#' @param allelenames whether to return a named vector
+#' @param bgc For Bayesian Genomic Clines (Gompert and Buerkle 2011)
 #' @export
 #' @return Returns a named list of allele counts.
 #' @seealso \link{ReadSNP} \link{GetBaseFrequencies} \link{ExportPops}
@@ -12,24 +14,26 @@
 #' ReturnAlleleCounts(splitfakeData[,2])
 #' lapply(splitfakeData, ReturnAlleleCounts)
 
-ReturnAlleleCounts <- function(site){
+ReturnAlleleCounts <- function(site, allelenames=TRUE, bgc=FALSE){
   uniques <- unique(site)
   bases <- ReturnUniqueBases(site)
-  allelesToCount <- NULL
-  for(i in sequence(length(uniques))){
-    if(all(ReturnNucs(uniques[i]) %in% bases))
-      allelesToCount <- c(allelesToCount, uniques[i])
+  if(bgc){
+    if(length(bases) == 0)
+      return(c(-9, -9))
   }
-  counts <- sapply(allelesToCount, function(x) length(which(site == x)))
-  whichToDouble <- which(names(counts) %in% c("A", "C", "T", "G"))
-  for(i in whichToDouble){   #double homos
-    counts[i] <- counts[i] * 2
+  if(!bgc){
+    if(length(bases) == 0)
+      return(c(0, 0))
   }
-  for(i in sequence(length(counts))){
-    if(!(i %in% whichToDouble)){
-      counts <- counts + counts[i]  #add a het to each other allele
-      counts <- counts[-i]
-    }
+  counts <- c(0,0)
+  for(i in sequence(length(bases))){
+    counts[i] <- counts[i] + length(which(site == bases[i])) *2
   }
+  if(any(!uniques %in% bases)){
+    whichambys <- ReturnAmbyCode(bases)
+    counts <- counts + length(which(site == uniques[whichambys]))
+  }
+  if(allelenames)
+    names(counts) <- bases
   return(counts)
 }
