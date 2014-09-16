@@ -12,10 +12,19 @@ addazero <- function(alleleCounts, rownamesOriginal){
 #alleleCounts should be from the function ReturnAlleleCounts 
 #rownamesOriginal should be from pops, but would also be "A,G" for each locus
   for(i in sequence(length(alleleCounts))){
-    if(paste(names(alleleCounts[[i]]), collapse=",") != rownamesOriginal[i]){
+    if(all(alleleCounts[[i]] == 0)){  #if both allele counts are 0 (ie NNN), then add the original names
+      names(alleleCounts[[i]]) <- strsplit(rownamesOriginal[i], ",")[[1]]
+    }
+    if(paste(names(alleleCounts[[i]]), collapse=",") == rownamesOriginal[i]){
+      alleleCounts[[i]] <- alleleCounts[[i]]
+    }
+    else{
       if(length(alleleCounts[[i]]) == 0){  #no data
         alleleCounts[[i]] <- c(0,0)
         names(alleleCounts[[i]]) <- strsplit(rownamesOriginal[i], ",")[[1]]
+      }
+      if(length(grep("[,]", paste(names(alleleCounts[[i]]), collapse=","))) == 1){  #one comma means two alleles
+        alleleCounts[[i]] <- rev(alleleCounts[[i]])
       }
       if(length(grep("[,]", paste(names(alleleCounts[[i]]), collapse=","))) == 0){  #no comma means one allele
         position <- grep(paste(names(alleleCounts[[i]]), collapse=","), strsplit(rownamesOriginal[i], ",")[[1]])
@@ -28,10 +37,6 @@ addazero <- function(alleleCounts, rownamesOriginal){
           names(alleleCounts[[i]])[1] <- strsplit(rownamesOriginal[i], ",")[[1]][1]
         }
       }
-      if(length(grep("[,]", paste(names(alleleCounts[[i]]), collapse=","))) == 1){  #one comma means two alleles
-        alleleCounts[[i]] <- rev(alleleCounts[[i]])
-      }
-
     }
   }
   return(alleleCounts)
