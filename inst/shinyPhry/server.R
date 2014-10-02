@@ -53,6 +53,8 @@ shinyServer(function(input, output) {
       initializeTable <- ReadSNP(inFile$datapath)
     if(inputFileType == "nex") 
       initializeTable <- convertNexDataToPhyData(read.nexus.data(inFile$datapath))  #change this over to ReadSNP too
+    if(initializeTable$nloci == "1")
+      initializeTable <- ReadSNP(SplitSNP(l$data))
     return(initializeTable)
   })
   
