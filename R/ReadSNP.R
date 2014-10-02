@@ -30,8 +30,10 @@
 ReadSNP <- function(file, row.names=1, preprocess=TRUE){
   if(class(file) == "character"){
     inputFileType <- FileFormat(file)
-    if(inputFileType == "phy")
+    if(inputFileType == "phy"){
+      #add a system grep to file here to check for interleaving
       initializeTable <- read.table(file, row.names=row.names, skip=GetLinesToSkip(file), stringsAsFactors=FALSE)
+    }
     if(inputFileType == "nex") 
       initializeTable <- ConvertNexDataToPhyData(read.nexus.data(file))
     if (is.na(inputFileType))

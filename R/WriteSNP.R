@@ -34,7 +34,7 @@ WriteSNP <- function(SNPdataset, file="", format="phylip", missing="N"){
     write(paste("#NEXUS"), file)
     write(paste("[Written ", Sys.Date(), " via phrynomics]", sep=""), file, append=TRUE)
     write(paste("BEGIN Data;"), file, append=TRUE)
-    write(paste("   DIMENSIONS NTAX=", length(SNPdataset), " NCHAR=", nchars, ";", sep=""), file, append=TRUE)
+    write(paste("   DIMENSIONS NTAX=", dim(SNPdataset)[1], " NCHAR=", nchars, ";", sep=""), file, append=TRUE)
     write(paste("   FORMAT DATATYPE=Standard INTERLEAVE=no missing=", missing, ";", sep=""), file, append=TRUE)
     write(paste("Matrix"), file, append=TRUE)
     write.table(SNPdataset, file, append=TRUE, quote=FALSE, col.names=FALSE)  

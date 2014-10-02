@@ -34,7 +34,9 @@ ReturnAlleleCounts <- function(site, allelenames=TRUE, bgc=FALSE){
     counts <- counts + length(which(site == uniques[whichambys]))
   }
   names(counts) <- bases
-  if(any(is.na(names(counts))))
-    counts <- counts[-which(is.na(names(counts)))]
+  if(!bgc){
+    if(any(is.na(names(counts))))
+      counts <- counts[-which(is.na(names(counts)))]
+  }
   return(counts)
 }
