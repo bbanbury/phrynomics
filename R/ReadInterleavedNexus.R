@@ -1,5 +1,18 @@
-ReadInterleavedNexus <- function(nexusFile){
-  dat <- scan(nexusFile, what="character", sep="\n")
+#' Read Interleaved Nexus File
+#' 
+#' Read Interleaved Nexus File
+#'
+#' This function reads in SNP datasets that are interleaved and converts them to data frame. These can then be written as standard nexus or phylip formatted files.   
+#'
+#' @aliases ReadInterleavedNexus
+#' @param file A file name specified by either a variable or a double-quoted string (ie, file=""). Also accepts R objects that are data frames or matrices and converts to the class "snp".  
+#' @export
+#' @return Returns a data frame with rownames as species and column(s) as loci
+#' @seealso \link{WriteSNP} 
+
+ReadInterleavedNexus <- function(file){
+#make sure this works with multiple loci?
+  dat <- scan(file, what="character", sep="\n")
   if(length(grep("\t;", dat) > 1))
     dat <- dat[-grep("\t;", dat)]
   whereDataStarts <- grep("matrix", dat, ignore.case=TRUE)+1
