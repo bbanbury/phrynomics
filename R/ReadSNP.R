@@ -50,10 +50,13 @@ ReadSNP <- function(file, row.names=1, preprocess=TRUE){
       initializeTable <- initializeTable[,-unique(underscores[,2])]
     }
   }
-  ntax <- dim(initializeTable)[1]
+#  if(is.data.frame(initializeTable))
+#    ntax <- length(initializeTable)
+#  if(is.matrix(initializeTable))
+    ntax <- dim(initializeTable)[1]
   nloci <- dim(initializeTable)[2]
   nsites <- nchar(initializeTable[1,])
-  snpdata <- list(data=initializeTable, ntax=ntax, nloci=nloci, nsites=nsites)
+  snpdata <- list(data=as.data.frame(initializeTable), ntax=ntax, nloci=nloci, nsites=nsites)
   class(snpdata) <- "snp"
   return(snpdata)
 }
