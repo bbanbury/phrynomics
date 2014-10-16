@@ -26,7 +26,7 @@ This function will ...
 data(fakeData)
 fakeData <- RemoveNonBinary(RemoveInvariantSites(fakeData))
 fakeData <- AddAFlag(fakeData, flagToAdd="WEST", taxa=c("in1", "in2", "in3"))
-ExportPops(fakeData, subsets=c("WEST"))
+#ExportPops(fakeData, subsets=c("WEST"))
 }
 \seealso{
 \link{ReadSNP} \link{AddAFlag} \link{ReturnAlleleCounts}
