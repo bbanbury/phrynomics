@@ -1,12 +1,19 @@
 Package: phrynomics
-Version: 1.5
-Date: 2014-06-16
+Version: 2.0
+Date: 2014-07-24
 Title: phrynomics: An SNP toolkit
 Author: Barb Banbury <darwinthesun@gmail.com> and Adam Leache <leache@uw.edu>
 Maintainer: Barb Banbury <darwinthesun@gmail.com>
 BugReports: https://github.com/bbanbury/phrynomics/issues
-Depends: R (>= 2.13.0)
-Imports: ape, phangorn
+Depends:
+    R (>= 2.13.0)
+Imports:
+    ape,
+    phangorn
 LazyData: yes
-Description: The package phrynomics is a toolkit for manipulating SNP data. It will read in sequences, check for variable and binary sites, allow removal of taxa or sites, and transform characters in various ways. There are options for exporting data to fit several popular phylogenetics programs (ex: RAxML, MrBayes, and SNAPP). 
+Description: The package phrynomics is a toolkit for manipulating SNP data. It
+    will read in sequences, check for variable and binary sites, allow removal
+    of taxa or sites, and transform characters in various ways. There are
+    options for exporting data to fit several popular phylogenetics programs
+    (ex: RAxML, MrBayes, and SNAPP).
 License: GPL (>= 2)

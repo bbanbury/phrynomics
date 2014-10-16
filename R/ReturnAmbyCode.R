@@ -1,3 +1,15 @@
+#' Return Ambiguity Codes
+#' 
+#' This function will take a set of bases and return the IUPAC ambiguity code. 
+#' @param bases A vector of bases
+#' @export
+#' @return Returns a single character with the ambiguity code.
+#' @seealso \link{ReadSNP} \link{WriteSNP} \link{ReturnNucs}
+#' @examples
+#' bases <- c("A", "G")
+#' ReturnAmbyCode(bases)
+#' ReturnAmbyCode(c("A","G","C"))
+
 ReturnAmbyCode <- function(bases){
   if(all(bases %in% c("A","G")))  return("R")
   if(all(bases %in% c("C","T")))  return("Y")

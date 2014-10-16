@@ -1,6 +1,17 @@
+#' Return Ambiguity Codes
+#' 
+#' This function will take an IUPAC ambiguity code and return a set of bases
+#' @param NucCode An ambiguity code
+#' @param forSNAPP Logical. If FALSE (default), then missing data characters will be returned as all possibilities. If TRUE, the return for missing data will be returned "-".
+#' @export
+#' @return Returns a character vector with base possibilities.
+#' @seealso \link{ReadSNP} \link{WriteSNP} \link{ReturnAmbyCode}
+#' @examples
+#' ReturnNucs("N", forSNAPP=FALSE)
+#' ReturnNucs("N", forSNAPP=TRUE)
+#' ReturnNucs("K")
+
 ReturnNucs <- function(NucCode, forSNAPP=FALSE) {
-#Function for returning possible bases
-#SNAPP missing data needs to be handled differently, so for now just return "-"
   possibilities <- NULL
   if(NucCode == "A" || NucCode == "G" || NucCode == "C" || NucCode == "T" || NucCode == "U")
     possibilities <- NucCode
