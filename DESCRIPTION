@@ -8,8 +8,7 @@ BugReports: https://github.com/bbanbury/phrynomics/issues
 Depends:
     R (>= 2.13.0)
 Imports:
-    ape,
-    phangorn
+    ape
 LazyData: yes
 Description: The package phrynomics is a toolkit for manipulating SNP data. It
     will read in sequences, check for variable and binary sites, allow removal

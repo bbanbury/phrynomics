@@ -14,5 +14,4 @@
 #' @docType package
 #' @name phrynomics
 #' @import ape 
-#' @importFrom phangorn treedist
 NULL
