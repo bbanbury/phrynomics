@@ -32,7 +32,7 @@ ReadSNP <- function(file, row.names=1, preprocess=TRUE){
     inputFileType <- FileFormat(file)
     if(inputFileType == "phy"){
       #add a system grep to file here to check for interleaving
-      initializeTable <- read.table(file, row.names=row.names, skip=GetLinesToSkip(file)+1, stringsAsFactors=FALSE)
+      initializeTable <- read.table(file, row.names=row.names, skip=GetLinesToSkip(file)+1, stringsAsFactors=FALSE, colClasses=c("character"))
     }
     if(inputFileType == "nex") 
       initializeTable <- ConvertNexDataToPhyData(read.nexus.data(file))
@@ -50,10 +50,7 @@ ReadSNP <- function(file, row.names=1, preprocess=TRUE){
       initializeTable <- initializeTable[,-unique(underscores[,2])]
     }
   }
-#  if(is.data.frame(initializeTable))
-#    ntax <- length(initializeTable)
-#  if(is.matrix(initializeTable))
-    ntax <- dim(initializeTable)[1]
+  ntax <- dim(initializeTable)[1]
   nloci <- dim(initializeTable)[2]
   nsites <- nchar(initializeTable[1,])
   snpdata <- list(data=as.data.frame(initializeTable), ntax=ntax, nloci=nloci, nsites=nsites)
