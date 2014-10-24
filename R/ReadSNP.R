@@ -32,7 +32,7 @@ ReadSNP <- function(file, row.names=1, preprocess=TRUE){
     inputFileType <- FileFormat(file)
     if(inputFileType == "phy"){
       #add a system grep to file here to check for interleaving
-      initializeTable <- read.table(file, row.names=row.names, skip=GetLinesToSkip(file)+1, stringsAsFactors=FALSE, colClasses=c("character"))
+      initializeTable <- read.table(file, row.names=row.names, skip=GetLinesToSkip(file), stringsAsFactors=FALSE, colClasses=c("character"))
     }
     if(inputFileType == "nex") 
       initializeTable <- ConvertNexDataToPhyData(read.nexus.data(file))
