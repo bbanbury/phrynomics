@@ -15,9 +15,9 @@ GetLinesToSkip <- function(file){
   a <- length(suppressWarnings(system(paste("grep 'ID:' ", file, sep=""), intern=TRUE)))
   b <- length(suppressWarnings(system(paste("grep ^[#+] ", file, sep=""), intern=TRUE)))
   c <- 0
-  if(length(strsplit(system(paste("head -n 1 ", file, sep=""), intern=TRUE), split=" ")[[1]]) == 2){
-    if(!system(paste("head -n 2 ", file, sep=""), intern=TRUE)[1] == system(paste("head -n 2 ", file, sep=""), intern=TRUE)[2])
-      c <- 1
-  }
+  #if(length(strsplit(system(paste("head -n 1 ", file, sep=""), intern=TRUE), split=" ")[[1]]) == 2){
+  #  if(!system(paste("head -n 2 ", file, sep=""), intern=TRUE)[1] == system(paste("head -n 2 ", file, sep=""), intern=TRUE)[2])
+  #    c <- 1
+  #}
   return(a+b+c)
 }
