@@ -27,12 +27,14 @@
 #' data(fakeData)
 #' ReadSNP(fakeData)
 
-ReadSNP <- function(file, row.names=1, preprocess=TRUE){
+ReadSNP <- function(file, row.names=1, preprocess=TRUE, fileFormat=NULL, extralinestoskip=0){
   if(class(file) == "character"){
-    inputFileType <- FileFormat(file)
+    inputFileType <- fileFormat
+    if(is.null(inputFileType))
+      inputFileType <- FileFormat(file)
     if(inputFileType == "phy"){
       #add a system grep to file here to check for interleaving
-      initializeTable <- read.table(file, row.names=row.names, skip=GetLinesToSkip(file), stringsAsFactors=FALSE, colClasses=c("character"))
+      initializeTable <- read.table(file, row.names=row.names, skip=GetLinesToSkip(file)+extralinestoskip, stringsAsFactors=FALSE, colClasses=c("character"))
     }
     if(inputFileType == "nex") 
       initializeTable <- ConvertNexDataToPhyData(read.nexus.data(file))
