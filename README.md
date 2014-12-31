@@ -1,5 +1,6 @@
 phrynomics
 ==========
+![](http://barbbanbury.info/barbbanbury/Research_Projects_files/phrynoHead.jpg) 
 
 A collection of R code for dealing with SNP data and analyses. 
 
@@ -28,4 +29,3 @@ snpdata <- ReadSNP(fakeData)
 ```
 
 
-![plot of chunk tree](http://i.imgur.com/YaxCqhe.png) 
