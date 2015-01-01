@@ -14,13 +14,9 @@ devtools::install_github("bbanbury/phrynomics")
 ```
 
 
-## Simple examples
+## Phrynomics can do a lot of dataset manipulations and simple calculations. 
 
-Note: the library is still in active development and behaviour of the following
-functions may well change in the future:
-
-### Load a mock dataset
-
+### Load a mock dataset. Phrynomics accepts either phylip or nexus sequential (ie, not interleaved) formatted files.  
 
 ```r
 library(phrynomics)
@@ -28,4 +24,11 @@ data(fakeData)
 snpdata <- ReadSNP(fakeData)
 ```
 
+### Phrynomics loads datasets into the class "snp". There are lots of different measurements (calculate missing data, allele frequencies, number of sites per locus, etc) and also lots of ways to manipulate the data (translating bases, taking a single random SNP from each locus, removing invariant or nonbinary sites, remove whole species (multiple individuals), add a flag to species names, etc) and ways to visualize the data in tables or plots (plot, making a heatmap of missing data, making a plot of missing data per minimum individuals, minimum individuals tables, etc.). 
+
+### Examples of simple measures of your dataset:
+```r
+CalculateMissingData(snpdata, "loci")
+DataOverlap(snpdata)
+```
 
