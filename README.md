@@ -28,14 +28,14 @@ snpdata <- ReadSNP(fakeData)
 
 Phrynomics loads datasets into the class "snp". Typing the object into the console will only return a summary of the data, however you can see the data itself using the $ operator. 
 
-There are lots of different measurements (calculate missing data, allele frequencies, number of sites per locus, etc) and also lots of ways to manipulate the data (translating bases, taking a single random SNP from each locus, removing invariant or nonbinary sites, remove whole species (multiple individuals), add a flag to species names, etc) and ways to visualize the data in tables or plots (plot, making a heatmap of missing data, making a plot of missing data per minimum individuals, minimum individuals tables, etc.). 
+There are lots of different measurements (calculate missing data, allele frequencies, number of sites per locus, etc) and also lots of ways to manipulate the data (translating bases, taking a single random SNP from each locus, removing invariant or nonbinary sites, remove individuals, add a flag to species names, etc) and ways to visualize the data in tables or plots (plot, making a heatmap of missing data, making a plot of missing data per minimum individuals, minimum individuals tables, etc.). 
 
-### Examples of simple measures of your dataset:
+### Some simple measures of your dataset:
 ```r
 CalculateMissingData(snpdata, "loci")  
 DataOverlap(snpdata) 
 GetNumberOfSitesForLocus(snpdata) 
-GetSpecies(rownames(snpdata$data)) # 
+GetSpecies(rownames(snpdata$data)) 
 MakeMinIndTable(snpdata, showEvery=1)
 ```
 
