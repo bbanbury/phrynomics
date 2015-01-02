@@ -8,6 +8,8 @@
 #' @param file A file name specified by either a variable or a double-quoted string (ie, file=""). Also accepts R objects that are data frames or matrices and converts to the class "snp".  
 #' @param row.names A numeric indicating which column of data the row names occur (default is 1)
 #' @param preprocess If preprocess=TRUE, it will remove underscores from pyrad output ("_")
+#' @param fileFormat If NULL, phrynomics will try to guess whether your data is phylip or nexus formatted.  Otherwise you can specify, "phy" or "nex". 
+#' @param extralinestoskip Any blank lines or comments in the beginning of a file to skip
 #' @export
 #' @return Returns an object in the class "snp" with the following components:
 #' \itemize{
