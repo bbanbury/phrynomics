@@ -108,7 +108,7 @@ WriteSNP(snps, file="snps.phy", format="phylip")
 # Prepare data for SNPAPP
 snps <- ReadSNP("MyFileOfSNPs.phy")
 snps <- RemoveNonBinary(snps)
-snps <- TakeSingleSNPfromEachLocus(snpdata)$snpdata
+snps <- TakeSingleSNPfromEachLocus(snps)$snpdata
 snps <- TranslateBases(snps, translateMissingChar="?", ordered=TRUE)
 WriteSNP(snps, file="snps.nex", format="nexus", missing="?")
 
