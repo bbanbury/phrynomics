@@ -33,7 +33,7 @@ shinyUI(pageWithSidebar(
     fileInput("OrigData", "Choose File To Upload (.phy, .nex, .txt, .snps):", accept=c(".snps", ".nex", ".txt", ".phy")),
     textInput("minInds", "Enter Minimum number of individuals with sequence data required for a locus to be included in the dataset:", value=""), 
     br(),
-    downloadButton("dRAxML", label="Transform and Download to RAxML Mk Model"),
+    downloadButton("dRAxML", label="Transform and Download to RAxML"),
     downloadButton("dMrBayes", label="Transform and Download to MrBayes Mk/v Model"),
     downloadButton("dsnapp", label="Transform and Download to SNAPP"),
     br(), 
