@@ -11,19 +11,18 @@
 #' RemoveMissingSpeciesLoci(fakeData)
 #' RemoveMissingSpeciesLoci(fakeData, chatty=TRUE)
 
-RemoveMissingSpeciesLoci <- function(SNPdataset, chatty=FALSE) {
+RemoveMissingSpeciesLoci <- function(SNPdataset, chatty=FALSE){
   snpclass <- "table"
-  if(class(SNPdataset) == "snp"){
+  if (class(SNPdataset) == "snp"){
     snpclass <- "snp"
     SNPdataset <- SNPdataset$data
   }
-  speciesWithN <- apply(SNPdataset, 2, IsMissingSpecies, SpeciesNames=rownames(SNPdataset))
-  if(chatty)
+  speciesWithN <- apply(SNPdataset, 2, IsMissingSpecies, SpeciesNames = rownames(SNPdataset), chatty=chatty)
+  if(chatty) 
     message(paste("removed", length(which(speciesWithN == "FALSE")), "of", length(speciesWithN), "SNPs"))
-  newSNPdataset <- as.data.frame(SNPdataset[,speciesWithN])
-  rownames(newSNPdataset) <- rownames(SNPdataset)  
-  if(snpclass == "snp")
+  newSNPdataset <- as.data.frame(SNPdataset[, speciesWithN])
+  rownames(newSNPdataset) <- rownames(SNPdataset)
+  if (snpclass == "snp") 
     return(ReadSNP(newSNPdataset))
-  else
-    return(newSNPdataset) 
+  else return(newSNPdataset)
 }

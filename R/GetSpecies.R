@@ -13,5 +13,5 @@
 #' GetSpecies(rownames(fakeData))
 
 GetSpecies <- function(taxa){
-  return(unique(gsub("\\d$", "", taxa)))
+  return(unique(gsub("\\d*$", "", taxa)))
 }
