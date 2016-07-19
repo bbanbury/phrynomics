@@ -25,7 +25,7 @@ shinyUI(pageWithSidebar(
     br(),
     a("exampleData.phy", href="example.txt"),
     br(),
-    a("exampleData.nex", href="example.nex"),
+    checkboxInput("UseExampleData", "Click here to try it out with example data", value = FALSE),
     br(),
     br(),
     h4("Original Dastset"),

@@ -42,19 +42,25 @@ shinyServer(function(input, output) {
   ##  ---   Initial Data   ---  ##
 
   initializeTable <- reactive({
-    if(is.null(input$OrigData))
+    if(is.null(input$OrigData) && !input$UseExampleData)
       return(NULL)
-    inFile <- input$OrigData
-    fileSize <- inFile$size
-    inputFileType <- FileFormat(inFile$datapath)
-    if(is.null(inputFileType))
-      return(NULL)
-    if(inputFileType == "phy")
-      initializeTable <- ReadSNP(inFile$datapath)
-    if(inputFileType == "nex") 
-      initializeTable <- convertNexDataToPhyData(read.nexus.data(inFile$datapath))  #change this over to ReadSNP too
-    if(initializeTable$nloci == "1")
-      initializeTable <- ReadSNP(SplitSNP(initializeTable$data))
+    if(input$UseExampleData){
+      data(snpdata)
+      initializeTable <- snpdata
+    }
+    if(!is.null(input$OrigData)){
+      inFile <- input$OrigData
+      fileSize <- inFile$size
+      inputFileType <- FileFormat(inFile$datapath)
+      if(is.null(inputFileType))
+        return(NULL)
+      if(inputFileType == "phy")
+        initializeTable <- ReadSNP(inFile$datapath, fileFormat="phy", extralinestoskip=1)
+      if(inputFileType == "nex") 
+        initializeTable <- ReadSNP(inFile$datapath, fileFormat="nex")  
+      if(initializeTable$nloci == "1")
+        initializeTable <- ReadSNP(SplitSNP(initializeTable$data))
+    }
     return(initializeTable)
   })
   

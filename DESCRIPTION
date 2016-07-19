@@ -16,3 +16,4 @@ Description: The package phrynomics is a toolkit for manipulating SNP data. It
     options for exporting data to fit several popular phylogenetics programs
     (ex: RAxML, MrBayes, and SNAPP).
 License: GPL (>= 2)
+RoxygenNote: 5.0.1
