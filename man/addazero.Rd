@@ -20,4 +20,3 @@ This function will add a zero if allele counts are missing from subpops
 \seealso{
 \link{ReadSNP} \link{WriteSNP} \link{ExportPops}
 }
-

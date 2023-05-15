@@ -28,4 +28,3 @@ plotMissing(myData, calc="sites")
 \seealso{
 \link{ReadSNP} \link{summary.snp} \link{plot.snp}
 }
-

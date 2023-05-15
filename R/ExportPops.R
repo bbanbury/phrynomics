@@ -18,7 +18,7 @@
 ExportPops <- function(SNPdataset, file="", subsets=c(), includeFull=FALSE, ...){
 #this will print to screen and write to file a treemix file.
 #subsets should be the flags ex: c("north", "west").  Will write full pop then n subsets
-  if(class(SNPdataset) == "snp")
+  if(inherits(SNPdataset, "snp"))
     SNPdataset <- SNPdataset$data
   alleleCounts <- lapply(SplitSNP(cSNP(SNPdataset)), ReturnAlleleCounts)
   pops <- matrix(ncol=1+length(subsets), nrow=length(alleleCounts))

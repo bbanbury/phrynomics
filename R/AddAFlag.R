@@ -14,7 +14,7 @@
 AddAFlag <- function(SNPdataset, flagToAdd="", taxa=c()){
 #will add a flag to certain taxa for subsetting later
   snpclass <- "table"
-  if(class(SNPdataset) == "snp"){
+  if(inherits(SNPdataset, "snp")){
     snpclass <- "snp"
     SNPdataset <- SNPdataset$data
   }

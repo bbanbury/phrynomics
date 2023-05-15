@@ -24,4 +24,3 @@ SplitSNP(fakeData)$data
 \seealso{
 \link{ReadSNP} \link{cSNP}
 }
-

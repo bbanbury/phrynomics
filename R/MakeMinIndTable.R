@@ -15,7 +15,7 @@
 #' MakeMinIndTable(fakeData, showEvery=3)
 
 MakeMinIndTable <- function(SNPdataset, showEvery=5, missingChar="any", file=NULL, ...){
-  if(class(SNPdataset) == "snp")
+  if(inherits(SNPdataset, "snp"))
     SNPdataset <- SNPdataset$data
   toKeep <- rev(c(1, seq.int(to=dim(SNPdataset)[1], from=showEvery, by=showEvery)))
   indTable <- matrix(nrow=length(toKeep), ncol=4)

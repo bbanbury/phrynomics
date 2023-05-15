@@ -33,4 +33,3 @@ WriteSNP(fakeData, file="refakeData.nex", format="nexus")
 \seealso{
 \link{ReadSNP}
 }
-

@@ -23,4 +23,3 @@ TakeSingleSNPfromEachLocus(fakeData)[[1]]
 \seealso{
 \link{ReadSNP} \link{WriteSNP} \link{CalculateMissingData}
 }
-

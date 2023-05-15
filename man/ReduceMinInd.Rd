@@ -4,8 +4,13 @@
 \alias{ReduceMinInd}
 \title{Reduce Data by Minimum Individuals}
 \usage{
-ReduceMinInd(SNPdataset, calc = "loci", threshold = 0.9,
-  missingChar = "any", chatty = FALSE)
+ReduceMinInd(
+  SNPdataset,
+  calc = "loci",
+  threshold = 0.9,
+  missingChar = "any",
+  chatty = FALSE
+)
 }
 \arguments{
 \item{SNPdataset}{SNP dataset in the class "matrix", "data.frame", or "snp"}
@@ -32,4 +37,3 @@ MakePresentAbsent(fakeData, "loci")
 \seealso{
 \link{ReadSNP} \link{MakeMinIndTable} \link{CalculateMissingData} \link{plotMissing}
 }
-

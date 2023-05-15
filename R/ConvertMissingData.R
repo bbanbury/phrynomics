@@ -15,7 +15,7 @@
 
 ConvertMissingData <- function(SNPdataset, oldmissing=c("-","N"), newmissing="N"){
   snpclass <- "table"
-  if(class(SNPdataset) == "snp"){
+  if(inherits(SNPdataset, "snp")){
     snpclass <- "snp"
     SNPdataset <- SNPdataset$data
   }

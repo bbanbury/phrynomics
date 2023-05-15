@@ -23,4 +23,3 @@ ReturnAmbyCode(c("A","G","C"))
 \seealso{
 \link{ReadSNP} \link{WriteSNP} \link{ReturnNucs}
 }
-

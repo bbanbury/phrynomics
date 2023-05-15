@@ -4,8 +4,13 @@
 \alias{MakeMinIndTable}
 \title{Reduce Data by Minimum Individuals}
 \usage{
-MakeMinIndTable(SNPdataset, showEvery = 5, missingChar = "any",
-  file = NULL, ...)
+MakeMinIndTable(
+  SNPdataset,
+  showEvery = 5,
+  missingChar = "any",
+  file = NULL,
+  ...
+)
 }
 \arguments{
 \item{SNPdataset}{SNP dataset in the class "matrix", "data.frame", or "snp"}
@@ -32,4 +37,3 @@ MakeMinIndTable(fakeData, showEvery=3)
 \seealso{
 \link{ReadSNP} \link{ReduceMinInd} \link{plotMissing}
 }
-

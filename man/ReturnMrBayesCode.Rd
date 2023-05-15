@@ -21,4 +21,3 @@ ReturnMrBayesCode("A")
 \seealso{
 \link{ReadSNP} \link{WriteSNP} \link{ReturnAmbyCode} \link{ReturnMrBayesAmbyCode}
 }
-

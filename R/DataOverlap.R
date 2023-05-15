@@ -10,7 +10,7 @@
 #' DataOverlap(fakeData)
 
 DataOverlap <- function (SNPdataset){
-  if(class(SNPdataset) == "snp")
+  if(inherits(SNPdataset, "snp"))
     SNPdataset <- SNPdataset$data
   presAbsentDataset <- MakePresentAbsent(SNPdataset, calc="loci")
   rownames(presAbsentDataset) <- rownames(SNPdataset)

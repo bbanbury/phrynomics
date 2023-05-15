@@ -13,7 +13,7 @@
 #' MakeStructureFormat(fakeData)
 MakeStructureFormat <- function(SNPdataset){
   snpclass <- "table"
-  if (class(SNPdataset) == "snp") {
+  if (inherits(SNPdataset, "snp")) {
     snpclass <- "snp"
     SNPdataset <- SNPdataset$data
   }

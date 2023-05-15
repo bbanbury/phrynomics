@@ -5,8 +5,13 @@
 \alias{snp}
 \title{Read SNP}
 \usage{
-ReadSNP(file, row.names = 1, preprocess = TRUE, fileFormat = NULL,
-  extralinestoskip = 0)
+ReadSNP(
+  file,
+  row.names = 1,
+  preprocess = TRUE,
+  fileFormat = NULL,
+  extralinestoskip = 0
+)
 }
 \arguments{
 \item{file}{A file name specified by either a variable or a double-quoted string (ie, file=""). Also accepts R objects that are data frames or matrices and converts to the class "snp".}
@@ -47,4 +52,3 @@ ReadSNP(fakeData)
 \seealso{
 \link{WriteSNP}
 }
-

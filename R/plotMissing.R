@@ -16,7 +16,7 @@
 #' plotMissing(myData, calc="sites")
 
 plotMissing <- function(SNPdataset, calc="loci", ...){
-  if(class(SNPdataset) == "snp")
+  if(inherits(SNPdataset, "snp"))
     SNPdataset <- SNPdataset$data
   numSpecies <- MakePresentAbsent(SNPdataset, calc=calc)
   sums <- apply(numSpecies, 2, sum)

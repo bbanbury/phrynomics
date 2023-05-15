@@ -25,4 +25,3 @@ RemoveMissingSpeciesLoci(fakeData, chatty=TRUE)
 \seealso{
 \link{ReadSNP} \link{WriteSNP} \link{GetSpecies} \link{IsMissingSpecies}
 }
-

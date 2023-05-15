@@ -31,4 +31,3 @@ cSNP(coolData)
 \seealso{
 \link{ReadSNP} \link{SplitSNP}
 }
-

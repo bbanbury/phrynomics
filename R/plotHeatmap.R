@@ -21,7 +21,7 @@
 #' plotHeatmap(exdata, colorMissing=TRUE, grid=FALSE, col="red", xaxisTicks=0, cex.axis=0.5)
 
 plotHeatmap <- function(SNPdataset, calc="loci", col="black", colorMissing=FALSE, grid=TRUE, xaxisTicks=10, ...) {
-  if(class(SNPdataset) == "snp")
+  if(inherits(SNPdataset, "snp"))
     SNPdataset <- SNPdataset$data
   if(calc == "sites"){
     SNPdataset <- SplitSNP(SNPdataset)

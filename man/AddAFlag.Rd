@@ -26,4 +26,3 @@ AddAFlag(fakeData, flagToAdd="WEST", taxa=c("in1", "in2", "in3"))
 \seealso{
 \link{ReadSNP} \link{WriteSNP} \link{ExportPops}
 }
-

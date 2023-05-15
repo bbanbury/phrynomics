@@ -13,7 +13,7 @@
 #' MakePresentAbsent(fakeData, "loci")
 
 MakePresentAbsent <- function(SNPdataset, calc="loci", missingChar="any"){
-  if(class(SNPdataset) == "snp")
+  if(inherits(SNPdataset, "snp"))
     SNPdataset <- SNPdataset$data
   if(calc == "sites"){
     SNPdataset <- SplitSNP(SNPdataset)

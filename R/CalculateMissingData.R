@@ -16,7 +16,7 @@ CalculateMissingData <- function(SNPdataset, calc="sites", missingChar="any"){
   if (missingChar == "any")
     missingChar <- c("N", "-", "?")
   char <- match.arg(arg=missingChar, choices=c("N", "-", "?"), several.ok=TRUE)
-  if(class(SNPdataset) == "snp")
+  if(inherits(SNPdataset, "snp"))
     SNPdataset <- SNPdataset$data 
   missingSites <- MakePresentAbsent(SNPdataset, calc=calc)
   PercentMissing <- apply(missingSites, 2, function(x) (length(x) - sum(x))/length(x))

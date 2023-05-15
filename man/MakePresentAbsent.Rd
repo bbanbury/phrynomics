@@ -27,4 +27,3 @@ MakePresentAbsent(fakeData, "loci")
 \seealso{
 \link{ReadSNP} \link{ConvertMissingData} \link{CalculateMissingData}
 }
-

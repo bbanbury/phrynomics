@@ -28,4 +28,3 @@ ConvertMissingData(fakeData, "any", "?")
 \seealso{
 \link{ReadSNP} \link{CalculateMissingData}
 }
-

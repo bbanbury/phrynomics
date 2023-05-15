@@ -25,4 +25,3 @@ RemoveNonBinary(fakeData, chatty=TRUE)
 \seealso{
 \link{ReadSNP} \link{WriteSNP} \link{RemoveInvariantSites} \link{IsBinary}
 }
-

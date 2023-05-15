@@ -22,4 +22,3 @@ IsVariable(c("A", "A", "A", "M"))
 \seealso{
 \link{ReadSNP} \link{WriteSNP}
 }
-

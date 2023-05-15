@@ -20,4 +20,3 @@ site 10: \tab "A", "G", "R", and "V" \tab Is Variable and binary. \cr
 docType data
 }
 \keyword{datasets}
-

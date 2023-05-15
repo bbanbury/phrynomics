@@ -22,4 +22,3 @@ IsBinary(c("A", "A", "Y"))
 \seealso{
 \link{ReadSNP} \link{WriteSNP} \link{IsVariable}
 }
-

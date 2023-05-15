@@ -21,4 +21,3 @@ This function reads in SNP datasets that are interleaved and converts them to da
 \seealso{
 \link{WriteSNP}
 }
-
