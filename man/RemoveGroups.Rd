@@ -24,4 +24,3 @@ RemoveGroups(fakeData, groupFlag ="in")
 \seealso{
 \link{ReadSNP} \link{WriteSNP}
 }
-

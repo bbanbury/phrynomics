@@ -29,4 +29,3 @@ IsMissingSpecies(fakeData[,3], Spnames)
 \seealso{
 \link{ReadSNP} \link{WriteSNP} \link{GetSpecies} \link{RemoveMissingSpeciesLoci}
 }
-

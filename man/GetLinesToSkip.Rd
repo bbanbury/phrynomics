@@ -23,4 +23,3 @@ GetLinesToSkip("example.phy")
 \seealso{
 \link{ReadSNP}
 }
-

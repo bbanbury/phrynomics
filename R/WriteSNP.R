@@ -20,14 +20,14 @@
 #' WriteSNP(fakeData, file="refakeData.nex", format="nexus")
 
 WriteSNP <- function(SNPdataset, file="", format="phylip", missing="N"){
-  if(class(SNPdataset) == "snp")
+  if(inherits(SNPdataset, "snp"))
     SNPdataset <- SNPdataset$data
   if(format == "phylip"){
     write(c(dim(SNPdataset)[1], sum(nchar(SNPdataset[1,]))), file=file)
     write.table(SNPdataset, file=file, quote=FALSE, append=TRUE, col.names=FALSE)
   }
   if(format == "nexus"){
-    if(class(SNPdataset) == "data.frame" || class(SNPdataset) == "matrix")
+    if(inherits(SNPdataset, "data.frame") || inherits(SNPdataset, "matrix"))
       if(dim(SNPdataset)[2] > 1)
         SNPdataset <- data.frame(apply(SNPdataset, 1, paste, collapse=""))
     nchars <- min(apply(SNPdataset, 1, nchar))

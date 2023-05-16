@@ -21,7 +21,7 @@
 
 TranslateBases <- function(SNPdataset, translateMissing=TRUE, translateMissingChar="-", ordered=FALSE){
   snpclass <- "table"
-  if(class(SNPdataset) == "snp"){
+  if(inherits(SNPdataset, "snp")){
     snpclass <- "snp"
     SNPdataset <- SNPdataset$data
   }

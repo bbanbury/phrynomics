@@ -30,7 +30,7 @@
 #' ReadSNP(fakeData)
 
 ReadSNP <- function(file, row.names=1, preprocess=TRUE, fileFormat=NULL, extralinestoskip=0){
-  if(class(file) == "character"){
+  if(inherits(file, "character")){
     inputFileType <- fileFormat
     if(is.null(inputFileType))
       inputFileType <- FileFormat(file)
@@ -43,7 +43,7 @@ ReadSNP <- function(file, row.names=1, preprocess=TRUE, fileFormat=NULL, extrali
     if (is.na(inputFileType))
       stop("Having a hard time reading the file")
   }
-  if(class(file) == "data.frame" || class(file) == "matrix"){ 
+  if(inherits(file, "data.frame")|| inherits(file, "matrix")){ 
     initializeTable <- data.frame(lapply(file, as.character), stringsAsFactors=FALSE)
     rownames(initializeTable) <- rownames(file)
   }

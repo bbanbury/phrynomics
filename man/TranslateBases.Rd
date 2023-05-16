@@ -4,8 +4,12 @@
 \alias{TranslateBases}
 \title{Translate Bases}
 \usage{
-TranslateBases(SNPdataset, translateMissing = TRUE,
-  translateMissingChar = "-", ordered = FALSE)
+TranslateBases(
+  SNPdataset,
+  translateMissing = TRUE,
+  translateMissingChar = "-",
+  ordered = FALSE
+)
 }
 \arguments{
 \item{SNPdataset}{SNP data in the class "matrix", "data.frame", or "snp"}
@@ -36,4 +40,3 @@ TranslateBases(fakeData, translateMissing=TRUE, ordered=TRUE)
 \seealso{
 \link{ReadSNP} \link{WriteSNP} \link{RemoveNonBinary}
 }
-

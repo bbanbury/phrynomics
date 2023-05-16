@@ -25,4 +25,3 @@ RemoveInvariantSites(fakeData, chatty=TRUE)
 \seealso{
 \link{ReadSNP} \link{WriteSNP} \link{IsVariable}
 }
-

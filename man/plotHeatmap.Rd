@@ -4,8 +4,15 @@
 \alias{plotHeatmap}
 \title{Plot SNP Missing Data Heatmap}
 \usage{
-plotHeatmap(SNPdataset, calc = "loci", col = "black",
-  colorMissing = FALSE, grid = TRUE, xaxisTicks = 10, ...)
+plotHeatmap(
+  SNPdataset,
+  calc = "loci",
+  col = "black",
+  colorMissing = FALSE,
+  grid = TRUE,
+  xaxisTicks = 10,
+  ...
+)
 }
 \arguments{
 \item{SNPdataset}{SNP dataset in the class "matrix", "data.frame", or "snp"}
@@ -37,4 +44,3 @@ plotHeatmap(exdata, colorMissing=TRUE, grid=FALSE, col="red", xaxisTicks=0, cex.
 \seealso{
 \link{ReadSNP} \link{CalculateMissingData} \link{PercentMissing}
 }
-

@@ -25,4 +25,3 @@ IsMissing(fakeData[1,3])
 \seealso{
 \link{ReadSNP} \link{MakePresentAbsent} \link{CalculateMissingData}
 }
-

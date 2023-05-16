@@ -26,4 +26,3 @@ ReturnUniqueBases(fakeData[,12])
 \seealso{
 \link{ReadSNP} \link{WriteSNP} \link{ReturnNucs}
 }
-

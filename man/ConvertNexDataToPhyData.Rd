@@ -18,4 +18,3 @@ This function will convert data from nexus formatting into phylip. Used internal
 \seealso{
 \link{ReadSNP}
 }
-

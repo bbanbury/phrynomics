@@ -26,4 +26,3 @@ FileFormat("example.nex")
 \seealso{
 \link{ReadSNP}
 }
-

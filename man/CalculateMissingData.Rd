@@ -27,4 +27,3 @@ CalculateMissingData(fakeData, calc="loci")
 \seealso{
 \link{ReadSNP} \link{SplitSNP}
 }
-

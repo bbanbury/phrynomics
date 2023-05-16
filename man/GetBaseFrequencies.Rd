@@ -25,4 +25,3 @@ GetBaseFrequencies(splitfakeData[,3])
 \seealso{
 \link{ReadSNP} \link{ReturnUniqueBases}
 }
-

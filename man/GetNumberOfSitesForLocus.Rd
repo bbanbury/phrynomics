@@ -26,4 +26,3 @@ GetNumberOfSitesForLocus(fakeData, 3)
 \seealso{
 \link{ReadSNP} \link{TakeSingleSNPfromEachLocus}
 }
-

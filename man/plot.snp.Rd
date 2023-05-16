@@ -27,4 +27,3 @@ plot(myData)
 \seealso{
 \link{ReadSNP} \link{summary.snp} \link{plotMissing}
 }
-

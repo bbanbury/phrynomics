@@ -17,7 +17,7 @@
 
 ReduceMinInd <- function(SNPdataset, calc="loci", threshold=0.9, missingChar="any", chatty=FALSE){
   snpclass <- "table"
-  if(class(SNPdataset) == "snp"){
+  if(inherits(SNPdataset, "snp")){
     snpclass <- "snp"
     SNPdataset <- SNPdataset$data
   }

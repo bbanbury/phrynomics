@@ -2,9 +2,8 @@
 % Please edit documentation in R/phrynomics.R
 \docType{package}
 \name{phrynomics}
-\alias{Phrynomics}
 \alias{phrynomics}
-\alias{phrynomics-package}
+\alias{Phrynomics}
 \title{phrynomics - Phylogenetic Genomics on Phrynosomatid Lizards}
 \description{
 A sweet set of SNP dataset maipulation tools. Initially designed to modify our phrynosomatid lizard datasets, the new phrynomics version should be able to modify any SNP datasets. The functions will read in sequences, check for variable and binary sites, remove of taxa or sites, and transform characters in various ways. There are options for exporting data to fit several popular phylogenetics programs (ex: RAxML, MrBayes, and SNAPP).
@@ -21,4 +20,3 @@ License: \tab GPL(>= 2) \cr
 \author{
 Barb Banbury & Adam Leache
 }
-

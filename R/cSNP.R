@@ -18,7 +18,7 @@
 
 cSNP <- function(splitSNP, KeepVector=NULL, maintainLoci=TRUE){
   snpclass <- "table"
-  if(class(splitSNP) == "snp"){
+  if(inherits(splitSNP, "snp")){
       snpclass <- "snp"
       splitSNP <- splitSNP$data
   }

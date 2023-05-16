@@ -27,4 +27,3 @@ str(b)
 \seealso{
 \link{ReadSNP} \link{WriteSNP} \link{summary.snp}
 }
-

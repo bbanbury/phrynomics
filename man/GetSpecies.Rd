@@ -25,4 +25,3 @@ GetSpecies(rownames(fakeData))
 \seealso{
 \link{ReadSNP} \link{IsMissingSpecies} \link{RemoveMissingSpeciesLoci}
 }
-

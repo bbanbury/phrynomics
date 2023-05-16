@@ -13,7 +13,7 @@
 #' GetNumberOfSitesForLocus(fakeData, 3)
 
 GetNumberOfSitesForLocus <- function(SNPdataset, locus){
-  if(class(SNPdataset) == "snp")
+  if(inherits(SNPdataset, "snp"))
     SNPdataset <- SNPdataset$data
   return(nchar(SNPdataset[1,])[locus])
 }

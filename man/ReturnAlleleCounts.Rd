@@ -29,4 +29,3 @@ lapply(splitfakeData, ReturnAlleleCounts)
 \seealso{
 \link{ReadSNP} \link{GetBaseFrequencies} \link{ExportPops}
 }
-
